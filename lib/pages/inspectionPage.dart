@@ -5,7 +5,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 class InspectionPage extends StatefulWidget {
   const InspectionPage({super.key});
-
   @override
   _InspectionPageState createState() => _InspectionPageState();
 }
@@ -18,14 +17,12 @@ class _InspectionPageState extends State<InspectionPage> {
     'Left Side': null,
     'Right Side': null,
   };
-  File? _rcImage; // To store the RC photo
+  File? _rcImage;
   bool _inspectionCanceled = false;
   bool _inspectionRescheduled = false;
-  int _currentIndex = 0; // To keep track of the selected tab
-
+  int _currentIndex = 0;
   String _transmission = 'Automatic';
   String _fuelType = 'Petrol';
-
   Future<void> _getImage(String side) async {
     final status = await Permission.camera.request();
     if (status.isGranted) {
@@ -67,7 +64,7 @@ class _InspectionPageState extends State<InspectionPage> {
     setState(() {
       _inspectionRescheduled = true;
     });
-    Navigator.pop(context); // Navigate back to the homepage
+    Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Inspection rescheduled'),
@@ -85,7 +82,6 @@ class _InspectionPageState extends State<InspectionPage> {
     );
   }
 
-  // Build the "Car Details" page
   Widget _buildCarDetailsPage() {
     return SingleChildScrollView(
       child: Column(

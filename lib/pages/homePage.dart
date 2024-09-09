@@ -18,6 +18,7 @@ class _HomepageState extends State<Homepage> {
       'car': 'ABC123',
       'salespersonName': 'Alice Johnson',
       'salespersonContact': '+1122334455',
+      'evaluationTime': '12:00 PM',
     },
     {
       'name': 'Jane Smith',
@@ -26,23 +27,9 @@ class _HomepageState extends State<Homepage> {
       'car': 'XYZ789',
       'salespersonName': 'Bob Brown',
       'salespersonContact': '+9988776655',
+      'evaluationTime': '1:30 PM',
     },
-    {
-      'name': 'Jane Smith',
-      'mobile': '+0987654321',
-      'location': 'Los Angeles',
-      'car': 'XYZ789',
-      'salespersonName': 'Bob Brown',
-      'salespersonContact': '+9988776655',
-    },
-    {
-      'name': 'Jane Smith',
-      'mobile': '+0987654321',
-      'location': 'Los Angeles',
-      'car': 'XYZ789',
-      'salespersonName': 'Bob Brown',
-      'salespersonContact': '+9988776655',
-    },
+    // Add more tasks here if needed
   ];
   late List<bool> isLoading;
 
@@ -223,13 +210,26 @@ class _HomepageState extends State<Homepage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Client: ${task['name']}',
-                                  style: const TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Client: ${task['name']}',
+                                      style: const TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    Text(
+                                      task['evaluationTime']!,
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 8.0),
                                 Text(
@@ -338,28 +338,15 @@ class _HomepageState extends State<Homepage> {
                                         ? null
                                         : () => _startInspection(index),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16.0),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
+                                      backgroundColor: const Color(0xFFB06AB3),
                                     ),
                                     child: isLoading[index]
-                                        ? const SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: CircularProgressIndicator())
-                                        : const Text(
-                                            'Start Inspection',
-                                            style: TextStyle(
-                                              fontSize:
-                                                  18.0, // Adjust font size
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
+                                        ? const CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          )
+                                        : const Text('Start Inspection'),
                                   ),
                                 ),
                               ],
