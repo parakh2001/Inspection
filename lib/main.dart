@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:inspection/pages/carDetails.dart';
 import 'package:inspection/pages/finalVerdict.dart';
 import 'package:inspection/pages/homePage.dart';
-import 'package:inspection/pages/inspectionPage.dart';
+// import 'package:inspection/pages/inspectionPage.dart';
 import 'package:inspection/pages/loginPage.dart';
 import 'package:inspection/pages/profilePage.dart';
 import 'package:inspection/pages/settingsPage.dart';
@@ -33,9 +33,6 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/settings': (context) => const SettingsPage(),
         '/inspection': (context) => const InspectionPage(),
-        // '/cardetails': (context) => const CarInspectionApp(task: {
-        //       'car': 'ABC123',
-        //     }),
         '/finalverdict': (context) => const Finalverdict(),
       },
     );

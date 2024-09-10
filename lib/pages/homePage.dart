@@ -1,12 +1,13 @@
+import 'package:geocoding/geocoding.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
   @override
   State<Homepage> createState() => _HomepageState();
 }
-
 class _HomepageState extends State<Homepage> {
   final int totalTasks = 7;
   int completedTasksCount = 0;
@@ -29,14 +30,67 @@ class _HomepageState extends State<Homepage> {
       'salespersonContact': '+9988776655',
       'evaluationTime': '1:30 PM',
     },
-    // Add more tasks here if needed
   ];
   late List<bool> isLoading;
+  String _userLocation = "Fetching location...";
 
   @override
   void initState() {
     super.initState();
     isLoading = List<bool>.filled(tasks.length, false);
+    _fetchUserLocation();
+  }
+
+  Future<void> _fetchUserLocation() async {
+    // Check if location services are enabled
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _userLocation = "Location services are disabled";
+      });
+      return;
+    }
+
+    // Request permission to access location
+    var status = await Permission.locationWhenInUse.request();
+    if (status.isGranted) {
+      try {
+        // Get current location
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+
+        // Reverse geocode to get address information
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        // Check if we got valid placemarks and update state
+        if (placemarks.isNotEmpty) {
+          Placemark placemark = placemarks.first;
+          setState(() {
+            _userLocation = placemark.locality ?? "Unknown location";
+          });
+        } else {
+          setState(() {
+            _userLocation = "Unable to determine location";
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _userLocation = "Error fetching location: $e";
+        });
+      }
+    } else if (status.isDenied) {
+      setState(() {
+        _userLocation = "Location permission denied";
+      });
+    } else if (status.isPermanentlyDenied) {
+      setState(() {
+        _userLocation = "Location permission permanently denied";
+      });
+    }
   }
 
   void _makeCall(String phoneNumber) async {
@@ -70,8 +124,6 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       isLoading[index] = true;
     });
-
-    // Simulate a delay for the loading process (replace with actual logic)
     await Future.delayed(const Duration(seconds: 2));
     setState(() {
       isLoading[index] = false;
@@ -85,9 +137,9 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Upcoming Tasks (${tasks.length})',
-          style: const TextStyle(
+        title: const Text(
+          'Upcoming Tasks',
+          style: TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -176,7 +228,17 @@ class _HomepageState extends State<Homepage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Your Location: $_userLocation',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16.0),
               LinearProgressIndicator(
                 value: completedTasksCount / totalTasks,
                 backgroundColor: Colors.grey[300],
@@ -249,9 +311,9 @@ class _HomepageState extends State<Homepage> {
                                 ),
                                 const SizedBox(height: 8.0),
                                 Text(
-                                  'Car Number: ${task['car']}',
+                                  'Car: ${task['car']}',
                                   style: const TextStyle(
-                                    fontSize: 18.0, // Increased font size
+                                    fontSize: 18.0,
                                     color: Colors.black54,
                                   ),
                                 ),
@@ -260,94 +322,38 @@ class _HomepageState extends State<Homepage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.phone,
-                                          color: Colors.green),
+                                    ElevatedButton.icon(
                                       onPressed: () =>
                                           _makeCall(task['mobile']!),
+                                      icon: const Icon(Icons.phone),
+                                      label: const Text('Call'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                      ),
                                     ),
-                                    IconButton(
-                                      icon: const Icon(Icons.message,
-                                          color: Colors.green),
+                                    ElevatedButton.icon(
                                       onPressed: () =>
                                           _sendWhatsAppMessage(task['mobile']!),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.location_on,
-                                          color: Colors.blue),
-                                      onPressed: () async {
-                                        final Uri locationUri = Uri(
-                                          scheme: 'geo',
-                                          path: '0,0',
-                                          queryParameters: {
-                                            'q': task['location']
-                                          },
-                                        );
-                                        if (await canLaunchUrl(locationUri)) {
-                                          await launchUrl(locationUri);
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                  'Unable to view location'),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.person,
-                                          color: Colors
-                                              .orange), // Salesperson icon
-                                      onPressed: () {
-                                        final salespersonName =
-                                            task['salespersonName'] ??
-                                                'Unknown';
-                                        final salespersonContact =
-                                            task['salespersonContact'] ??
-                                                'Unknown';
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: Text(
-                                                  'Salesperson: $salespersonName'),
-                                              content: Text(
-                                                  'Contact: $salespersonContact'),
-                                              actions: [
-                                                ElevatedButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: const Text('Close'),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
+                                      icon: const Icon(Icons.message),
+                                      label: const Text('WhatsApp'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                      ),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 16.0),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: isLoading[index]
-                                        ? null
-                                        : () => _startInspection(index),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFB06AB3),
-                                    ),
-                                    child: isLoading[index]
-                                        ? const CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                    Colors.white),
-                                          )
-                                        : const Text('Start Inspection'),
-                                  ),
+                                ElevatedButton(
+                                  onPressed: isLoading[index]
+                                      ? null
+                                      : () => _startInspection(index),
+                                  child: isLoading[index]
+                                      ? const CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        )
+                                      : const Text('Start Inspection'),
                                 ),
                               ],
                             ),

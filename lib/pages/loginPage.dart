@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:inspection/pages/homePage.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,20 +10,26 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
-
-  void forgotPassword() {
-    // Forgot password and password recovery
+  void forgotPassword() async {
+    final String email = usernameController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email')),
+      );
+      return;
+    }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset email sent')),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Failed to send reset email')),
+      );
+    }
   }
-
-  void googleSignIn() {
-    // Sign in using Gmail
-  }
-
-  void createAccount() {
-    // Handle create account logic here
-  }
-
-  void _login() {
+  void _login() async {
     final String email = usernameController.text.trim();
     final String password = passwordController.text.trim();
 
@@ -33,13 +40,24 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Placeholder logic for navigation without Firebase
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Homepage(),
-      ),
-    );
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Homepage(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Login failed')),
+      );
+    }
   }
 
   @override
@@ -133,20 +151,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 16.0),
               const Divider(color: Colors.black38),
-              const SizedBox(height: 16.0),
-              ElevatedButton.icon(
-                onPressed: googleSignIn,
-                icon: const Icon(Icons.login, color: Colors.white),
-                label: const Text('Sign in with Google'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
               const SizedBox(height: 16.0),
             ],
           ),
