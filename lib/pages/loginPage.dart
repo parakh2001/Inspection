@@ -1,15 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:inspection/pages/homePage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:inspection/screens/homePage.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
   _LoginPageState createState() => _LoginPageState();
 }
+
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isAutoLogin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  // Load saved credentials if available
+  void _loadSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString('email');
+    String? savedPassword = prefs.getString('password');
+    if (savedEmail != null && savedPassword != null) {
+      usernameController.text = savedEmail;
+      passwordController.text = savedPassword;
+      setState(() {
+        _isAutoLogin = true; // Update the flag to show auto-login option
+      });
+    }
+  }
+
+  // Save login credentials to shared preferences
+  void _saveCredentials(String email, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('password', password);
+  }
+
+  // Handle forgot password logic
   void forgotPassword() async {
     final String email = usernameController.text.trim();
     if (email.isEmpty) {
@@ -29,14 +62,18 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
-  void _login() async {
+
+  // Handle login logic
+  void _login({bool autoLogin = false}) async {
     final String email = usernameController.text.trim();
     final String password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in both fields')),
-      );
+      if (!autoLogin) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill in both fields')),
+        );
+      }
       return;
     }
 
@@ -47,6 +84,12 @@ class _LoginPageState extends State<LoginPage> {
         password: password,
       );
 
+      // Save credentials only if not in autoLogin mode
+      if (!autoLogin) {
+        _saveCredentials(email, password);
+      }
+
+      // Navigate to homepage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -54,9 +97,11 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Login failed')),
-      );
+      if (!autoLogin) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'Login failed')),
+        );
+      }
     }
   }
 

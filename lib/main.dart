@@ -3,11 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:inspection/pages/carDetails.dart';
 import 'package:inspection/pages/finalVerdict.dart';
-import 'package:inspection/pages/homePage.dart';
+import 'package:inspection/screens/homePage.dart';
 // import 'package:inspection/pages/inspectionPage.dart';
 import 'package:inspection/pages/loginPage.dart';
-import 'package:inspection/pages/profilePage.dart';
-import 'package:inspection/pages/settingsPage.dart';
+import 'package:inspection/screens/profilePage.dart';
+import 'package:inspection/screens/settingsPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

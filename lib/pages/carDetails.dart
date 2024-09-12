@@ -3,13 +3,11 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 class InspectionPage extends StatefulWidget {
   const InspectionPage({super.key});
   @override
   _InspectionPageState createState() => _InspectionPageState();
 }
-
 class _InspectionPageState extends State<InspectionPage> {
   final ImagePicker _picker = ImagePicker();
   Map<String, File?> _images = {
@@ -25,7 +23,6 @@ class _InspectionPageState extends State<InspectionPage> {
   String _transmission = 'Automatic';
   String _fuelType = 'Petrol';
   DateTime? _selectedDate;
-
   Future<void> _getImage(String side) async {
     final status = await Permission.camera.request();
     if (status.isGranted) {
@@ -46,13 +43,11 @@ class _InspectionPageState extends State<InspectionPage> {
       );
     }
   }
-
   bool _allImagesCaptured() {
     return !_inspectionCanceled &&
         !_inspectionRescheduled &&
         _images.values.every((image) => image != null);
   }
-
   bool _isPreviousImageCaptured(String currentKey) {
     List<String> keys = _images.keys.toList();
     int currentIndex = keys.indexOf(currentKey);
@@ -62,7 +57,6 @@ class _InspectionPageState extends State<InspectionPage> {
     String previousKey = keys[currentIndex - 1];
     return _images[previousKey] != null;
   }
-
   void _rescheduleInspection() {
     setState(() {
       _inspectionRescheduled = true;
@@ -74,7 +68,6 @@ class _InspectionPageState extends State<InspectionPage> {
       ),
     );
   }
-
   void _cancelInspection() {
     setState(() {
       _inspectionCanceled = true;
@@ -84,7 +77,6 @@ class _InspectionPageState extends State<InspectionPage> {
       const SnackBar(content: Text('Inspection cancelled')),
     );
   }
-
   Future<void> _saveCarDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(
@@ -99,12 +91,10 @@ class _InspectionPageState extends State<InspectionPage> {
     }
     await prefs.setString('transmission', _transmission);
     await prefs.setString('fuelType', _fuelType);
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Car details saved')),
     );
   }
-
   Widget _buildCarDetailsPage() {
     return SingleChildScrollView(
       child: Column(
@@ -239,7 +229,6 @@ class _InspectionPageState extends State<InspectionPage> {
       ),
     );
   }
-
   // Helper method to build text fields with icons
   Widget _buildTextField(String label, IconData icon) {
     return TextField(
@@ -252,7 +241,6 @@ class _InspectionPageState extends State<InspectionPage> {
       ),
     );
   }
-
   // Build the "Inspection" page
   Widget _buildInspectionPage() {
     return Column(
@@ -375,7 +363,6 @@ class _InspectionPageState extends State<InspectionPage> {
       ],
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -400,17 +387,14 @@ class _InspectionPageState extends State<InspectionPage> {
     );
   }
 }
-
 class InspectionConfirmationPage extends StatelessWidget {
   final File? rcImage;
   final Map<String, File?> images;
-
   const InspectionConfirmationPage({
     Key? key,
     required this.rcImage,
     required this.images,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

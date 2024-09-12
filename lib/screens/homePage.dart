@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
+
   @override
   State<Homepage> createState() => _HomepageState();
 }
+
 class _HomepageState extends State<Homepage> {
   final int totalTasks = 7;
   int completedTasksCount = 0;
+
   final List<Map<String, String>> tasks = [
     {
       'name': 'John Doe',
@@ -31,6 +35,7 @@ class _HomepageState extends State<Homepage> {
       'evaluationTime': '1:30 PM',
     },
   ];
+
   late List<bool> isLoading;
   String _userLocation = "Fetching location...";
 
@@ -42,7 +47,6 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> _fetchUserLocation() async {
-    // Check if location services are enabled
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       setState(() {
@@ -51,22 +55,18 @@ class _HomepageState extends State<Homepage> {
       return;
     }
 
-    // Request permission to access location
     var status = await Permission.locationWhenInUse.request();
     if (status.isGranted) {
       try {
-        // Get current location
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
 
-        // Reverse geocode to get address information
         List<Placemark> placemarks = await placemarkFromCoordinates(
           position.latitude,
           position.longitude,
         );
 
-        // Check if we got valid placemarks and update state
         if (placemarks.isNotEmpty) {
           Placemark placemark = placemarks.first;
           setState(() {
@@ -118,6 +118,33 @@ class _HomepageState extends State<Homepage> {
         const SnackBar(content: Text('Unable to send WhatsApp message')),
       );
     }
+  }
+
+  void _showSalespersonDetails(String name, String contact) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Salesperson Details"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Name: $name"),
+              Text("Contact: $contact"),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _startInspection(int index) async {
@@ -297,24 +324,24 @@ class _HomepageState extends State<Homepage> {
                                 Text(
                                   'Mobile: ${task['mobile']}',
                                   style: const TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.black54,
+                                    fontSize: 16.0,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 8.0),
                                 Text(
                                   'Location: ${task['location']}',
                                   style: const TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.black54,
+                                    fontSize: 16.0,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 8.0),
                                 Text(
                                   'Car: ${task['car']}',
                                   style: const TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.black54,
+                                    fontSize: 16.0,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 16.0),
@@ -322,42 +349,43 @@ class _HomepageState extends State<Homepage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    ElevatedButton.icon(
+                                    IconButton(
                                       onPressed: () =>
                                           _makeCall(task['mobile']!),
-                                      icon: const Icon(Icons.phone),
-                                      label: const Text('Call'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
-                                      ),
+                                      icon: const Icon(Icons.phone,
+                                          color: Color(0xFF3498DB)),
                                     ),
-                                    ElevatedButton.icon(
+                                    IconButton(
                                       onPressed: () =>
                                           _sendWhatsAppMessage(task['mobile']!),
-                                      icon: const Icon(Icons.message),
-                                      label: const Text('WhatsApp'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green,
+                                      icon: const Icon(Icons.message,
+                                          color: Color(0xFF25D366)),
+                                    ),
+                                    IconButton(
+                                      onPressed: () => _showSalespersonDetails(
+                                        task['salespersonName']!,
+                                        task['salespersonContact']!,
                                       ),
+                                      icon: const Icon(Icons.info,
+                                          color: Colors.orange),
                                     ),
                                   ],
-                                ),
-                                const SizedBox(height: 16.0),
-                                ElevatedButton(
-                                  onPressed: isLoading[index]
-                                      ? null
-                                      : () => _startInspection(index),
-                                  child: isLoading[index]
-                                      ? const CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
-                                        )
-                                      : const Text('Start Inspection'),
                                 ),
                               ],
                             ),
                           ),
+                        ),
+                        ElevatedButton(
+                          onPressed: isLoading[index]
+                              ? null
+                              : () => _startInspection(index),
+                          child: isLoading[index]
+                              ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                )
+                              : const Text('Start Inspection'),
                         ),
                       ],
                     );
