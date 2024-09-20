@@ -8,13 +8,11 @@ import 'package:inspection/screens/homePage.dart';
 import 'package:inspection/pages/loginPage.dart';
 import 'package:inspection/screens/profilePage.dart';
 import 'package:inspection/screens/settingsPage.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
