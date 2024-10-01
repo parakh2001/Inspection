@@ -91,86 +91,6 @@ class _InspectionPageState extends State<InspectionPage> {
     );
   }
 
-  Future<void> _saveCarDetailsToFirebase() async {
-    // // Save car details to SharedPreferences (optional)
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // await prefs.setString('rcDetails', 'RC details here');
-    // await prefs.setString('make', 'Make here');
-    // await prefs.setString('model', 'Model here');
-    // await prefs.setString('variant', 'Variant here');
-    // if (_selectedDate != null) {
-    //   await prefs.setString(
-    //       'makeYearMonth', '${_selectedDate!.year}/${_selectedDate!.month}');
-    // }
-    // await prefs.setString('transmission', _transmission);
-    // await prefs.setString('fuelType', _fuelType);
-
-    // Save details to Firebase
-    final String key = _dbRef.push().key!;
-
-    // Save images to Firebase Storage
-    String? rcImageUrl;
-    if (_rcImage != null) {
-      rcImageUrl = await _uploadImageToFirebase(_rcImage!, 'RC_$key.jpg');
-    }
-
-    Map<String, String?> imageUrls = {};
-    for (var side in _images.keys) {
-      if (_images[side] != null) {
-        String? url =
-            await _uploadImageToFirebase(_images[side]!, '${side}_$key.jpg');
-        imageUrls[side] = url;
-      }
-    }
-
-    // Save data to Firebase Realtime Database
-    await _dbRef.child(key).set({
-      'rcDetails': 'RC details here',
-      'make': 'Make here',
-      'model': 'Model here',
-      'variant': 'Variant here',
-      'makeYearMonth': _selectedDate != null
-          ? '${_selectedDate!.year}/${_selectedDate!.month}'
-          : '',
-      'transmission': _transmission,
-      'fuelType': _fuelType,
-      'rcImageUrl': rcImageUrl,
-      'images': imageUrls,
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Car details and images saved to Firebase')),
-    );
-  }
-
-  Future<String?> _uploadImageToFirebase(File image, String fileName) async {
-    try {
-      final Reference storageRef =
-          FirebaseStorage.instance.ref().child('inspection_images/$fileName');
-      final UploadTask uploadTask = storageRef.putFile(image);
-
-      // Monitor the upload task to get more details in case of failure
-      final TaskSnapshot snapshot = await uploadTask.whenComplete(() {});
-
-      if (snapshot.state == TaskState.success) {
-        // If upload succeeds, return the download URL
-        final String downloadURL = await snapshot.ref.getDownloadURL();
-        return downloadURL;
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image upload failed')),
-        );
-        return null;
-      }
-    } catch (e) {
-      // Improved error handling
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error uploading $fileName: $e')),
-      );
-      return null;
-    }
-  }
-
   final _formKey = GlobalKey<FormState>();
 
   Widget _buildCarDetailsPage() {
@@ -209,7 +129,7 @@ class _InspectionPageState extends State<InspectionPage> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  _saveCarDetailsToFirebase();
+                  // _saveCarDetailsToFirebase();
                 }
               },
               child: const Text('Save Car Details'),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:inspection/pages/carDetails.dart';
 import 'package:inspection/pages/loginPage.dart';
-import 'package:inspection/screens/profilePage.dart';
 import 'package:inspection/screens/settingsPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../model/lead.dart';
@@ -14,11 +14,40 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   final DatabaseReference _database = FirebaseDatabase.instance.ref('leads');
   late Future<List<Lead>> _futureLeads;
-
   @override
   void initState() {
     super.initState();
     _futureLeads = _fetchLeads(); // Fetch leads initially
+  }
+
+  Future<void> _updateLeadStatus(String leadId, String newStatus) async {
+    try {
+      await _database.child(leadId).update({
+        'lead_status': newStatus,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lead status updated to $newStatus')),
+      );
+      _refreshLeads(); // Refresh leads after status update
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating lead status: $e')),
+      );
+    }
+  }
+
+  Future<void> _contactSalesperson(String salespersonId) async {
+    // Example implementation: Open the phone dialer
+    final Uri url = Uri(
+        scheme: 'tel',
+        path: 'salesperson_phone_number'); // Replace with actual logic
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch contact')),
+      );
+    }
   }
 
   void _launchMap(String address) async {
@@ -131,9 +160,6 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen size
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -146,7 +172,8 @@ class _HomepageState extends State<Homepage> {
           ],
         ),
         drawer: Container(
-          width: screenWidth > 600 ? 300 : 250, // Responsive drawer width
+          width: MediaQuery.of(context).size.width *
+              0.75, // Set drawer width to 75% of screen width
           child: Drawer(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -167,7 +194,9 @@ class _HomepageState extends State<Homepage> {
                         'Gowaggon',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 20
+                              : 24, // Adjust font size for smaller screens
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -176,19 +205,27 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Profile'),
+                  title: Text('Profile',
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 16
+                              : 18)), // Responsive font size
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(),
+                        builder: (context) => InspectionPage(),
                       ),
                     );
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.settings),
-                  title: Text('Settings'),
+                  title: Text('Settings',
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 16
+                              : 18)), // Responsive font size
                   onTap: () {
                     Navigator.push(
                       context,
@@ -200,7 +237,11 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.logout),
-                  title: Text('Logout'),
+                  title: Text('Logout',
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 16
+                              : 18)), // Responsive font size
                   onTap: () {
                     // Perform logout logic here
                     Navigator.pushReplacement(
@@ -221,13 +262,10 @@ class _HomepageState extends State<Homepage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
-
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
-
             final leads = snapshot.data ?? [];
-
             return Column(
               children: [
                 // Lead Count Section (below AppBar)
@@ -327,34 +365,83 @@ class _HomepageState extends State<Homepage> {
                                                 lead.carTransmission),
                                             const SizedBox(width: 5),
                                             Text(
-                                              lead.carFuelType ?? 'N/A',
+                                              lead.carVariant,
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 fontSize: 14,
                                               ),
                                             ),
-                                            const SizedBox(width: 5),
-                                            _buildCarIcon(lead.carFuelType),
                                           ],
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () =>
-                                              _launchMap(lead.customerAddress),
-                                          child: const Text('Navigate'),
+                                    const SizedBox(height: 8),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          _makeCall(lead.customerMobileNumber),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.phone,
+                                              color: Colors.blue),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            lead.customerMobileNumber,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.blueAccent,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          _launchMap(lead.customerAddress),
+                                      child: const Text(
+                                        'View on Google Maps',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.blueAccent,
+                                          decoration: TextDecoration.underline,
                                         ),
-                                        ElevatedButton(
-                                          onPressed: () => _makeCall(
-                                              lead.customerMobileNumber),
-                                          child: const Text('Call'),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Lead Type: ${lead.leadRank}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const Divider(height: 20, thickness: 1),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Navigate to the Inspection Page
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const InspectionPage()), // Replace with your actual InspectionPage widget
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blueAccent,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 20),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
-                                      ],
+                                      ),
+                                      child: const Text(
+                                        'Start Inspection',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -5,6 +5,7 @@ import 'package:inspection/screens/homePage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -107,97 +108,103 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Login',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 32.0),
-              TextField(
-                controller: usernameController,
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  labelStyle: TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueAccent),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              TextField(
-                controller: passwordController,
-                obscureText: _obscurePassword,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: const TextStyle(color: Colors.black54),
-                  border: const OutlineInputBorder(),
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.blueAccent),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.black54,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                child: const Text(
+    return WillPopScope(
+      onWillPop: () async {
+        // Prevent the back button from doing anything
+        return false;
+      },
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
                   'Login',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8.0),
-              TextButton(
-                onPressed: forgotPassword,
-                child: const Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: Colors.black54),
+                const SizedBox(height: 32.0),
+                TextField(
+                  controller: usernameController,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    labelStyle: TextStyle(color: Colors.black54),
+                    border: OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blueAccent),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16.0),
-              const Divider(color: Colors.black38),
-              const SizedBox(height: 16.0),
-            ],
+                const SizedBox(height: 16.0),
+                TextField(
+                  controller: passwordController,
+                  obscureText: _obscurePassword,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    labelStyle: const TextStyle(color: Colors.black54),
+                    border: const OutlineInputBorder(),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blueAccent),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.black54,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(fontSize: 18.0, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                TextButton(
+                  onPressed: forgotPassword,
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                const Divider(color: Colors.black38),
+                const SizedBox(height: 16.0),
+              ],
+            ),
           ),
         ),
       ),
