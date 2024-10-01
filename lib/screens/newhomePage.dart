@@ -82,7 +82,8 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  Widget _buildCarIcon(String fuelType) {
+  Widget _buildCarIcon(String? fuelType) {
+    print('Fuel Type: $fuelType'); // Check the value
     switch (fuelType) {
       case 'Petrol':
         return Icon(Icons.local_gas_station, color: Colors.red);
@@ -95,166 +96,198 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  Widget _buildTransmissionIcon(String transmission) {
-    return Icon(transmission == 'Automatic' ? Icons.autorenew : Icons.drive_eta,
-        color: Colors.blue);
+  Widget _buildTransmissionIcon(String? transmission) {
+    print('Transmission: $transmission'); // Check the value
+
+    if (transmission == null) {
+      return Icon(Icons.error, color: Colors.grey); // Fallback in case of null
+    }
+
+    return Icon(
+      transmission == 'Automatic' ? Icons.autorenew : Icons.drive_eta,
+      color: Colors.blue,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Leads',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: leads.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: leads.length,
-              itemBuilder: (context, index) {
-                final lead = leads[index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Top Row: Customer Info + 3-dot menu
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    lead.customerName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.black87,
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            // Lead Count Section (below AppBar)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Upcoming Leads: ${leads.length} of 7',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Expanded(
+              child: leads.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: leads.length,
+                      itemBuilder: (context, index) {
+                        final lead = leads[index];
+                        return Card(
+                          margin: const EdgeInsets.all(8),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Top Row: Customer Info + 3-dot menu
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            lead.customerName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Evaluation Time: ${lead.evaluationTime}',
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.more_vert),
+                                      onPressed: () {
+                                        // Show options or menu
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Customer City: ${lead.customerCity}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Car Info
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.directions_car,
+                                            color: Colors
+                                                .blue), // Generic car icon
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          'Car: ${lead.carModel} (${lead.carCompany})',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        _buildTransmissionIcon(
+                                            lead.carTransmission),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          lead.carVariant,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: () =>
+                                      _makeCall(lead.customerMobileNumber),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.phone,
+                                          color: Colors.blue),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        lead.customerMobileNumber,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.blueAccent,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                GestureDetector(
+                                  onTap: () => _launchMap(lead.customerAddress),
+                                  child: const Text(
+                                    'View on Google Maps',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.blueAccent,
+                                      decoration: TextDecoration.underline,
                                     ),
                                   ),
-                                  Text(
-                                    'Evaluation Time: ${lead.evaluationTime}',
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.red),
+                                ),
+                                const Divider(height: 20, thickness: 1),
+                                // Start Inspection Button
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Add your inspection logic here
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 20),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.more_vert),
-                              onPressed: () {
-                                // Show options or menu
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Customer City: ${lead.customerCity}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Car Info
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                _buildCarIcon(lead.carFuelType),
-                                const SizedBox(width: 5),
-                                Text(
-                                  'Car: ${lead.carModel} (${lead.carCompany})',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14),
+                                  child: const Text(
+                                    'Start Inspection',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                _buildTransmissionIcon(lead.carTransmission),
-                                const SizedBox(width: 5),
-                                Text(
-                                  lead.carVariant,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Address and Contact
-                        GestureDetector(
-                          onTap: () => _makeCall(lead.customerMobileNumber),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.phone, color: Colors.blue),
-                              const SizedBox(width: 5),
-                              Text(
-                                lead.customerMobileNumber,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.blueAccent,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: () => _launchMap(lead.customerAddress),
-                          child: const Text(
-                            'View on Google Maps',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.blueAccent,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                        const Divider(height: 20, thickness: 1),
-                        // Start Inspection Button
-                        ElevatedButton(
-                          onPressed: () {
-                            // Add your inspection logic here
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            'Start Inspection',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
-                );
-              },
             ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -24,7 +24,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _checkLoginStatus();
   }
-
   Future<void> _checkLoginStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
