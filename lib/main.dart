@@ -1,21 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:inspection/screens/newhomePage.dart';
+import 'package:inspection/screens/homePage.dart';
 import 'package:inspection/pages/loginPage.dart';
 import 'package:inspection/screens/profilePage.dart';
 import 'package:inspection/screens/settingsPage.dart';
 import 'package:inspection/pages/finalVerdict.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
   _MyAppState createState() => _MyAppState();
 }
+
 class _MyAppState extends State<MyApp> {
   // Variable to hold the initial screen
   Widget _initialScreen = const CircularProgressIndicator();
@@ -24,6 +27,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _checkLoginStatus();
   }
+
   Future<void> _checkLoginStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
@@ -36,6 +40,7 @@ class _MyAppState extends State<MyApp> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

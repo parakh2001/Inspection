@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:inspection/screens/newhomePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:inspection/screens/homePage.dart';
 
