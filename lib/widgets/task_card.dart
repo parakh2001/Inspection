@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class TaskCard extends StatelessWidget {
   final Map<String, String> task;
   final VoidCallback onCall;
@@ -7,7 +6,6 @@ class TaskCard extends StatelessWidget {
   final VoidCallback onSalespersonDetails;
   final VoidCallback onStartInspection;
   final bool isLoading;
-
   const TaskCard({
     required this.task,
     required this.onCall,
@@ -17,13 +15,11 @@ class TaskCard extends StatelessWidget {
     required this.isLoading,
     Key? key,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     IconData getTransmissionIcon(String type) {
       return type == 'Automatic' ? Icons.directions_car : Icons.settings;
     }
-
     IconData getFuelIcon(String variant) {
       switch (variant) {
         case 'Petrol':
@@ -36,7 +32,6 @@ class TaskCard extends StatelessWidget {
           return Icons.error;
       }
     }
-
     return Column(
       children: [
         Card(
