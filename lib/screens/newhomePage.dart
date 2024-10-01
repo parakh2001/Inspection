@@ -18,17 +18,6 @@ class _HomepageState extends State<Homepage> {
     _fetchLeads();
   }
 
-  Future<Map<dynamic, dynamic>> fetchCustomerData(String customerId) async {
-    final DatabaseReference ref = FirebaseDatabase.instance.ref();
-    final DataSnapshot snapshot = await ref.child('customer/$customerId').get();
-    if (snapshot.exists) {
-      return snapshot.value as Map<dynamic, dynamic>;
-    } else {
-      print('No customer data found for $customerId');
-      return {};
-    }
-  }
-
   Future<void> _fetchLeads() async {
     final snapshot = await _database.once();
     final data = snapshot.snapshot.value as Map<dynamic, dynamic>?;
@@ -56,22 +45,40 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  void _launchCaller(String phoneNumber) async {
-    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
-    } else {
-      throw 'Could not launch $url';
+  void _launchMap(String address) async {
+    if (address.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Address is empty')),
+      );
+      return;
+    }
+
+    final Uri url = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
+
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch the map')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error launching map: $e')),
+      );
     }
   }
 
-  void _launchMap(String address) async {
-    final Uri url = Uri.parse(
-        'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
+  void _makeCall(String phoneNumber) async {
+    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
-      throw 'Could not launch $url';
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch dialer')),
+      );
     }
   }
 
@@ -110,16 +117,17 @@ class _HomepageState extends State<Homepage> {
               itemBuilder: (context, index) {
                 final lead = leads[index];
                 return Card(
-                  margin: const EdgeInsets.all(10),
-                  elevation: 8,
+                  margin: const EdgeInsets.all(8),
+                  elevation: 4,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Top Row: Customer Info + 3-dot menu
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -127,101 +135,102 @@ class _HomepageState extends State<Homepage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Customer Name:',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                        color: Colors.blue),
+                                  Text(
+                                    lead.customerName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                   Text(
-                                    '${lead.customerName}',
+                                    'Evaluation Time: ${lead.evaluationTime}',
                                     style: const TextStyle(
-                                        fontSize: 16, color: Colors.black87),
+                                        fontSize: 14, color: Colors.red),
                                   ),
                                 ],
                               ),
                             ),
-                            Text(
-                              'Evaluation Time: ${lead.evaluationTime}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.red),
+                            IconButton(
+                              icon: Icon(Icons.more_vert),
+                              onPressed: () {
+                                // Show options or menu
+                              },
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         Text(
                           'Customer City: ${lead.customerCity}',
                           style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 16),
+                              fontWeight: FontWeight.w500, fontSize: 14),
                         ),
-                        Text(
-                          'Customer Address: ${lead.customerAddress}',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 16),
-                        ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
+
+                        // Car Info
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(Icons.phone, color: Colors.blue),
-                            const SizedBox(width: 10),
-                            GestureDetector(
-                              onTap: () =>
-                                  _launchCaller(lead.customerMobileNumber),
-                              child: Text(
-                                '${lead.customerMobileNumber}',
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.blueAccent),
-                              ),
+                            Row(
+                              children: [
+                                _buildCarIcon(lead.carFuelType),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Car: ${lead.carModel} (${lead.carCompany})',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                _buildTransmissionIcon(lead.carTransmission),
+                                const SizedBox(width: 5),
+                                Text(
+                                  lead.carVariant,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
+
+                        // Address and Contact
+                        GestureDetector(
+                          onTap: () => _makeCall(lead.customerMobileNumber),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.phone, color: Colors.blue),
+                              const SizedBox(width: 5),
+                              Text(
+                                lead.customerMobileNumber,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.blueAccent,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         GestureDetector(
                           onTap: () => _launchMap(lead.customerAddress),
                           child: const Text(
                             'View on Google Maps',
                             style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.blueAccent,
-                                decoration: TextDecoration.underline),
+                              fontSize: 14,
+                              color: Colors.blueAccent,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
-                        const Divider(
-                            height: 30, thickness: 1, color: Colors.grey),
-                        Text(
-                          'Car Details:',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.blueGrey),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            _buildCarIcon(lead.carFuelType),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Car Number: ${lead.carNumber}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            _buildTransmissionIcon(lead.carTransmission),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Car Model: ${lead.carModel}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
+                        const Divider(height: 20, thickness: 1),
+                        // Start Inspection Button
                         ElevatedButton(
                           onPressed: () {
                             // Add your inspection logic here
@@ -229,15 +238,15 @@ class _HomepageState extends State<Homepage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blueAccent,
                             padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
+                                vertical: 8, horizontal: 20),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           child: const Text(
                             'Start Inspection',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],

@@ -24,6 +24,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _checkLoginStatus();
   }
+
   Future<void> _checkLoginStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
@@ -47,8 +48,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
-          child:
-              _initialScreen, // Show the initial screen based on login status
+          child: _initialScreen,
         ),
       ),
       routes: {
