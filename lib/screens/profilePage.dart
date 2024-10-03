@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
   // Get the logged-in user's email
   String? getCurrentUserEmail() {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -85,6 +86,9 @@ class ProfilePage extends StatelessWidget {
                   }
 
                   final evaluator = evaluatorSnapshot.data!;
+                  final String evaluatorId = evaluator['evaluator_id'] ??
+                      'N/A'; // Dynamic evaluator_id
+
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -100,15 +104,12 @@ class ProfilePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8.0),
                         Text(
-                          'ID: ${evaluator['evaluator_id'] ?? 'N/A'}',
+                          'ID: $evaluatorId', // Use dynamic evaluator_id
                           style: const TextStyle(
-                            fontSize: 18.0, // Increase the font size
-                            fontWeight:
-                                FontWeight.w600, // Make the text a bit bolder
-                            color: Colors
-                                .white, // Change the text color for better contrast
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                             shadows: [
-                              // Adding a shadow for better readability
                               Shadow(
                                 color: Colors.black26,
                                 offset: Offset(1.0, 1.0),
@@ -116,7 +117,6 @@ class ProfilePage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          textAlign: TextAlign.left, // Align text to the left
                         ),
                         const SizedBox(height: 24.0),
                         Container(
@@ -163,7 +163,7 @@ class ProfilePage extends StatelessWidget {
                               ProfileDetail(
                                 icon: Icons.email,
                                 title: 'Email Id',
-                                value: _getCities(evaluator['evaluator_email']),
+                                value: evaluator['evaluator_email'] ?? 'N/A',
                               ),
                             ],
                           ),
@@ -182,11 +182,9 @@ class ProfilePage extends StatelessWidget {
       return 'No cities available';
     }
     if (locations is List<dynamic>) {
-      // If locations is a list of cities
       return locations.map((city) => city.toString()).join(', ');
     }
     if (locations is String) {
-      // If locations is a single string
       return locations;
     }
     return 'Unknown format';

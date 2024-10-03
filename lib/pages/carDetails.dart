@@ -1,246 +1,105 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../model/car_doc.dart';
 
-class InspectionPage extends StatefulWidget {
-  const InspectionPage({super.key});
+class CarDetailsPage extends StatefulWidget {
+  final String? carId; // If editing existing data, carId should be passed
+  const CarDetailsPage({Key? key, this.carId}) : super(key: key);
+
   @override
-  _InspectionPageState createState() => _InspectionPageState();
+  _CarDetailsPageState createState() => _CarDetailsPageState();
 }
 
-class _InspectionPageState extends State<InspectionPage> {
-  final ImagePicker _picker = ImagePicker();
-  Map<String, File?> _images = {
-    'Front': null,
-    'Back': null,
-    'Left Side': null,
-    'Right Side': null,
-  };
-  File? _rcImage;
-  bool _inspectionCanceled = false;
-  bool _inspectionRescheduled = false;
-  int _currentIndex = 0;
-  String _transmission = 'Automatic';
-  String _fuelType = 'Petrol';
-  DateTime? _selectedDate;
+class _CarDetailsPageState extends State<CarDetailsPage> {
+  late DatabaseReference _database;
+  int _selectedIndex = 0; // To keep track of the selected page
 
-  final DatabaseReference _dbRef =
-      FirebaseDatabase.instance.ref().child('inspections');
+  // Text controllers for car details
+  final TextEditingController _rcNumberController = TextEditingController();
+  final TextEditingController _mfgYearMonthController = TextEditingController();
+  final TextEditingController _carMakeController = TextEditingController();
+  final TextEditingController _carModelController = TextEditingController();
+  final TextEditingController _fuelTypeController = TextEditingController();
+  final TextEditingController _transmissionController = TextEditingController();
+  final TextEditingController _ownersController = TextEditingController();
+  final TextEditingController _engineNumberController = TextEditingController();
 
-  Future<void> _getImage(String side) async {
-    final status = await Permission.camera.request();
-    if (status.isGranted) {
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.camera);
-      if (pickedFile != null) {
+  bool _hsrpAvailable = false;
+  bool _isChassisNumberOk = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _database = FirebaseDatabase.instance.ref('inspection');
+
+    if (widget.carId != null) {
+      _loadCarData(); // Load data if carId is passed (for editing)
+    }
+  }
+
+  // Load existing data if carId is provided
+  void _loadCarData() async {
+    if (widget.carId != null) {
+      final dataSnapshot = await _database.child(widget.carId!).get();
+      if (dataSnapshot.exists) {
+        final carData = CarDoc.fromMap(dataSnapshot.value as Map);
         setState(() {
-          if (side == 'RC') {
-            _rcImage = File(pickedFile.path);
-          } else {
-            _images[side] = File(pickedFile.path);
-          }
+          _rcNumberController.text = carData.rcDetails.rcNumber;
+          _mfgYearMonthController.text = carData.carDetails.mfgYearMonth;
+          _carMakeController.text = carData.carDetails.carMake;
+          _carModelController.text = carData.carDetails.carModel;
+          _fuelTypeController.text = carData.carDetails.fuelType;
+          _transmissionController.text = carData.carDetails.transmission;
+          _ownersController.text = carData.others.owners.toString();
+          _engineNumberController.text = carData.others.engineNumber;
+          _hsrpAvailable = carData.others.hsrpAvailable;
+          _isChassisNumberOk = carData.others.isChassisNumberOk;
         });
       }
+    }
+  }
+
+  // Save data to Firebase
+  void _saveCarDetails() async {
+    final newCarDoc = CarDoc(
+      rcDetails: RcDetails(
+        rcNumber: _rcNumberController.text,
+        rcImage:
+            'https://someimageurl.com', // Replace with actual logic for image
+      ),
+      carDetails: CarDetails(
+        mfgYearMonth: _mfgYearMonthController.text,
+        carMake: _carMakeController.text,
+        carModel: _carModelController.text,
+        fuelType: _fuelTypeController.text,
+        transmission: _transmissionController.text,
+        images:
+            'https://someimageurl.com', // Replace with actual logic for image
+      ),
+      registrationDetails: RegistrationDetails(
+        registrationYearMonth: _mfgYearMonthController.text,
+      ),
+      others: Others(
+        owners: int.parse(_ownersController.text),
+        hsrpAvailable: _hsrpAvailable,
+        engineNumber: _engineNumberController.text,
+        isChassisNumberOk: _isChassisNumberOk,
+        chassisNumberImage: 'https://someimageurl.com',
+        noOfKeys: 2, // Example static data, you can replace
+        images: [
+          'https://someimageurl.com'
+        ], // Replace with logic for multiple images
+      ),
+    );
+
+    if (widget.carId != null) {
+      await _database.child(widget.carId!).set(newCarDoc.toMap());
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Camera permission denied')),
-      );
+      await _database.push().set(newCarDoc.toMap());
     }
-  }
 
-  bool _allImagesCaptured() {
-    return !_inspectionCanceled &&
-        !_inspectionRescheduled &&
-        _images.values.every((image) => image != null);
-  }
-
-  bool _isPreviousImageCaptured(String currentKey) {
-    List<String> keys = _images.keys.toList();
-    int currentIndex = keys.indexOf(currentKey);
-    if (currentIndex == 0) {
-      return true;
-    }
-    String previousKey = keys[currentIndex - 1];
-    return _images[previousKey] != null;
-  }
-
-  void _rescheduleInspection() {
-    setState(() {
-      _inspectionRescheduled = true;
-    });
-    Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Inspection rescheduled'),
-      ),
-    );
-  }
-
-  void _cancelInspection() {
-    setState(() {
-      _inspectionCanceled = true;
-    });
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Inspection cancelled')),
-    );
-  }
-
-  final _formKey = GlobalKey<FormState>();
-
-  Widget _buildCarDetailsPage() {
-    return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            const Text(
-              'Car Details',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            GestureDetector(
-              onTap: () => _getImage('RC'),
-              child: _rcImage == null
-                  ? Container(
-                      height: 150,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.camera_alt,
-                          size: 50, color: Colors.grey),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.file(_rcImage!),
-                    ),
-            ),
-            const SizedBox(height: 20),
-            _buildTextField('RC Details', Icons.article, true),
-            _buildTextField('Make', Icons.business, true),
-            _buildTextField('Model', Icons.directions_car, true),
-            _buildTextField('Variant', Icons.build, false),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // _saveCarDetailsToFirebase();
-                }
-              },
-              child: const Text('Save Car Details'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, IconData icon, bool isRequired) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      validator: (value) {
-        if (isRequired && (value == null || value.isEmpty)) {
-          return 'Please enter $label';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildInspectionPage() {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            children: _images.keys.map((side) {
-              return Card(
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 10.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$side View',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4568DC),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _images[side] == null
-                          ? GestureDetector(
-                              onTap: () {
-                                if (_isPreviousImageCaptured(side)) {
-                                  _getImage(side);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Capture previous images first'),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  size: 100,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.file(_images[side]!),
-                            ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: _allImagesCaptured()
-              ? () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Inspection completed')),
-                  );
-                }
-              : null,
-          child: const Text('Complete Inspection'),
-        ),
-        ElevatedButton(
-          onPressed: _cancelInspection,
-          child: const Text('Cancel Inspection'),
-        ),
-        ElevatedButton(
-          onPressed: _rescheduleInspection,
-          child: const Text('Reschedule Inspection'),
-        ),
-      ],
+      const SnackBar(content: Text('Car Details Saved!')),
     );
   }
 
@@ -248,20 +107,20 @@ class _InspectionPageState extends State<InspectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inspection Page'),
+        title: Text('Inspection'),
       ),
       body: IndexedStack(
-        index: _currentIndex,
+        index: _selectedIndex,
         children: [
-          _buildCarDetailsPage(),
-          _buildInspectionPage(),
+          _buildCarDetailsPage(), // Car Details Page
+          _buildInspectionPage(), // Inspection Page
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
-            _currentIndex = index;
+            _selectedIndex = index; // Update the selected index
           });
         },
         items: const [
@@ -270,10 +129,91 @@ class _InspectionPageState extends State<InspectionPage> {
             label: 'Car Details',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fact_check),
-            label: 'Inspection Page',
+            icon: Icon(Icons.assignment),
+            label: 'Inspection',
           ),
         ],
+      ),
+    );
+  }
+
+  // Method to build the Car Details section
+  Widget _buildCarDetailsPage() {
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        _buildExpansionTile('RC Details', [
+          _buildTextField(_rcNumberController, 'RC Number'),
+        ]),
+        _buildExpansionTile('Car Details', [
+          _buildTextField(_mfgYearMonthController, 'Manufacturing Year/Month'),
+          _buildTextField(_carMakeController, 'Car Make'),
+          _buildTextField(_carModelController, 'Car Model'),
+          _buildTextField(_fuelTypeController, 'Fuel Type'),
+          _buildTextField(_transmissionController, 'Transmission Type'),
+        ]),
+        _buildExpansionTile('Other Details', [
+          _buildTextField(_ownersController, 'Number of Owners',
+              isNumber: true),
+          _buildTextField(_engineNumberController, 'Engine Number'),
+          SwitchListTile(
+            title: const Text('HSRP Available'),
+            value: _hsrpAvailable,
+            onChanged: (val) {
+              setState(() {
+                _hsrpAvailable = val;
+              });
+            },
+          ),
+          SwitchListTile(
+            title: const Text('Chassis Number OK'),
+            value: _isChassisNumberOk,
+            onChanged: (val) {
+              setState(() {
+                _isChassisNumberOk = val;
+              });
+            },
+          ),
+        ]),
+        ElevatedButton(
+          onPressed: _saveCarDetails,
+          child: const Text('Save Car Details'),
+        ),
+      ],
+    );
+  }
+
+  // Dummy Inspection Page
+  Widget _buildInspectionPage() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.assignment_turned_in, size: 100, color: Colors.blue),
+          SizedBox(height: 20),
+          Text('Inspection Page', style: TextStyle(fontSize: 24)),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to create text fields
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      {bool isNumber = false}) {
+    return TextField(
+      controller: controller,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      decoration: InputDecoration(labelText: labelText),
+    );
+  }
+
+  // Helper method to create sections with an expandable tile
+  Widget _buildExpansionTile(String title, List<Widget> children) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ExpansionTile(
+        title: Text(title, style: Theme.of(context).textTheme.headlineLarge),
+        children: children,
       ),
     );
   }

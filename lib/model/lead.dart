@@ -41,7 +41,7 @@ class Lead {
     required this.carTransmission,
     required this.carCompany,
   });
-  factory Lead.fromJson(Map<String, dynamic> leadData,
+  factory Lead.fromJson(Map<dynamic, dynamic> leadData,
       Map<dynamic, dynamic> customerData, Map<dynamic, dynamic> carData) {
     return Lead(
       carId: leadData['car_id'] ?? 'N/A',

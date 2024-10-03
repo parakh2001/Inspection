@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:inspection/pages/carDetails.dart';
 import 'package:inspection/pages/loginPage.dart';
+import 'package:inspection/screens/profilePage.dart';
 import 'package:inspection/screens/settingsPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../model/lead.dart';
@@ -17,7 +18,7 @@ class _HomepageState extends State<Homepage> {
   @override
   void initState() {
     super.initState();
-    _futureLeads = _fetchLeads(); // Fetch leads initially
+    _futureLeads = _fetchLeads();
   }
 
   Future<void> _updateLeadStatus(String leadId, String newStatus) async {
@@ -214,7 +215,7 @@ class _HomepageState extends State<Homepage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => InspectionPage(),
+                        builder: (context) => ProfilePage(),
                       ),
                     );
                   },
@@ -237,13 +238,13 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.logout),
-                  title: Text('Logout',
-                      style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width < 600
-                              ? 16
-                              : 18)), // Responsive font size
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 16 : 18),
+                  ),
                   onTap: () {
-                    // Perform logout logic here
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -268,7 +269,6 @@ class _HomepageState extends State<Homepage> {
             final leads = snapshot.data ?? [];
             return Column(
               children: [
-                // Lead Count Section (below AppBar)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
@@ -426,7 +426,7 @@ class _HomepageState extends State<Homepage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const InspectionPage()), // Replace with your actual InspectionPage widget
+                                                  CarDetailsPage()),
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
