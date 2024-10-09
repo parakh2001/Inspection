@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import '../model/car_doc.dart';
 
 class CarDetailsPage extends StatefulWidget {
@@ -12,9 +16,8 @@ class CarDetailsPage extends StatefulWidget {
 
 class _CarDetailsPageState extends State<CarDetailsPage> {
   late DatabaseReference _database;
+  late FirebaseStorage _storage;
   int _selectedIndex = 0; // To keep track of the selected page
-
-  // Text controllers for car details
   final TextEditingController _rcNumberController = TextEditingController();
   final TextEditingController _mfgYearMonthController = TextEditingController();
   final TextEditingController _carMakeController = TextEditingController();
@@ -26,14 +29,16 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
   bool _hsrpAvailable = false;
   bool _isChassisNumberOk = false;
-
+  String _rcImageUrl = ''; // URL for the RC image
+  String _engineImageUrl = ''; // URL for the engine image
+  final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
     super.initState();
     _database = FirebaseDatabase.instance.ref('inspection');
-
+    _storage = FirebaseStorage.instance;
     if (widget.carId != null) {
-      _loadCarData(); // Load data if carId is passed (for editing)
+      _loadCarData();
     }
   }
 
@@ -54,7 +59,42 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           _engineNumberController.text = carData.others.engineNumber;
           _hsrpAvailable = carData.others.hsrpAvailable;
           _isChassisNumberOk = carData.others.isChassisNumberOk;
+          _rcImageUrl = carData.rcDetails.rcImage; // Load existing image URL
+          _engineImageUrl =
+              carData.others.engineImage; // Load existing engine image URL
         });
+      }
+    }
+  }
+
+  // Method to capture and upload an image
+  Future<void> _captureImage(bool isRc) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      final file = File(image.path);
+      String filePath =
+          '/inspection/car_doc/images/${DateTime.now().millisecondsSinceEpoch}.png';
+
+      try {
+        final ref = _storage.ref().child(filePath);
+        await ref.putFile(file);
+        String downloadUrl = await ref.getDownloadURL();
+
+        setState(() {
+          if (isRc) {
+            _rcImageUrl = downloadUrl; // Update RC image URL
+          } else {
+            _engineImageUrl = downloadUrl; // Update engine image URL
+          }
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image Uploaded!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload image: $e')),
+        );
       }
     }
   }
@@ -64,8 +104,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     final newCarDoc = CarDoc(
       rcDetails: RcDetails(
         rcNumber: _rcNumberController.text,
-        rcImage:
-            'https://someimageurl.com', // Replace with actual logic for image
+        rcImage: _rcImageUrl, // Save the RC image URL
       ),
       carDetails: CarDetails(
         mfgYearMonth: _mfgYearMonthController.text,
@@ -73,8 +112,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
         carModel: _carModelController.text,
         fuelType: _fuelTypeController.text,
         transmission: _transmissionController.text,
-        images:
-            'https://someimageurl.com', // Replace with actual logic for image
+        images: 'https://someimageurl.com',
       ),
       registrationDetails: RegistrationDetails(
         registrationYearMonth: _mfgYearMonthController.text,
@@ -85,19 +123,16 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
         engineNumber: _engineNumberController.text,
         isChassisNumberOk: _isChassisNumberOk,
         chassisNumberImage: 'https://someimageurl.com',
-        noOfKeys: 2, // Example static data, you can replace
-        images: [
-          'https://someimageurl.com'
-        ], // Replace with logic for multiple images
+        noOfKeys: 2,
+        images: ['https://someimageurl.com'],
+        engineImage: _engineImageUrl, // Save the engine image URL
       ),
     );
-
     if (widget.carId != null) {
       await _database.child(widget.carId!).set(newCarDoc.toMap());
     } else {
       await _database.push().set(newCarDoc.toMap());
     }
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Car Details Saved!')),
     );
@@ -107,20 +142,20 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Inspection'),
+        title: const Text('Inspection'),
       ),
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          _buildCarDetailsPage(), // Car Details Page
-          _buildInspectionPage(), // Inspection Page
+          _buildCarDetailsPage(),
+          _buildInspectionPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
-            _selectedIndex = index; // Update the selected index
+            _selectedIndex = index;
           });
         },
         items: const [
@@ -144,6 +179,15 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       children: [
         _buildExpansionTile('RC Details', [
           _buildTextField(_rcNumberController, 'RC Number'),
+          // Button to capture RC image
+          ElevatedButton(
+            onPressed: () => _captureImage(true), // Capture RC image
+            child: const Text('Capture RC Image'),
+          ),
+          if (_rcImageUrl.isNotEmpty) ...[
+            Image.network(_rcImageUrl,
+                height: 150, fit: BoxFit.cover), // Display RC image
+          ],
         ]),
         _buildExpansionTile('Car Details', [
           _buildTextField(_mfgYearMonthController, 'Manufacturing Year/Month'),
@@ -156,6 +200,15 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           _buildTextField(_ownersController, 'Number of Owners',
               isNumber: true),
           _buildTextField(_engineNumberController, 'Engine Number'),
+          // Button to capture Engine image
+          ElevatedButton(
+            onPressed: () => _captureImage(false), // Capture engine image
+            child: const Text('Capture Engine Image'),
+          ),
+          if (_engineImageUrl.isNotEmpty) ...[
+            Image.network(_engineImageUrl,
+                height: 150, fit: BoxFit.cover), // Display engine image
+          ],
           SwitchListTile(
             title: const Text('HSRP Available'),
             value: _hsrpAvailable,
@@ -176,45 +229,35 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           ),
         ]),
         ElevatedButton(
-          onPressed: _saveCarDetails,
-          child: const Text('Save Car Details'),
+          onPressed: _saveCarDetails, // Save button
+          child: const Text('Save Details'),
         ),
       ],
     );
   }
 
-  // Dummy Inspection Page
-  Widget _buildInspectionPage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.assignment_turned_in, size: 100, color: Colors.blue),
-          SizedBox(height: 20),
-          Text('Inspection Page', style: TextStyle(fontSize: 24)),
-        ],
-      ),
+  // Build an ExpansionTile for better UI organization
+  Widget _buildExpansionTile(String title, List<Widget> children) {
+    return ExpansionTile(
+      title: Text(title),
+      children: children,
     );
   }
 
-  // Helper method to create text fields
-  Widget _buildTextField(TextEditingController controller, String labelText,
+  // Build a text field with controller and label
+  Widget _buildTextField(TextEditingController controller, String label,
       {bool isNumber = false}) {
     return TextField(
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(labelText: labelText),
+      decoration: InputDecoration(labelText: label),
     );
   }
 
-  // Helper method to create sections with an expandable tile
-  Widget _buildExpansionTile(String title, List<Widget> children) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ExpansionTile(
-        title: Text(title, style: Theme.of(context).textTheme.headlineLarge),
-        children: children,
-      ),
+  // Method to build the Inspection page
+  Widget _buildInspectionPage() {
+    return Center(
+      child: const Text('Inspection Page'),
     );
   }
 }

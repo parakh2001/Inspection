@@ -17,7 +17,6 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 class _MyAppState extends State<MyApp> {
-  // Variable to hold the initial screen
   Widget _initialScreen = const CircularProgressIndicator();
   @override
   void initState() {
@@ -28,10 +27,8 @@ class _MyAppState extends State<MyApp> {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
       if (user != null) {
-        // User is signed in, show homepage
         _initialScreen = Homepage();
       } else {
-        // User is not signed in, show login page
         _initialScreen = const LoginPage();
       }
     });

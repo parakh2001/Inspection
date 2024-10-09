@@ -26,10 +26,14 @@ class _HomepageState extends State<Homepage> {
       await _database.child(leadId).update({
         'lead_status': newStatus,
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lead status updated to $newStatus')),
+        SnackBar(
+          content: Text('Lead status updated to $newStatus'),
+        ),
       );
-      _refreshLeads(); // Refresh leads after status update
+
+      _refreshLeads();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error updating lead status: $e')),
@@ -39,9 +43,7 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> _contactSalesperson(String salespersonId) async {
     // Example implementation: Open the phone dialer
-    final Uri url = Uri(
-        scheme: 'tel',
-        path: 'salesperson_phone_number'); // Replace with actual logic
+    final Uri url = Uri(scheme: 'tel', path: 'salesperson_phone_number');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -112,12 +114,10 @@ class _HomepageState extends State<Homepage> {
     List<Lead> leads = [];
     if (data != null) {
       List<Future<void>> futures = [];
-
       for (var entry in data.entries) {
         final leadData = Map<String, dynamic>.from(entry.value);
         String customerId = leadData['customer_id'];
         String carId = leadData['car_id'];
-
         // Fetch customer and car data
         futures.add(FirebaseDatabase.instance
             .ref('customer/$customerId')
@@ -138,24 +138,24 @@ class _HomepageState extends State<Homepage> {
                 : {};
             Lead lead = Lead.fromJson(leadData, customerData, carData);
             // Filter leads with lead_rank as 'L3'
-            if (lead.leadRank == 'L3') {
+            if (lead.leadRank == 'L3' &&
+                (lead.leadStatus == "Pending" ||
+                    lead.leadStatus == "pending" ||
+                    lead.leadStatus == "PENDING")) {
               leads.add(lead);
             }
           });
         }));
       }
-
       // Wait for all futures to complete
       await Future.wait(futures);
     }
-
     return leads;
   }
 
   void _refreshLeads() {
     setState(() {
-      _futureLeads =
-          _fetchLeads(); // Refresh leads by calling the fetch function again
+      _futureLeads = _fetchLeads();
     });
   }
 
@@ -168,13 +168,12 @@ class _HomepageState extends State<Homepage> {
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: _refreshLeads, // Refresh button
+              onPressed: _refreshLeads,
             ),
           ],
         ),
         drawer: Container(
-          width: MediaQuery.of(context).size.width *
-              0.75, // Set drawer width to 75% of screen width
+          width: MediaQuery.of(context).size.width * 0.75,
           child: Drawer(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -195,9 +194,8 @@ class _HomepageState extends State<Homepage> {
                         'Gowaggon',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: MediaQuery.of(context).size.width < 600
-                              ? 20
-                              : 24, // Adjust font size for smaller screens
+                          fontSize:
+                              MediaQuery.of(context).size.width < 600 ? 20 : 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -206,11 +204,12 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Profile',
-                      style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width < 600
-                              ? 16
-                              : 18)), // Responsive font size
+                  title: Text(
+                    'Profile',
+                    style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 16 : 18),
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -222,11 +221,12 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.settings),
-                  title: Text('Settings',
-                      style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width < 600
-                              ? 16
-                              : 18)), // Responsive font size
+                  title: Text(
+                    'Settings',
+                    style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 16 : 18),
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -261,7 +261,9 @@ class _HomepageState extends State<Homepage> {
           future: _futureLeads,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
@@ -282,7 +284,9 @@ class _HomepageState extends State<Homepage> {
                 ),
                 Expanded(
                   child: leads.isEmpty
-                      ? const Center(child: Text('No upcoming leads'))
+                      ? const Center(
+                          child: Text('No upcoming leads'),
+                        )
                       : ListView.builder(
                           itemCount: leads.length,
                           itemBuilder: (context, index) {
@@ -298,6 +302,7 @@ class _HomepageState extends State<Homepage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // Inside the ListView.builder where you have the three-dot icon
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -324,14 +329,31 @@ class _HomepageState extends State<Homepage> {
                                             ],
                                           ),
                                         ),
-                                        IconButton(
-                                          icon: const Icon(Icons.more_vert),
-                                          onPressed: () {
-                                            // Show options or menu
+                                        // Replace the IconButton with PopupMenuButton
+                                        PopupMenuButton<String>(
+                                          onSelected: (String value) {
+                                            if (value == 'Reschedule') {
+                                              _updateLeadStatus(
+                                                  lead.leadId, 'Rescheduled');
+                                            } else if (value == 'Cancel') {
+                                              _updateLeadStatus(
+                                                  lead.leadId, 'Cancelled');
+                                            }
                                           },
+                                          itemBuilder: (BuildContext context) {
+                                            return {'Reschedule', 'Cancel'}
+                                                .map((String choice) {
+                                              return PopupMenuItem<String>(
+                                                value: choice,
+                                                child: Text(choice),
+                                              );
+                                            }).toList();
+                                          },
+                                          icon: const Icon(Icons.more_vert),
                                         ),
                                       ],
                                     ),
+
                                     const SizedBox(height: 8),
                                     Text(
                                       'City: ${lead.customerCity}',
@@ -421,12 +443,12 @@ class _HomepageState extends State<Homepage> {
                                     const Divider(height: 20, thickness: 1),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Navigate to the Inspection Page
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CarDetailsPage()),
+                                            builder: (context) =>
+                                                CarDetailsPage(),
+                                          ),
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(

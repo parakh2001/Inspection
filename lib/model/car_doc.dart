@@ -149,6 +149,7 @@ class Others {
   final String chassisNumberImage;
   final int noOfKeys;
   final List<String> images;
+  final String engineImage;
 
   Others({
     required this.owners,
@@ -158,29 +159,32 @@ class Others {
     required this.chassisNumberImage,
     required this.noOfKeys,
     required this.images,
+    required this.engineImage,
   });
 
-  factory Others.fromMap(Map<dynamic, dynamic> data) {
+  factory Others.fromMap(Map<dynamic, dynamic> map) {
     return Others(
-      owners: data['owners'] ?? 0,
-      hsrpAvailable: data['hsrp_available'] ?? false,
-      engineNumber: data['engine_number'] ?? '',
-      isChassisNumberOk: data['isChassisNumberOk'] ?? false,
-      chassisNumberImage: data['chassisNumberImage'] ?? '',
-      noOfKeys: data['noOfKeys'] ?? 0,
-      images: List<String>.from(data['images'] ?? []),
+      owners: map['owners'] ?? 0,
+      hsrpAvailable: map['hsrpAvailable'] ?? false,
+      engineNumber: map['engineNumber'] ?? '',
+      isChassisNumberOk: map['isChassisNumberOk'] ?? false,
+      chassisNumberImage: map['chassisNumberImage'] ?? '',
+      noOfKeys: map['noOfKeys'] ?? 0,
+      images: List<String>.from(map['images'] ?? []),
+      engineImage: map['engineImage'] ?? '',
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'owners': owners,
-      'hsrp_available': hsrpAvailable,
-      'engine_number': engineNumber,
+      'hsrpAvailable': hsrpAvailable,
+      'engineNumber': engineNumber,
       'isChassisNumberOk': isChassisNumberOk,
       'chassisNumberImage': chassisNumberImage,
       'noOfKeys': noOfKeys,
       'images': images,
+      'engineImage': engineImage,
     };
   }
 }
