@@ -1,0 +1,185 @@
+import 'package:flutter/material.dart';
+
+class Inspection {
+  final String carId;
+  final CarDocDetails carDoc;
+
+  Inspection({
+    required this.carId,
+    required this.carDoc,
+  });
+
+  factory Inspection.fromMap(Map<dynamic, dynamic> data) {
+    return Inspection(
+      carId: data['car_id'] ?? '',
+      carDoc: CarDocDetails.fromMap(data['car_doc']),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'car_id': carId,
+      'car_doc': carDoc.toMap(),
+    };
+  }
+}
+
+class CarDocDetails {
+  final RcDetails rcDetails;
+  final CarDetail carDetails;
+  final RegistrationDetails registrationDetails;
+  final Others others;
+
+  CarDocDetails({
+    required this.rcDetails,
+    required this.carDetails,
+    required this.registrationDetails,
+    required this.others,
+  });
+
+  factory CarDocDetails.fromMap(Map<dynamic, dynamic> data) {
+    return CarDocDetails(
+      rcDetails: RcDetails.fromMap(data['rc_details']),
+      carDetails: CarDetail.fromMap(data['car_details']),
+      registrationDetails: RegistrationDetails.fromMap(data['registration_details']),
+      others: Others.fromMap(data['others']),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'rc_details': rcDetails.toMap(),
+      'car_details': carDetails.toMap(),
+      'registration_details': registrationDetails.toMap(),
+      'others': others.toMap(),
+    };
+  }
+}
+
+class RcDetails {
+  final String rcNumber;
+  final String rcImage;
+
+  RcDetails({
+    required this.rcNumber,
+    required this.rcImage,
+  });
+
+  factory RcDetails.fromMap(Map<dynamic, dynamic> data) {
+    return RcDetails(
+      rcNumber: data['rc_number'] ?? '',
+      rcImage: data['rc_image'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'rc_number': rcNumber,
+      'rc_image': rcImage,
+    };
+  }
+}
+
+class CarDetail {
+  final String mfgYearMonth;
+  final String carMake;
+  final String carModel;
+  final String fuelType;
+  final String transmission;
+  final String images;
+
+  CarDetail({
+    required this.mfgYearMonth,
+    required this.carMake,
+    required this.carModel,
+    required this.fuelType,
+    required this.transmission,
+    required this.images,
+  });
+
+  factory CarDetail.fromMap(Map<dynamic, dynamic> data) {
+    return CarDetail(
+      mfgYearMonth: data['mfg_year_month'] ?? '',
+      carMake: data['car_make'] ?? '',
+      carModel: data['car_model'] ?? '',
+      fuelType: data['fuel_type'] ?? '',
+      transmission: data['transmission'] ?? '',
+      images: data['images'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'mfg_year_month': mfgYearMonth,
+      'car_make': carMake,
+      'car_model': carModel,
+      'fuel_type': fuelType,
+      'transmission': transmission,
+      'images': images,
+    };
+  }
+}
+
+class RegistrationDetails {
+  final String registrationYearMonth;
+
+  RegistrationDetails({
+    required this.registrationYearMonth,
+  });
+
+  factory RegistrationDetails.fromMap(Map<dynamic, dynamic> data) {
+    return RegistrationDetails(
+      registrationYearMonth: data['registration_year_month'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'registration_year_month': registrationYearMonth,
+    };
+  }
+}
+
+class Others {
+  final int owners;
+  final bool hsrpAvailable;
+  final String engineNumber;
+  final bool isChassisNumberOk;
+  final String chassisNumberImage;
+  final int noOfKeys;
+  final List<String> images;
+
+  Others({
+    required this.owners,
+    required this.hsrpAvailable,
+    required this.engineNumber,
+    required this.isChassisNumberOk,
+    required this.chassisNumberImage,
+    required this.noOfKeys,
+    required this.images,
+  });
+
+  factory Others.fromMap(Map<dynamic, dynamic> data) {
+    return Others(
+      owners: data['owners'] ?? 0,
+      hsrpAvailable: data['hsrp_available'] ?? false,
+      engineNumber: data['engine_number'] ?? '',
+      isChassisNumberOk: data['isChassisNumberOk'] ?? false,
+      chassisNumberImage: data['chassisNumberImage'] ?? '',
+      noOfKeys: data['noOfKeys'] ?? 0,
+      images: List<String>.from(data['images'] ?? []),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'owners': owners,
+      'hsrp_available': hsrpAvailable,
+      'engine_number': engineNumber,
+      'isChassisNumberOk': isChassisNumberOk,
+      'chassisNumberImage': chassisNumberImage,
+      'noOfKeys': noOfKeys,
+      'images': images,
+    };
+  }
+}

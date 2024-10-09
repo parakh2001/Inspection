@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "669110726884",
+    "firebase_url": "https://gowaggon-default-rtdb.firebaseio.com",
+    "project_id": "gowaggon",
+    "storage_bucket": "gowaggon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669110726884:android:23f09bcd7834cf1f1cfcf1",
+        "android_client_info": {
+          "package_name": "com.example.dealer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCddTE17vjCzLmlIJdlGgXsglI6y6OIlRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669110726884:android:33647288d9c3a36d1cfcf1",
+        "android_client_info": {
+          "package_name": "com.example.inspection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCddTE17vjCzLmlIJdlGgXsglI6y6OIlRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669110726884:android:9c2359dddec8226a1cfcf1",
+        "android_client_info": {
+          "package_name": "com.gowaggon.car.inspection.inspection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCddTE17vjCzLmlIJdlGgXsglI6y6OIlRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669110726884:android:d44b2e9791f2ce811cfcf1",
+        "android_client_info": {
+          "package_name": "com.gowaggon.dealer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCddTE17vjCzLmlIJdlGgXsglI6y6OIlRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669110726884-5081bikcpfin4ni9vou24hbjfo0kqrbr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
