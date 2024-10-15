@@ -26,13 +26,17 @@ class CarDetails {
         reMarks: reMarks ?? this.reMarks,
       );
 
-  factory CarDetails.fromJson(String str) => CarDetails.fromMap(json.decode(str));
+  factory CarDetails.fromJson(String str) =>
+      CarDetails.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory CarDetails.fromMap(Map<String, dynamic> json) => CarDetails(
-        carDoc: json["car_doc"] == null ? null : CarDoc.fromMap(json["car_doc"]),
-        carHealth: json["car_health"] == null ? null : CarHealth.fromMap(json["car_health"]),
+        carDoc:
+            json["car_doc"] == null ? null : CarDoc.fromMap(json["car_doc"]),
+        carHealth: json["car_health"] == null
+            ? null
+            : CarHealth.fromMap(json["car_health"]),
         carId: json["car_id"],
         reMarks: json["reMarks"],
       );
@@ -76,10 +80,16 @@ class CarDoc {
   String toJson() => json.encode(toMap());
 
   factory CarDoc.fromMap(Map<String, dynamic> json) => CarDoc(
-        carDetails: json["car_details"] == null ? null : CarDetailsClass.fromMap(json["car_details"]),
+        carDetails: json["car_details"] == null
+            ? null
+            : CarDetailsClass.fromMap(json["car_details"]),
         others: json["others"] == null ? null : Others.fromMap(json["others"]),
-        rcDetails: json["rc_details"] == null ? null : RcDetails.fromMap(json["rc_details"]),
-        registrationDetails: json["registration_details"] == null ? null : RegistrationDetails.fromMap(json["registration_details"]),
+        rcDetails: json["rc_details"] == null
+            ? null
+            : RcDetails.fromMap(json["rc_details"]),
+        registrationDetails: json["registration_details"] == null
+            ? null
+            : RegistrationDetails.fromMap(json["registration_details"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -124,7 +134,8 @@ class CarDetailsClass {
         transmission: transmission ?? this.transmission,
       );
 
-  factory CarDetailsClass.fromJson(String str) => CarDetailsClass.fromMap(json.decode(str));
+  factory CarDetailsClass.fromJson(String str) =>
+      CarDetailsClass.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -193,7 +204,9 @@ class Others {
         chassisNumberImage: json["chassisNumberImage"],
         engineNumber: json["engine_number"],
         hsrpAvailable: json["hsrp_available"],
-        images: json["images"] == null ? [] : List<String>.from(json["images"]!.map((x) => x)),
+        images: json["images"] == null
+            ? []
+            : List<String>.from(json["images"]!.map((x) => x)),
         isChassisNumberOk: json["isChassisNumberOk"],
         noOfKeys: json["noOfKeys"],
         owners: json["owners"],
@@ -203,7 +216,8 @@ class Others {
         "chassisNumberImage": chassisNumberImage,
         "engine_number": engineNumber,
         "hsrp_available": hsrpAvailable,
-        "images": images == null ? [] : List<dynamic>.from(images!.map((x) => x)),
+        "images":
+            images == null ? [] : List<dynamic>.from(images!.map((x) => x)),
         "isChassisNumberOk": isChassisNumberOk,
         "noOfKeys": noOfKeys,
         "owners": owners,
@@ -254,14 +268,17 @@ class RegistrationDetails {
     String? registrationYearMonth,
   }) =>
       RegistrationDetails(
-        registrationYearMonth: registrationYearMonth ?? this.registrationYearMonth,
+        registrationYearMonth:
+            registrationYearMonth ?? this.registrationYearMonth,
       );
 
-  factory RegistrationDetails.fromJson(String str) => RegistrationDetails.fromMap(json.decode(str));
+  factory RegistrationDetails.fromJson(String str) =>
+      RegistrationDetails.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory RegistrationDetails.fromMap(Map<String, dynamic> json) => RegistrationDetails(
+  factory RegistrationDetails.fromMap(Map<String, dynamic> json) =>
+      RegistrationDetails(
         registrationYearMonth: json["registration_year_month"],
       );
 
@@ -325,16 +342,31 @@ class CarHealth {
   String toJson() => json.encode(toMap());
 
   factory CarHealth.fromMap(Map<String, dynamic> json) => CarHealth(
-        battery: json["battery"] == null ? null : Battery.fromMap(json["battery"]),
+        battery:
+            json["battery"] == null ? null : Battery.fromMap(json["battery"]),
         engine: json["engine"] == null ? null : Engine.fromMap(json["engine"]),
         extra: json["extra"] == null ? null : Extra.fromMap(json["extra"]),
-        frontSide: json["front_side"] == null ? null : FrontSide.fromMap(json["front_side"]),
-        interior1: json["interior-1"] == null ? null : Interior1.fromMap(json["interior-1"]),
-        interior2: json["interior-2"] == null ? null : Interior2.fromMap(json["interior-2"]),
-        leftSide: json["left_side"] == null ? null : LeftSide.fromMap(json["left_side"]),
-        rearSide: json["rear_side"] == null ? null : RearSide.fromMap(json["rear_side"]),
-        rightSide: json["right_side"] == null ? null : RightSide.fromMap(json["right_side"]),
-        testDrive: json["test_drive"] == null ? null : TestDrive.fromMap(json["test_drive"]),
+        frontSide: json["front_side"] == null
+            ? null
+            : FrontSide.fromMap(json["front_side"]),
+        interior1: json["interior-1"] == null
+            ? null
+            : Interior1.fromMap(json["interior-1"]),
+        interior2: json["interior-2"] == null
+            ? null
+            : Interior2.fromMap(json["interior-2"]),
+        leftSide: json["left_side"] == null
+            ? null
+            : LeftSide.fromMap(json["left_side"]),
+        rearSide: json["rear_side"] == null
+            ? null
+            : RearSide.fromMap(json["rear_side"]),
+        rightSide: json["right_side"] == null
+            ? null
+            : RightSide.fromMap(json["right_side"]),
+        testDrive: json["test_drive"] == null
+            ? null
+            : TestDrive.fromMap(json["test_drive"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -421,7 +453,9 @@ class Engine {
   String toJson() => json.encode(toMap());
 
   factory Engine.fromMap(Map<String, dynamic> json) => Engine(
-        staticEngineOn: json["static_engine_on"] == null ? null : StaticEngineOn.fromMap(json["static_engine_on"]),
+        staticEngineOn: json["static_engine_on"] == null
+            ? null
+            : StaticEngineOn.fromMap(json["static_engine_on"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -452,26 +486,41 @@ class StaticEngineOn {
     Videos? videos,
   }) =>
       StaticEngineOn(
-        checkForAtGearBoxLeakages: checkForAtGearBoxLeakages ?? this.checkForAtGearBoxLeakages,
-        checkForEngineLeakages: checkForEngineLeakages ?? this.checkForEngineLeakages,
-        checkForEnginePerformances: checkForEnginePerformances ?? this.checkForEnginePerformances,
-        checkForManualGearBoxLeakages: checkForManualGearBoxLeakages ?? this.checkForManualGearBoxLeakages,
+        checkForAtGearBoxLeakages:
+            checkForAtGearBoxLeakages ?? this.checkForAtGearBoxLeakages,
+        checkForEngineLeakages:
+            checkForEngineLeakages ?? this.checkForEngineLeakages,
+        checkForEnginePerformances:
+            checkForEnginePerformances ?? this.checkForEnginePerformances,
+        checkForManualGearBoxLeakages:
+            checkForManualGearBoxLeakages ?? this.checkForManualGearBoxLeakages,
         videos: videos ?? this.videos,
       );
 
-  factory StaticEngineOn.fromJson(String str) => StaticEngineOn.fromMap(json.decode(str));
+  factory StaticEngineOn.fromJson(String str) =>
+      StaticEngineOn.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory StaticEngineOn.fromMap(Map<String, dynamic> json) => StaticEngineOn(
         checkForAtGearBoxLeakages:
-            json["check_for_at_gear_box_leakages"] == null ? null : CheckForAtGearBoxLeakages.fromMap(json["check_for_at_gear_box_leakages"]),
-        checkForEngineLeakages: json["check_for_engine_leakages"] == null ? null : CheckForEngineLeakages.fromMap(json["check_for_engine_leakages"]),
-        checkForEnginePerformances:
-            json["check_for_engine_performances"] == null ? null : CheckForEnginePerformances.fromMap(json["check_for_engine_performances"]),
-        checkForManualGearBoxLeakages: json["check_for_manual_gear_box_leakages"] == null
+            json["check_for_at_gear_box_leakages"] == null
+                ? null
+                : CheckForAtGearBoxLeakages.fromMap(
+                    json["check_for_at_gear_box_leakages"]),
+        checkForEngineLeakages: json["check_for_engine_leakages"] == null
             ? null
-            : CheckForManualGearBoxLeakages.fromMap(json["check_for_manual_gear_box_leakages"]),
+            : CheckForEngineLeakages.fromMap(json["check_for_engine_leakages"]),
+        checkForEnginePerformances:
+            json["check_for_engine_performances"] == null
+                ? null
+                : CheckForEnginePerformances.fromMap(
+                    json["check_for_engine_performances"]),
+        checkForManualGearBoxLeakages:
+            json["check_for_manual_gear_box_leakages"] == null
+                ? null
+                : CheckForManualGearBoxLeakages.fromMap(
+                    json["check_for_manual_gear_box_leakages"]),
         videos: json["videos"] == null ? null : Videos.fromMap(json["videos"]),
       );
 
@@ -479,7 +528,8 @@ class StaticEngineOn {
         "check_for_at_gear_box_leakages": checkForAtGearBoxLeakages?.toMap(),
         "check_for_engine_leakages": checkForEngineLeakages?.toMap(),
         "check_for_engine_performances": checkForEnginePerformances?.toMap(),
-        "check_for_manual_gear_box_leakages": checkForManualGearBoxLeakages?.toMap(),
+        "check_for_manual_gear_box_leakages":
+            checkForManualGearBoxLeakages?.toMap(),
         "videos": videos?.toMap(),
       };
 }
@@ -498,15 +548,19 @@ class CheckForAtGearBoxLeakages {
     bool? leakageFromAtInputShaft,
   }) =>
       CheckForAtGearBoxLeakages(
-        leakageFromAtGearboxHousing: leakageFromAtGearboxHousing ?? this.leakageFromAtGearboxHousing,
-        leakageFromAtInputShaft: leakageFromAtInputShaft ?? this.leakageFromAtInputShaft,
+        leakageFromAtGearboxHousing:
+            leakageFromAtGearboxHousing ?? this.leakageFromAtGearboxHousing,
+        leakageFromAtInputShaft:
+            leakageFromAtInputShaft ?? this.leakageFromAtInputShaft,
       );
 
-  factory CheckForAtGearBoxLeakages.fromJson(String str) => CheckForAtGearBoxLeakages.fromMap(json.decode(str));
+  factory CheckForAtGearBoxLeakages.fromJson(String str) =>
+      CheckForAtGearBoxLeakages.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CheckForAtGearBoxLeakages.fromMap(Map<String, dynamic> json) => CheckForAtGearBoxLeakages(
+  factory CheckForAtGearBoxLeakages.fromMap(Map<String, dynamic> json) =>
+      CheckForAtGearBoxLeakages(
         leakageFromAtGearboxHousing: json["leakage_from_at_gearbox_housing"],
         leakageFromAtInputShaft: json["leakage_from_at_input_shaft"],
       );
@@ -540,18 +594,25 @@ class CheckForEngineLeakages {
     bool? seepageFromEngineTiming,
   }) =>
       CheckForEngineLeakages(
-        leakageFromEngineBlock: leakageFromEngineBlock ?? this.leakageFromEngineBlock,
-        leakageFromExhaustManifold: leakageFromExhaustManifold ?? this.leakageFromExhaustManifold,
-        leakageFromTurbocharger: leakageFromTurbocharger ?? this.leakageFromTurbocharger,
-        leakgeFromMetalTiming: leakgeFromMetalTiming ?? this.leakgeFromMetalTiming,
-        seepageFromEngineTiming: seepageFromEngineTiming ?? this.seepageFromEngineTiming,
+        leakageFromEngineBlock:
+            leakageFromEngineBlock ?? this.leakageFromEngineBlock,
+        leakageFromExhaustManifold:
+            leakageFromExhaustManifold ?? this.leakageFromExhaustManifold,
+        leakageFromTurbocharger:
+            leakageFromTurbocharger ?? this.leakageFromTurbocharger,
+        leakgeFromMetalTiming:
+            leakgeFromMetalTiming ?? this.leakgeFromMetalTiming,
+        seepageFromEngineTiming:
+            seepageFromEngineTiming ?? this.seepageFromEngineTiming,
       );
 
-  factory CheckForEngineLeakages.fromJson(String str) => CheckForEngineLeakages.fromMap(json.decode(str));
+  factory CheckForEngineLeakages.fromJson(String str) =>
+      CheckForEngineLeakages.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CheckForEngineLeakages.fromMap(Map<String, dynamic> json) => CheckForEngineLeakages(
+  factory CheckForEngineLeakages.fromMap(Map<String, dynamic> json) =>
+      CheckForEngineLeakages(
         leakageFromEngineBlock: json["leakage_from_engine_block"],
         leakageFromExhaustManifold: json["leakage_from_exhaust_manifold"],
         leakageFromTurbocharger: json["leakage_from_turbocharger"],
@@ -585,18 +646,23 @@ class CheckForEnginePerformances {
     bool? overheatingInEngine,
   }) =>
       CheckForEnginePerformances(
-        backCompressionInEngine: backCompressionInEngine ?? this.backCompressionInEngine,
-        overheaingDueToRadiatorSystem: overheaingDueToRadiatorSystem ?? this.overheaingDueToRadiatorSystem,
+        backCompressionInEngine:
+            backCompressionInEngine ?? this.backCompressionInEngine,
+        overheaingDueToRadiatorSystem:
+            overheaingDueToRadiatorSystem ?? this.overheaingDueToRadiatorSystem,
         overheatingInEngine: overheatingInEngine ?? this.overheatingInEngine,
       );
 
-  factory CheckForEnginePerformances.fromJson(String str) => CheckForEnginePerformances.fromMap(json.decode(str));
+  factory CheckForEnginePerformances.fromJson(String str) =>
+      CheckForEnginePerformances.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CheckForEnginePerformances.fromMap(Map<String, dynamic> json) => CheckForEnginePerformances(
+  factory CheckForEnginePerformances.fromMap(Map<String, dynamic> json) =>
+      CheckForEnginePerformances(
         backCompressionInEngine: json["back_compression_in_engine"],
-        overheaingDueToRadiatorSystem: json["overheaing_due_to_radiator_system"],
+        overheaingDueToRadiatorSystem:
+            json["overheaing_due_to_radiator_system"],
         overheatingInEngine: json["overheating_in_engine"],
       );
 
@@ -627,17 +693,22 @@ class CheckForManualGearBoxLeakages {
     bool? leakageFromMtInputShaft,
   }) =>
       CheckForManualGearBoxLeakages(
-        leakageFrom5ThGearHousing: leakageFrom5ThGearHousing ?? this.leakageFrom5ThGearHousing,
+        leakageFrom5ThGearHousing:
+            leakageFrom5ThGearHousing ?? this.leakageFrom5ThGearHousing,
         leakageFromDriveAxle: leakageFromDriveAxle ?? this.leakageFromDriveAxle,
-        leakageFromMtGearboxHousing: leakageFromMtGearboxHousing ?? this.leakageFromMtGearboxHousing,
-        leakageFromMtInputShaft: leakageFromMtInputShaft ?? this.leakageFromMtInputShaft,
+        leakageFromMtGearboxHousing:
+            leakageFromMtGearboxHousing ?? this.leakageFromMtGearboxHousing,
+        leakageFromMtInputShaft:
+            leakageFromMtInputShaft ?? this.leakageFromMtInputShaft,
       );
 
-  factory CheckForManualGearBoxLeakages.fromJson(String str) => CheckForManualGearBoxLeakages.fromMap(json.decode(str));
+  factory CheckForManualGearBoxLeakages.fromJson(String str) =>
+      CheckForManualGearBoxLeakages.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory CheckForManualGearBoxLeakages.fromMap(Map<String, dynamic> json) => CheckForManualGearBoxLeakages(
+  factory CheckForManualGearBoxLeakages.fromMap(Map<String, dynamic> json) =>
+      CheckForManualGearBoxLeakages(
         leakageFrom5ThGearHousing: json["leakage_from_5th_gear_housing"],
         leakageFromDriveAxle: json["leakage_from_drive_axle"],
         leakageFromMtGearboxHousing: json["leakage_from_mt_gearbox_housing"],
@@ -739,9 +810,15 @@ class FrontSide {
   String toJson() => json.encode(toMap());
 
   factory FrontSide.fromMap(Map<String, dynamic> json) => FrontSide(
-        frontExterior1: json["front_exterior_1"] == null ? null : FrontExterior1.fromMap(json["front_exterior_1"]),
-        frontExterior2: json["front_exterior_2"] == null ? null : FrontExterior2.fromMap(json["front_exterior_2"]),
-        frontStructure1: json["front_structure_1"] == null ? null : FrontStructure1.fromMap(json["front_structure_1"]),
+        frontExterior1: json["front_exterior_1"] == null
+            ? null
+            : FrontExterior1.fromMap(json["front_exterior_1"]),
+        frontExterior2: json["front_exterior_2"] == null
+            ? null
+            : FrontExterior2.fromMap(json["front_exterior_2"]),
+        frontStructure1: json["front_structure_1"] == null
+            ? null
+            : FrontStructure1.fromMap(json["front_structure_1"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -779,23 +856,38 @@ class FrontExterior1 {
       FrontExterior1(
         bonnetPanel: bonnetPanel ?? this.bonnetPanel,
         carKey: carKey ?? this.carKey,
-        centralLockingRemoteHousing: centralLockingRemoteHousing ?? this.centralLockingRemoteHousing,
+        centralLockingRemoteHousing:
+            centralLockingRemoteHousing ?? this.centralLockingRemoteHousing,
         frontBumperGrill: frontBumperGrill ?? this.frontBumperGrill,
         frontBumperPanel: frontBumperPanel ?? this.frontBumperPanel,
-        frontRegistrationPlate: frontRegistrationPlate ?? this.frontRegistrationPlate,
+        frontRegistrationPlate:
+            frontRegistrationPlate ?? this.frontRegistrationPlate,
       );
 
-  factory FrontExterior1.fromJson(String str) => FrontExterior1.fromMap(json.decode(str));
+  factory FrontExterior1.fromJson(String str) =>
+      FrontExterior1.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory FrontExterior1.fromMap(Map<String, dynamic> json) => FrontExterior1(
-        bonnetPanel: json["bonnet_panel"] == null ? null : BonnetPanel.fromMap(json["bonnet_panel"]),
-        carKey: json["car_key"] == null ? null : CarKey.fromMap(json["car_key"]),
-        centralLockingRemoteHousing: json["central_locking_remote_housing"] == null ? null : CarKey.fromMap(json["central_locking_remote_housing"]),
-        frontBumperGrill: json["front_bumper_grill"] == null ? null : FrontBumperGrill.fromMap(json["front_bumper_grill"]),
-        frontBumperPanel: json["front_bumper_panel"] == null ? null : FrontBumperPanel.fromMap(json["front_bumper_panel"]),
-        frontRegistrationPlate: json["front_registration_plate"] == null ? null : FrontRegistrationPlate.fromMap(json["front_registration_plate"]),
+        bonnetPanel: json["bonnet_panel"] == null
+            ? null
+            : BonnetPanel.fromMap(json["bonnet_panel"]),
+        carKey:
+            json["car_key"] == null ? null : CarKey.fromMap(json["car_key"]),
+        centralLockingRemoteHousing:
+            json["central_locking_remote_housing"] == null
+                ? null
+                : CarKey.fromMap(json["central_locking_remote_housing"]),
+        frontBumperGrill: json["front_bumper_grill"] == null
+            ? null
+            : FrontBumperGrill.fromMap(json["front_bumper_grill"]),
+        frontBumperPanel: json["front_bumper_panel"] == null
+            ? null
+            : FrontBumperPanel.fromMap(json["front_bumper_panel"]),
+        frontRegistrationPlate: json["front_registration_plate"] == null
+            ? null
+            : FrontRegistrationPlate.fromMap(json["front_registration_plate"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -850,11 +942,13 @@ class BonnetPanel {
         paintDefective: paintDefective ?? this.paintDefective,
         repainted: repainted ?? this.repainted,
         replaced: replaced ?? this.replaced,
-        sealantMissingCrackRepaired: sealantMissingCrackRepaired ?? this.sealantMissingCrackRepaired,
+        sealantMissingCrackRepaired:
+            sealantMissingCrackRepaired ?? this.sealantMissingCrackRepaired,
         wrapping: wrapping ?? this.wrapping,
       );
 
-  factory BonnetPanel.fromJson(String str) => BonnetPanel.fromMap(json.decode(str));
+  factory BonnetPanel.fromJson(String str) =>
+      BonnetPanel.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -968,11 +1062,13 @@ class FrontBumperGrill {
         scratchesMinor: scratchesMinor ?? this.scratchesMinor,
       );
 
-  factory FrontBumperGrill.fromJson(String str) => FrontBumperGrill.fromMap(json.decode(str));
+  factory FrontBumperGrill.fromJson(String str) =>
+      FrontBumperGrill.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontBumperGrill.fromMap(Map<String, dynamic> json) => FrontBumperGrill(
+  factory FrontBumperGrill.fromMap(Map<String, dynamic> json) =>
+      FrontBumperGrill(
         crackMajor: json["crack_major"],
         crackMinor: json["crack_minor"],
         images: json["images"],
@@ -1021,15 +1117,18 @@ class FrontBumperPanel {
         paintDefective: paintDefective ?? this.paintDefective,
         partMissing: partMissing ?? this.partMissing,
         repainted: repainted ?? this.repainted,
-        tabLocksScrewRepaired: tabLocksScrewRepaired ?? this.tabLocksScrewRepaired,
+        tabLocksScrewRepaired:
+            tabLocksScrewRepaired ?? this.tabLocksScrewRepaired,
         wrapping: wrapping ?? this.wrapping,
       );
 
-  factory FrontBumperPanel.fromJson(String str) => FrontBumperPanel.fromMap(json.decode(str));
+  factory FrontBumperPanel.fromJson(String str) =>
+      FrontBumperPanel.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontBumperPanel.fromMap(Map<String, dynamic> json) => FrontBumperPanel(
+  factory FrontBumperPanel.fromMap(Map<String, dynamic> json) =>
+      FrontBumperPanel(
         images: json["images"],
         paintDefective: json["paint_defective"],
         partMissing: json["part_missing"],
@@ -1078,11 +1177,13 @@ class FrontRegistrationPlate {
         partMissing: partMissing ?? this.partMissing,
       );
 
-  factory FrontRegistrationPlate.fromJson(String str) => FrontRegistrationPlate.fromMap(json.decode(str));
+  factory FrontRegistrationPlate.fromJson(String str) =>
+      FrontRegistrationPlate.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontRegistrationPlate.fromMap(Map<String, dynamic> json) => FrontRegistrationPlate(
+  factory FrontRegistrationPlate.fromMap(Map<String, dynamic> json) =>
+      FrontRegistrationPlate(
         aftermarketFitment: json["aftermarket fitment"],
         damagedMajor: json["damaged_major"],
         damagedMinor: json["damaged_minor"],
@@ -1131,31 +1232,51 @@ class FrontExterior2 {
     FrontLeftExterior? rightHeadlightHousing,
   }) =>
       FrontExterior2(
-        frontLeftFogLightHousing: frontLeftFogLightHousing ?? this.frontLeftFogLightHousing,
-        frontRightFogLightHousing: frontRightFogLightHousing ?? this.frontRightFogLightHousing,
+        frontLeftFogLightHousing:
+            frontLeftFogLightHousing ?? this.frontLeftFogLightHousing,
+        frontRightFogLightHousing:
+            frontRightFogLightHousing ?? this.frontRightFogLightHousing,
         leftDrl: leftDrl ?? this.leftDrl,
-        leftHeadlightAssembly: leftHeadlightAssembly ?? this.leftHeadlightAssembly,
+        leftHeadlightAssembly:
+            leftHeadlightAssembly ?? this.leftHeadlightAssembly,
         leftHeadlightHousing: leftHeadlightHousing ?? this.leftHeadlightHousing,
         rightDrl: rightDrl ?? this.rightDrl,
-        rightHeadlightAssembly: rightHeadlightAssembly ?? this.rightHeadlightAssembly,
-        rightHeadlightHousing: rightHeadlightHousing ?? this.rightHeadlightHousing,
+        rightHeadlightAssembly:
+            rightHeadlightAssembly ?? this.rightHeadlightAssembly,
+        rightHeadlightHousing:
+            rightHeadlightHousing ?? this.rightHeadlightHousing,
       );
 
-  factory FrontExterior2.fromJson(String str) => FrontExterior2.fromMap(json.decode(str));
+  factory FrontExterior2.fromJson(String str) =>
+      FrontExterior2.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory FrontExterior2.fromMap(Map<String, dynamic> json) => FrontExterior2(
-        frontLeftFogLightHousing:
-            json["front_left_fog_light_housing"] == null ? null : FrontLeftExterior.fromMap(json["front_left_fog_light_housing"]),
-        frontRightFogLightHousing:
-            json["front_right_fog_light_housing"] == null ? null : FrontLeftExterior.fromMap(json["front_right_fog_light_housing"]),
-        leftDrl: json["left_DRL"] == null ? null : FrontLeftExterior.fromMap(json["left_DRL"]),
-        leftHeadlightAssembly: json["left_headlight_assembly"] == null ? null : FrontLeftExterior.fromMap(json["left_headlight_assembly"]),
-        leftHeadlightHousing: json["left_headlight_housing"] == null ? null : FrontLeftExterior.fromMap(json["left_headlight_housing"]),
-        rightDrl: json["right_drl"] == null ? null : FrontLeftExterior.fromMap(json["right_drl"]),
-        rightHeadlightAssembly: json["right_headlight_assembly"] == null ? null : FrontLeftExterior.fromMap(json["right_headlight_assembly"]),
-        rightHeadlightHousing: json["right_headlight_housing"] == null ? null : FrontLeftExterior.fromMap(json["right_headlight_housing"]),
+        frontLeftFogLightHousing: json["front_left_fog_light_housing"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_left_fog_light_housing"]),
+        frontRightFogLightHousing: json["front_right_fog_light_housing"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_right_fog_light_housing"]),
+        leftDrl: json["left_DRL"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_DRL"]),
+        leftHeadlightAssembly: json["left_headlight_assembly"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_headlight_assembly"]),
+        leftHeadlightHousing: json["left_headlight_housing"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_headlight_housing"]),
+        rightDrl: json["right_drl"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_drl"]),
+        rightHeadlightAssembly: json["right_headlight_assembly"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_headlight_assembly"]),
+        rightHeadlightHousing: json["right_headlight_housing"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_headlight_housing"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1229,14 +1350,17 @@ class FrontLeftExterior {
         replaced: replaced ?? this.replaced,
         hammerRepairedMajor: hammerRepairedMajor ?? this.hammerRepairedMajor,
         hammerRepairedMinor: hammerRepairedMinor ?? this.hammerRepairedMinor,
-        sealantMissingCrackRepaired: sealantMissingCrackRepaired ?? this.sealantMissingCrackRepaired,
+        sealantMissingCrackRepaired:
+            sealantMissingCrackRepaired ?? this.sealantMissingCrackRepaired,
       );
 
-  factory FrontLeftExterior.fromJson(String str) => FrontLeftExterior.fromMap(json.decode(str));
+  factory FrontLeftExterior.fromJson(String str) =>
+      FrontLeftExterior.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontLeftExterior.fromMap(Map<String, dynamic> json) => FrontLeftExterior(
+  factory FrontLeftExterior.fromMap(Map<String, dynamic> json) =>
+      FrontLeftExterior(
         bendDentMajor: json["bend_dent_major"],
         bendDentMinor: json["bend_dent_minor"],
         corrosionMajor: json["corrosion_major"],
@@ -1292,23 +1416,36 @@ class FrontStructure1 {
     EdRadiatorSupport? weldedRadiatorSupport,
   }) =>
       FrontStructure1(
-        boltedRadiatorSupport: boltedRadiatorSupport ?? this.boltedRadiatorSupport,
+        boltedRadiatorSupport:
+            boltedRadiatorSupport ?? this.boltedRadiatorSupport,
         fibreRadiatorSupport: fibreRadiatorSupport ?? this.fibreRadiatorSupport,
         frontLeftLeg: frontLeftLeg ?? this.frontLeftLeg,
         frontRightLeft: frontRightLeft ?? this.frontRightLeft,
-        weldedRadiatorSupport: weldedRadiatorSupport ?? this.weldedRadiatorSupport,
+        weldedRadiatorSupport:
+            weldedRadiatorSupport ?? this.weldedRadiatorSupport,
       );
 
-  factory FrontStructure1.fromJson(String str) => FrontStructure1.fromMap(json.decode(str));
+  factory FrontStructure1.fromJson(String str) =>
+      FrontStructure1.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory FrontStructure1.fromMap(Map<String, dynamic> json) => FrontStructure1(
-        boltedRadiatorSupport: json["bolted_radiator_support"] == null ? null : EdRadiatorSupport.fromMap(json["bolted_radiator_support"]),
-        fibreRadiatorSupport: json["fibre_radiator_support"] == null ? null : FibreRadiatorSupport.fromMap(json["fibre_radiator_support"]),
-        frontLeftLeg: json["front_left_leg"] == null ? null : FrontLeftExterior.fromMap(json["front_left_leg"]),
-        frontRightLeft: json["front_right_left"] == null ? null : FrontLeftExterior.fromMap(json["front_right_left"]),
-        weldedRadiatorSupport: json["welded_radiator_support"] == null ? null : EdRadiatorSupport.fromMap(json["welded_radiator_support"]),
+        boltedRadiatorSupport: json["bolted_radiator_support"] == null
+            ? null
+            : EdRadiatorSupport.fromMap(json["bolted_radiator_support"]),
+        fibreRadiatorSupport: json["fibre_radiator_support"] == null
+            ? null
+            : FibreRadiatorSupport.fromMap(json["fibre_radiator_support"]),
+        frontLeftLeg: json["front_left_leg"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_left_leg"]),
+        frontRightLeft: json["front_right_left"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_right_left"]),
+        weldedRadiatorSupport: json["welded_radiator_support"] == null
+            ? null
+            : EdRadiatorSupport.fromMap(json["welded_radiator_support"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1354,11 +1491,13 @@ class EdRadiatorSupport {
         crackMinor: crackMinor ?? this.crackMinor,
       );
 
-  factory EdRadiatorSupport.fromJson(String str) => EdRadiatorSupport.fromMap(json.decode(str));
+  factory EdRadiatorSupport.fromJson(String str) =>
+      EdRadiatorSupport.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory EdRadiatorSupport.fromMap(Map<String, dynamic> json) => EdRadiatorSupport(
+  factory EdRadiatorSupport.fromMap(Map<String, dynamic> json) =>
+      EdRadiatorSupport(
         bendDentMajor: json["bend_dent_major"],
         bendDentMinor: json["bend_dent_minor"],
         corrosionMajor: json["corrosion_major"],
@@ -1399,11 +1538,13 @@ class FibreRadiatorSupport {
         repaired: repaired ?? this.repaired,
       );
 
-  factory FibreRadiatorSupport.fromJson(String str) => FibreRadiatorSupport.fromMap(json.decode(str));
+  factory FibreRadiatorSupport.fromJson(String str) =>
+      FibreRadiatorSupport.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FibreRadiatorSupport.fromMap(Map<String, dynamic> json) => FibreRadiatorSupport(
+  factory FibreRadiatorSupport.fromMap(Map<String, dynamic> json) =>
+      FibreRadiatorSupport(
         crackMajor: json["crack_major"],
         crackMinor: json["crack_minor"],
         repaired: json["repaired"],
@@ -1455,11 +1596,21 @@ class Interior1 {
   String toJson() => json.encode(toMap());
 
   factory Interior1.fromMap(Map<String, dynamic> json) => Interior1(
-        acAssembly: json["ac_assembly"] == null ? null : AcAssembly.fromMap(json["ac_assembly"]),
-        airbags: json["airbags"] == null ? null : AcAssembly.fromMap(json["airbags"]),
-        clusterPanelAssembly: json["cluster_panel_assembly"] == null ? null : AcAssembly.fromMap(json["cluster_panel_assembly"]),
-        dashboardAssembly: json["dashboard_assembly"] == null ? null : AcAssembly.fromMap(json["dashboard_assembly"]),
-        frontWindshieldGlass: json["front_windshield_glass"] == null ? null : AcAssembly.fromMap(json["front_windshield_glass"]),
+        acAssembly: json["ac_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["ac_assembly"]),
+        airbags: json["airbags"] == null
+            ? null
+            : AcAssembly.fromMap(json["airbags"]),
+        clusterPanelAssembly: json["cluster_panel_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["cluster_panel_assembly"]),
+        dashboardAssembly: json["dashboard_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["dashboard_assembly"]),
+        frontWindshieldGlass: json["front_windshield_glass"] == null
+            ? null
+            : AcAssembly.fromMap(json["front_windshield_glass"]),
         seats: json["seats"] == null ? null : AcAssembly.fromMap(json["seats"]),
       );
 
@@ -1543,7 +1694,8 @@ class AcAssembly {
         wrapping: wrapping ?? this.wrapping,
       );
 
-  factory AcAssembly.fromJson(String str) => AcAssembly.fromMap(json.decode(str));
+  factory AcAssembly.fromJson(String str) =>
+      AcAssembly.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -1614,12 +1766,17 @@ class Interior2 {
   }) =>
       Interior2(
         audioStereoAssembly: audioStereoAssembly ?? this.audioStereoAssembly,
-        centreConsoleAssembly: centreConsoleAssembly ?? this.centreConsoleAssembly,
-        forwardParkingSensors: forwardParkingSensors ?? this.forwardParkingSensors,
-        frontLeftDoorAssembly: frontLeftDoorAssembly ?? this.frontLeftDoorAssembly,
-        frontRightDoorAssembly: frontRightDoorAssembly ?? this.frontRightDoorAssembly,
+        centreConsoleAssembly:
+            centreConsoleAssembly ?? this.centreConsoleAssembly,
+        forwardParkingSensors:
+            forwardParkingSensors ?? this.forwardParkingSensors,
+        frontLeftDoorAssembly:
+            frontLeftDoorAssembly ?? this.frontLeftDoorAssembly,
+        frontRightDoorAssembly:
+            frontRightDoorAssembly ?? this.frontRightDoorAssembly,
         reverseParkingCamera: reverseParkingCamera ?? this.reverseParkingCamera,
-        reverseParkingSensors: reverseParkingSensors ?? this.reverseParkingSensors,
+        reverseParkingSensors:
+            reverseParkingSensors ?? this.reverseParkingSensors,
       );
 
   factory Interior2.fromJson(String str) => Interior2.fromMap(json.decode(str));
@@ -1627,13 +1784,27 @@ class Interior2 {
   String toJson() => json.encode(toMap());
 
   factory Interior2.fromMap(Map<String, dynamic> json) => Interior2(
-        audioStereoAssembly: json["audio_stereo_assembly"] == null ? null : AcAssembly.fromMap(json["audio_stereo_assembly"]),
-        centreConsoleAssembly: json["centre_console_assembly"] == null ? null : AcAssembly.fromMap(json["centre_console_assembly"]),
-        forwardParkingSensors: json["forward_parking_sensors"] == null ? null : AcAssembly.fromMap(json["forward_parking_sensors"]),
-        frontLeftDoorAssembly: json["front_left_door_assembly"] == null ? null : AcAssembly.fromMap(json["front_left_door_assembly"]),
-        frontRightDoorAssembly: json["front_right_door_assembly"] == null ? null : AcAssembly.fromMap(json["front_right_door_assembly"]),
-        reverseParkingCamera: json["reverse_parking_camera"] == null ? null : AcAssembly.fromMap(json["reverse_parking_camera"]),
-        reverseParkingSensors: json["reverse_parking_sensors"] == null ? null : AcAssembly.fromMap(json["reverse_parking_sensors"]),
+        audioStereoAssembly: json["audio_stereo_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["audio_stereo_assembly"]),
+        centreConsoleAssembly: json["centre_console_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["centre_console_assembly"]),
+        forwardParkingSensors: json["forward_parking_sensors"] == null
+            ? null
+            : AcAssembly.fromMap(json["forward_parking_sensors"]),
+        frontLeftDoorAssembly: json["front_left_door_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["front_left_door_assembly"]),
+        frontRightDoorAssembly: json["front_right_door_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["front_right_door_assembly"]),
+        reverseParkingCamera: json["reverse_parking_camera"] == null
+            ? null
+            : AcAssembly.fromMap(json["reverse_parking_camera"]),
+        reverseParkingSensors: json["reverse_parking_sensors"] == null
+            ? null
+            : AcAssembly.fromMap(json["reverse_parking_sensors"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1686,12 +1857,24 @@ class LeftSide {
   String toJson() => json.encode(toMap());
 
   factory LeftSide.fromMap(Map<String, dynamic> json) => LeftSide(
-        frontLeftExterior: json["front_left_exterior"] == null ? null : FrontLeftExterior.fromMap(json["front_left_exterior"]),
-        frontLeftMechanical: json["front_left_mechanical"] == null ? null : AcAssembly.fromMap(json["front_left_mechanical"]),
-        frontLeftStructure: json["front_left_structure"] == null ? null : FrontLeftStructure.fromMap(json["front_left_structure"]),
-        rearLeftExterior: json["rear_left_exterior"] == null ? null : FrontLeftExterior.fromMap(json["rear_left_exterior"]),
-        rearLeftMechanical: json["rear_left_mechanical"] == null ? null : FrontLeftExterior.fromMap(json["rear_left_mechanical"]),
-        rearLeftStructure: json["rear_left_structure"] == null ? null : RearLeftStructure.fromMap(json["rear_left_structure"]),
+        frontLeftExterior: json["front_left_exterior"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_left_exterior"]),
+        frontLeftMechanical: json["front_left_mechanical"] == null
+            ? null
+            : AcAssembly.fromMap(json["front_left_mechanical"]),
+        frontLeftStructure: json["front_left_structure"] == null
+            ? null
+            : FrontLeftStructure.fromMap(json["front_left_structure"]),
+        rearLeftExterior: json["rear_left_exterior"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["rear_left_exterior"]),
+        rearLeftMechanical: json["rear_left_mechanical"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["rear_left_mechanical"]),
+        rearLeftStructure: json["rear_left_structure"] == null
+            ? null
+            : RearLeftStructure.fromMap(json["rear_left_structure"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1742,18 +1925,34 @@ class FrontLeftStructure {
         rearLeftWheelHouse: rearLeftWheelHouse ?? this.rearLeftWheelHouse,
       );
 
-  factory FrontLeftStructure.fromJson(String str) => FrontLeftStructure.fromMap(json.decode(str));
+  factory FrontLeftStructure.fromJson(String str) =>
+      FrontLeftStructure.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontLeftStructure.fromMap(Map<String, dynamic> json) => FrontLeftStructure(
-        leftFloorPanChannel: json["left_floor_pan_channel"] == null ? null : AcAssembly.fromMap(json["left_floor_pan_channel"]),
-        leftPillarB: json["left_pillar_B"] == null ? null : AcAssembly.fromMap(json["left_pillar_B"]),
-        leftPillarC: json["left_pillar_C"] == null ? null : AcAssembly.fromMap(json["left_pillar_C"]),
-        leftRunningBoard: json["left_running_board"] == null ? null : TRunningBoard.fromMap(json["left_running_board"]),
-        rearLeftDoorChannel: json["rear_left_door_channel"] == null ? null : AcAssembly.fromMap(json["rear_left_door_channel"]),
-        rearLeftFloorPan: json["rear_left_floor_pan"] == null ? null : AcAssembly.fromMap(json["rear_left_floor_pan"]),
-        rearLeftWheelHouse: json["rear_left_wheel_house"] == null ? null : AcAssembly.fromMap(json["rear_left_wheel_house"]),
+  factory FrontLeftStructure.fromMap(Map<String, dynamic> json) =>
+      FrontLeftStructure(
+        leftFloorPanChannel: json["left_floor_pan_channel"] == null
+            ? null
+            : AcAssembly.fromMap(json["left_floor_pan_channel"]),
+        leftPillarB: json["left_pillar_B"] == null
+            ? null
+            : AcAssembly.fromMap(json["left_pillar_B"]),
+        leftPillarC: json["left_pillar_C"] == null
+            ? null
+            : AcAssembly.fromMap(json["left_pillar_C"]),
+        leftRunningBoard: json["left_running_board"] == null
+            ? null
+            : TRunningBoard.fromMap(json["left_running_board"]),
+        rearLeftDoorChannel: json["rear_left_door_channel"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_left_door_channel"]),
+        rearLeftFloorPan: json["rear_left_floor_pan"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_left_floor_pan"]),
+        rearLeftWheelHouse: json["rear_left_wheel_house"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_left_wheel_house"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1813,7 +2012,8 @@ class TRunningBoard {
         replaced: replaced ?? this.replaced,
       );
 
-  factory TRunningBoard.fromJson(String str) => TRunningBoard.fromMap(json.decode(str));
+  factory TRunningBoard.fromJson(String str) =>
+      TRunningBoard.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
@@ -1868,15 +2068,25 @@ class RearLeftStructure {
         rearLeftDoorPanel: rearLeftDoorPanel ?? this.rearLeftDoorPanel,
       );
 
-  factory RearLeftStructure.fromJson(String str) => RearLeftStructure.fromMap(json.decode(str));
+  factory RearLeftStructure.fromJson(String str) =>
+      RearLeftStructure.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory RearLeftStructure.fromMap(Map<String, dynamic> json) => RearLeftStructure(
-        leftFenderLining: json["left_fender_lining"] == null ? null : FrontLeftExterior.fromMap(json["left_fender_lining"]),
-        leftFenderPanel: json["left_fender_panel"] == null ? null : FrontLeftExterior.fromMap(json["left_fender_panel"]),
-        leftSvmAssembly: json["left_svm_assembly"] == null ? null : FrontLeftExterior.fromMap(json["left_svm_assembly"]),
-        rearLeftDoorPanel: json["rear_left_door_panel"] == null ? null : FrontLeftExterior.fromMap(json["rear_left_door_panel"]),
+  factory RearLeftStructure.fromMap(Map<String, dynamic> json) =>
+      RearLeftStructure(
+        leftFenderLining: json["left_fender_lining"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_fender_lining"]),
+        leftFenderPanel: json["left_fender_panel"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_fender_panel"]),
+        leftSvmAssembly: json["left_svm_assembly"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_svm_assembly"]),
+        rearLeftDoorPanel: json["rear_left_door_panel"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["rear_left_door_panel"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1910,8 +2120,12 @@ class RearSide {
   String toJson() => json.encode(toMap());
 
   factory RearSide.fromMap(Map<String, dynamic> json) => RearSide(
-        rearExterior: json["rear_exterior"] == null ? null : RearExterior.fromMap(json["rear_exterior"]),
-        roofStructureAndRoot: json["roof_structure_and_root"] == null ? null : RoofStructureAndRoot.fromMap(json["roof_structure_and_root"]),
+        rearExterior: json["rear_exterior"] == null
+            ? null
+            : RearExterior.fromMap(json["rear_exterior"]),
+        roofStructureAndRoot: json["roof_structure_and_root"] == null
+            ? null
+            : RoofStructureAndRoot.fromMap(json["roof_structure_and_root"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -1953,30 +2167,50 @@ class RearExterior {
   }) =>
       RearExterior(
         dickeyDoorPanel: dickeyDoorPanel ?? this.dickeyDoorPanel,
-        dickeyLeftStayRodShocker: dickeyLeftStayRodShocker ?? this.dickeyLeftStayRodShocker,
-        dickeyRightStayRodShocker: dickeyRightStayRodShocker ?? this.dickeyRightStayRodShocker,
-        leftTailLightAssembly: leftTailLightAssembly ?? this.leftTailLightAssembly,
+        dickeyLeftStayRodShocker:
+            dickeyLeftStayRodShocker ?? this.dickeyLeftStayRodShocker,
+        dickeyRightStayRodShocker:
+            dickeyRightStayRodShocker ?? this.dickeyRightStayRodShocker,
+        leftTailLightAssembly:
+            leftTailLightAssembly ?? this.leftTailLightAssembly,
         rearBumperPanel: rearBumperPanel ?? this.rearBumperPanel,
-        rearRegistrationPlate: rearRegistrationPlate ?? this.rearRegistrationPlate,
+        rearRegistrationPlate:
+            rearRegistrationPlate ?? this.rearRegistrationPlate,
         rearWindshieldGlass: rearWindshieldGlass ?? this.rearWindshieldGlass,
-        rightTailLightAssembly: rightTailLightAssembly ?? this.rightTailLightAssembly,
+        rightTailLightAssembly:
+            rightTailLightAssembly ?? this.rightTailLightAssembly,
       );
 
-  factory RearExterior.fromJson(String str) => RearExterior.fromMap(json.decode(str));
+  factory RearExterior.fromJson(String str) =>
+      RearExterior.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory RearExterior.fromMap(Map<String, dynamic> json) => RearExterior(
-        dickeyDoorPanel: json["dickey_door_panel"] == null ? null : FrontLeftExterior.fromMap(json["dickey_door_panel"]),
-        dickeyLeftStayRodShocker:
-            json["dickey_left_stay_rod_shocker"] == null ? null : FrontLeftExterior.fromMap(json["dickey_left_stay_rod_shocker"]),
-        dickeyRightStayRodShocker:
-            json["dickey_right_stay_rod_shocker"] == null ? null : FrontLeftExterior.fromMap(json["dickey_right_stay_rod_shocker"]),
-        leftTailLightAssembly: json["left_tail_light_assembly"] == null ? null : AcAssembly.fromMap(json["left_tail_light_assembly"]),
-        rearBumperPanel: json["rear_bumper_panel"] == null ? null : AcAssembly.fromMap(json["rear_bumper_panel"]),
-        rearRegistrationPlate: json["rear_registration_plate"] == null ? null : AcAssembly.fromMap(json["rear_registration_plate"]),
-        rearWindshieldGlass: json["rear_windshield_glass"] == null ? null : AcAssembly.fromMap(json["rear_windshield_glass"]),
-        rightTailLightAssembly: json["right_tail_light_assembly"] == null ? null : AcAssembly.fromMap(json["right_tail_light_assembly"]),
+        dickeyDoorPanel: json["dickey_door_panel"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_door_panel"]),
+        dickeyLeftStayRodShocker: json["dickey_left_stay_rod_shocker"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_left_stay_rod_shocker"]),
+        dickeyRightStayRodShocker: json["dickey_right_stay_rod_shocker"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_right_stay_rod_shocker"]),
+        leftTailLightAssembly: json["left_tail_light_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["left_tail_light_assembly"]),
+        rearBumperPanel: json["rear_bumper_panel"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_bumper_panel"]),
+        rearRegistrationPlate: json["rear_registration_plate"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_registration_plate"]),
+        rearWindshieldGlass: json["rear_windshield_glass"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_windshield_glass"]),
+        rightTailLightAssembly: json["right_tail_light_assembly"] == null
+            ? null
+            : AcAssembly.fromMap(json["right_tail_light_assembly"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2033,19 +2267,37 @@ class RoofStructureAndRoot {
         spareTyreAssembly: spareTyreAssembly ?? this.spareTyreAssembly,
       );
 
-  factory RoofStructureAndRoot.fromJson(String str) => RoofStructureAndRoot.fromMap(json.decode(str));
+  factory RoofStructureAndRoot.fromJson(String str) =>
+      RoofStructureAndRoot.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory RoofStructureAndRoot.fromMap(Map<String, dynamic> json) => RoofStructureAndRoot(
-        dickeyBackPanel: json["dickey_back_panel"] == null ? null : FrontLeftExterior.fromMap(json["dickey_back_panel"]),
-        dickeyFloor: json["dickey_floor"] == null ? null : FrontLeftExterior.fromMap(json["dickey_floor"]),
-        dickeyLeftLeg: json["dickey_left_leg"] == null ? null : FrontLeftExterior.fromMap(json["dickey_left_leg"]),
-        dickeyRightLeg: json["dickey_right_leg"] == null ? null : FrontLeftExterior.fromMap(json["dickey_right_leg"]),
-        dickeySidewalls: json["dickey_sidewalls"] == null ? null : DickeySidewalls.fromMap(json["dickey_sidewalls"]),
-        dickeyStrutTowers: json["dickey_strut_towers"] == null ? null : DickeyStrutTowers.fromMap(json["dickey_strut_towers"]),
-        roofPanel: json["roof_panel"] == null ? null : RoofPanel.fromMap(json["roof_panel"]),
-        spareTyreAssembly: json["spare_tyre_assembly"] == null ? null : SpareTyreAssembly.fromMap(json["spare_tyre_assembly"]),
+  factory RoofStructureAndRoot.fromMap(Map<String, dynamic> json) =>
+      RoofStructureAndRoot(
+        dickeyBackPanel: json["dickey_back_panel"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_back_panel"]),
+        dickeyFloor: json["dickey_floor"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_floor"]),
+        dickeyLeftLeg: json["dickey_left_leg"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_left_leg"]),
+        dickeyRightLeg: json["dickey_right_leg"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["dickey_right_leg"]),
+        dickeySidewalls: json["dickey_sidewalls"] == null
+            ? null
+            : DickeySidewalls.fromMap(json["dickey_sidewalls"]),
+        dickeyStrutTowers: json["dickey_strut_towers"] == null
+            ? null
+            : DickeyStrutTowers.fromMap(json["dickey_strut_towers"]),
+        roofPanel: json["roof_panel"] == null
+            ? null
+            : RoofPanel.fromMap(json["roof_panel"]),
+        spareTyreAssembly: json["spare_tyre_assembly"] == null
+            ? null
+            : SpareTyreAssembly.fromMap(json["spare_tyre_assembly"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2078,13 +2330,18 @@ class DickeySidewalls {
         rightDickeySidewall: rightDickeySidewall ?? this.rightDickeySidewall,
       );
 
-  factory DickeySidewalls.fromJson(String str) => DickeySidewalls.fromMap(json.decode(str));
+  factory DickeySidewalls.fromJson(String str) =>
+      DickeySidewalls.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory DickeySidewalls.fromMap(Map<String, dynamic> json) => DickeySidewalls(
-        leftDickeySidewall: json["left_dickey_sidewall"] == null ? null : FrontLeftExterior.fromMap(json["left_dickey_sidewall"]),
-        rightDickeySidewall: json["right_dickey_sidewall"] == null ? null : FrontLeftExterior.fromMap(json["right_dickey_sidewall"]),
+        leftDickeySidewall: json["left_dickey_sidewall"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_dickey_sidewall"]),
+        rightDickeySidewall: json["right_dickey_sidewall"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_dickey_sidewall"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2108,16 +2365,23 @@ class DickeyStrutTowers {
   }) =>
       DickeyStrutTowers(
         leftDickeyStrutTower: leftDickeyStrutTower ?? this.leftDickeyStrutTower,
-        rightDickeyStrutTower: rightDickeyStrutTower ?? this.rightDickeyStrutTower,
+        rightDickeyStrutTower:
+            rightDickeyStrutTower ?? this.rightDickeyStrutTower,
       );
 
-  factory DickeyStrutTowers.fromJson(String str) => DickeyStrutTowers.fromMap(json.decode(str));
+  factory DickeyStrutTowers.fromJson(String str) =>
+      DickeyStrutTowers.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory DickeyStrutTowers.fromMap(Map<String, dynamic> json) => DickeyStrutTowers(
-        leftDickeyStrutTower: json["left_dickey_strut_tower"] == null ? null : FrontLeftExterior.fromMap(json["left_dickey_strut_tower"]),
-        rightDickeyStrutTower: json["right_dickey_strut_tower"] == null ? null : FrontLeftExterior.fromMap(json["right_dickey_strut_tower"]),
+  factory DickeyStrutTowers.fromMap(Map<String, dynamic> json) =>
+      DickeyStrutTowers(
+        leftDickeyStrutTower: json["left_dickey_strut_tower"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["left_dickey_strut_tower"]),
+        rightDickeyStrutTower: json["right_dickey_strut_tower"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_dickey_strut_tower"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2185,14 +2449,18 @@ class RoofPanel {
     bool? wrapping,
   }) =>
       RoofPanel(
-        aftermarketDualTonePaint: aftermarketDualTonePaint ?? this.aftermarketDualTonePaint,
-        aftermarketSunroofFitment: aftermarketSunroofFitment ?? this.aftermarketSunroofFitment,
+        aftermarketDualTonePaint:
+            aftermarketDualTonePaint ?? this.aftermarketDualTonePaint,
+        aftermarketSunroofFitment:
+            aftermarketSunroofFitment ?? this.aftermarketSunroofFitment,
         corrosionMajor: corrosionMajor ?? this.corrosionMajor,
         corrosionMinor: corrosionMinor ?? this.corrosionMinor,
         externalHoleTear: externalHoleTear ?? this.externalHoleTear,
         images: images ?? this.images,
-        multipleDentsDentMajor: multipleDentsDentMajor ?? this.multipleDentsDentMajor,
-        multipleDentsDentMinor: multipleDentsDentMinor ?? this.multipleDentsDentMinor,
+        multipleDentsDentMajor:
+            multipleDentsDentMajor ?? this.multipleDentsDentMajor,
+        multipleDentsDentMinor:
+            multipleDentsDentMinor ?? this.multipleDentsDentMinor,
         paintDefective: paintDefective ?? this.paintDefective,
         paintMismatch: paintMismatch ?? this.paintMismatch,
         repainted: repainted ?? this.repainted,
@@ -2267,11 +2535,13 @@ class SpareTyreAssembly {
         spareTyreAvailable: spareTyreAvailable ?? this.spareTyreAvailable,
       );
 
-  factory SpareTyreAssembly.fromJson(String str) => SpareTyreAssembly.fromMap(json.decode(str));
+  factory SpareTyreAssembly.fromJson(String str) =>
+      SpareTyreAssembly.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory SpareTyreAssembly.fromMap(Map<String, dynamic> json) => SpareTyreAssembly(
+  factory SpareTyreAssembly.fromMap(Map<String, dynamic> json) =>
+      SpareTyreAssembly(
         images: json["images"],
         spareTyreAvailable: json["spare_tyre_available"],
       );
@@ -2313,10 +2583,18 @@ class RightSide {
   String toJson() => json.encode(toMap());
 
   factory RightSide.fromMap(Map<String, dynamic> json) => RightSide(
-        frontRightExterior: json["front_right_exterior"] == null ? null : FrontRightExterior.fromMap(json["front_right_exterior"]),
-        frontRightMechanical: json["front_right_mechanical"] == null ? null : FrontRightMechanical.fromMap(json["front_right_mechanical"]),
-        rearRightStructure: json["rear_right_structure"] == null ? null : RearRightStructure.fromMap(json["rear_right_structure"]),
-        rightRightMechanical: json["right_right_mechanical"] == null ? null : AcAssembly.fromMap(json["right_right_mechanical"]),
+        frontRightExterior: json["front_right_exterior"] == null
+            ? null
+            : FrontRightExterior.fromMap(json["front_right_exterior"]),
+        frontRightMechanical: json["front_right_mechanical"] == null
+            ? null
+            : FrontRightMechanical.fromMap(json["front_right_mechanical"]),
+        rearRightStructure: json["rear_right_structure"] == null
+            ? null
+            : RearRightStructure.fromMap(json["rear_right_structure"]),
+        rightRightMechanical: json["right_right_mechanical"] == null
+            ? null
+            : AcAssembly.fromMap(json["right_right_mechanical"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2353,15 +2631,25 @@ class FrontRightExterior {
         rightSvmAssembly: rightSvmAssembly ?? this.rightSvmAssembly,
       );
 
-  factory FrontRightExterior.fromJson(String str) => FrontRightExterior.fromMap(json.decode(str));
+  factory FrontRightExterior.fromJson(String str) =>
+      FrontRightExterior.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontRightExterior.fromMap(Map<String, dynamic> json) => FrontRightExterior(
-        frontRightDoorPanel: json["front_right_door_panel"] == null ? null : FrontLeftExterior.fromMap(json["front_right_door_panel"]),
-        rightFenderLining: json["right_fender_lining"] == null ? null : FrontLeftExterior.fromMap(json["right_fender_lining"]),
-        rightFenderPanel: json["right_fender_panel"] == null ? null : FrontLeftExterior.fromMap(json["right_fender_panel"]),
-        rightSvmAssembly: json["right_svm_assembly"] == null ? null : FrontLeftExterior.fromMap(json["right_svm_assembly"]),
+  factory FrontRightExterior.fromMap(Map<String, dynamic> json) =>
+      FrontRightExterior(
+        frontRightDoorPanel: json["front_right_door_panel"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_right_door_panel"]),
+        rightFenderLining: json["right_fender_lining"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_fender_lining"]),
+        rightFenderPanel: json["right_fender_panel"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_fender_panel"]),
+        rightSvmAssembly: json["right_svm_assembly"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["right_svm_assembly"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2400,23 +2688,37 @@ class FrontRightMechanical {
       FrontRightMechanical(
         exhaustSystem: exhaustSystem ?? this.exhaustSystem,
         fourWheelDrive: fourWheelDrive ?? this.fourWheelDrive,
-        frontRightBrakeAssembly: frontRightBrakeAssembly ?? this.frontRightBrakeAssembly,
+        frontRightBrakeAssembly:
+            frontRightBrakeAssembly ?? this.frontRightBrakeAssembly,
         frontRightSuspension: frontRightSuspension ?? this.frontRightSuspension,
-        frontRightTyreAssembly: frontRightTyreAssembly ?? this.frontRightTyreAssembly,
+        frontRightTyreAssembly:
+            frontRightTyreAssembly ?? this.frontRightTyreAssembly,
         frontWheelDrive: frontWheelDrive ?? this.frontWheelDrive,
       );
 
-  factory FrontRightMechanical.fromJson(String str) => FrontRightMechanical.fromMap(json.decode(str));
+  factory FrontRightMechanical.fromJson(String str) =>
+      FrontRightMechanical.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontRightMechanical.fromMap(Map<String, dynamic> json) => FrontRightMechanical(
+  factory FrontRightMechanical.fromMap(Map<String, dynamic> json) =>
+      FrontRightMechanical(
         exhaustSystem: json["exhaust_system"],
-        fourWheelDrive: json["four_wheel_drive"] == null ? null : FrontLeftExterior.fromMap(json["four_wheel_drive"]),
-        frontRightBrakeAssembly: json["front_right_brake_assembly"] == null ? null : FrontLeftExterior.fromMap(json["front_right_brake_assembly"]),
-        frontRightSuspension: json["front_right_suspension"] == null ? null : FrontRightSuspension.fromMap(json["front_right_suspension"]),
-        frontRightTyreAssembly: json["front_right_tyre_assembly"] == null ? null : FrontLeftExterior.fromMap(json["front_right_tyre_assembly"]),
-        frontWheelDrive: json["front_wheel_drive"] == null ? null : FrontLeftExterior.fromMap(json["front_wheel_drive"]),
+        fourWheelDrive: json["four_wheel_drive"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["four_wheel_drive"]),
+        frontRightBrakeAssembly: json["front_right_brake_assembly"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_right_brake_assembly"]),
+        frontRightSuspension: json["front_right_suspension"] == null
+            ? null
+            : FrontRightSuspension.fromMap(json["front_right_suspension"]),
+        frontRightTyreAssembly: json["front_right_tyre_assembly"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_right_tyre_assembly"]),
+        frontWheelDrive: json["front_wheel_drive"] == null
+            ? null
+            : FrontLeftExterior.fromMap(json["front_wheel_drive"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2449,27 +2751,34 @@ class FrontRightSuspension {
     bool? frontRightStrutAssembly,
   }) =>
       FrontRightSuspension(
-        frontJumpingRodAssembly: frontJumpingRodAssembly ?? this.frontJumpingRodAssembly,
+        frontJumpingRodAssembly:
+            frontJumpingRodAssembly ?? this.frontJumpingRodAssembly,
         frontRightLinkRod: frontRightLinkRod ?? this.frontRightLinkRod,
-        frontRightLowerControlArmAssembly: frontRightLowerControlArmAssembly ?? this.frontRightLowerControlArmAssembly,
-        frontRightStrutAssembly: frontRightStrutAssembly ?? this.frontRightStrutAssembly,
+        frontRightLowerControlArmAssembly: frontRightLowerControlArmAssembly ??
+            this.frontRightLowerControlArmAssembly,
+        frontRightStrutAssembly:
+            frontRightStrutAssembly ?? this.frontRightStrutAssembly,
       );
 
-  factory FrontRightSuspension.fromJson(String str) => FrontRightSuspension.fromMap(json.decode(str));
+  factory FrontRightSuspension.fromJson(String str) =>
+      FrontRightSuspension.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory FrontRightSuspension.fromMap(Map<String, dynamic> json) => FrontRightSuspension(
+  factory FrontRightSuspension.fromMap(Map<String, dynamic> json) =>
+      FrontRightSuspension(
         frontJumpingRodAssembly: json["front_jumping_rod_assembly"],
         frontRightLinkRod: json["front_right_link_rod"],
-        frontRightLowerControlArmAssembly: json["front_right_lower_control_arm_assembly"],
+        frontRightLowerControlArmAssembly:
+            json["front_right_lower_control_arm_assembly"],
         frontRightStrutAssembly: json["front_right_strut_assembly"],
       );
 
   Map<String, dynamic> toMap() => {
         "front_jumping_rod_assembly": frontJumpingRodAssembly,
         "front_right_link_rod": frontRightLinkRod,
-        "front_right_lower_control_arm_assembly": frontRightLowerControlArmAssembly,
+        "front_right_lower_control_arm_assembly":
+            frontRightLowerControlArmAssembly,
         "front_right_strut_assembly": frontRightStrutAssembly,
       };
 }
@@ -2512,18 +2821,34 @@ class RearRightStructure {
         rightRunningBoard: rightRunningBoard ?? this.rightRunningBoard,
       );
 
-  factory RearRightStructure.fromJson(String str) => RearRightStructure.fromMap(json.decode(str));
+  factory RearRightStructure.fromJson(String str) =>
+      RearRightStructure.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory RearRightStructure.fromMap(Map<String, dynamic> json) => RearRightStructure(
-        rearRightDoorChannel: json["rear_right_door_channel"] == null ? null : AcAssembly.fromMap(json["rear_right_door_channel"]),
-        rearRightFloorPan: json["rear_right_floor_pan"] == null ? null : AcAssembly.fromMap(json["rear_right_floor_pan"]),
-        rearRightWheelHouse: json["rear_right_wheel_house"] == null ? null : AcAssembly.fromMap(json["rear_right_wheel_house"]),
-        rightFloorPanChannel: json["right_floor_pan_channel"] == null ? null : AcAssembly.fromMap(json["right_floor_pan_channel"]),
-        rightPillarB: json["right_pillar_B"] == null ? null : AcAssembly.fromMap(json["right_pillar_B"]),
-        rightPillarC: json["right_pillar_c"] == null ? null : AcAssembly.fromMap(json["right_pillar_c"]),
-        rightRunningBoard: json["right_running_board"] == null ? null : TRunningBoard.fromMap(json["right_running_board"]),
+  factory RearRightStructure.fromMap(Map<String, dynamic> json) =>
+      RearRightStructure(
+        rearRightDoorChannel: json["rear_right_door_channel"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_right_door_channel"]),
+        rearRightFloorPan: json["rear_right_floor_pan"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_right_floor_pan"]),
+        rearRightWheelHouse: json["rear_right_wheel_house"] == null
+            ? null
+            : AcAssembly.fromMap(json["rear_right_wheel_house"]),
+        rightFloorPanChannel: json["right_floor_pan_channel"] == null
+            ? null
+            : AcAssembly.fromMap(json["right_floor_pan_channel"]),
+        rightPillarB: json["right_pillar_B"] == null
+            ? null
+            : AcAssembly.fromMap(json["right_pillar_B"]),
+        rightPillarC: json["right_pillar_c"] == null
+            ? null
+            : AcAssembly.fromMap(json["right_pillar_c"]),
+        rightRunningBoard: json["right_running_board"] == null
+            ? null
+            : TRunningBoard.fromMap(json["right_running_board"]),
       );
 
   Map<String, dynamic> toMap() => {
@@ -2554,8 +2879,10 @@ class TestDrive {
     bool? steeringHealth,
   }) =>
       TestDrive(
-        accelerateToCheckClutch: accelerateToCheckClutch ?? this.accelerateToCheckClutch,
-        applyBrakesTillCarStop: applyBrakesTillCarStop ?? this.applyBrakesTillCarStop,
+        accelerateToCheckClutch:
+            accelerateToCheckClutch ?? this.accelerateToCheckClutch,
+        applyBrakesTillCarStop:
+            applyBrakesTillCarStop ?? this.applyBrakesTillCarStop,
         steeringHealth: steeringHealth ?? this.steeringHealth,
       );
 
@@ -2564,10 +2891,14 @@ class TestDrive {
   String toJson() => json.encode(toMap());
 
   factory TestDrive.fromMap(Map<String, dynamic> json) => TestDrive(
-        accelerateToCheckClutch:
-            json["accelerate_to_check_clutch"] == null ? null : AccelerateToCheckClutch.fromMap(json["accelerate_to_check_clutch"]),
-        applyBrakesTillCarStop:
-            json["apply_brakes_till_car_stop"] == null ? null : ApplyBrakesTillCarStop.fromMap(json["apply_brakes_till_car_stop"]),
+        accelerateToCheckClutch: json["accelerate_to_check_clutch"] == null
+            ? null
+            : AccelerateToCheckClutch.fromMap(
+                json["accelerate_to_check_clutch"]),
+        applyBrakesTillCarStop: json["apply_brakes_till_car_stop"] == null
+            ? null
+            : ApplyBrakesTillCarStop.fromMap(
+                json["apply_brakes_till_car_stop"]),
         steeringHealth: json["steering_health"],
       );
 
@@ -2593,14 +2924,17 @@ class AccelerateToCheckClutch {
   }) =>
       AccelerateToCheckClutch(
         clutchPedalVibration: clutchPedalVibration ?? this.clutchPedalVibration,
-        noiseFromTurbocharger: noiseFromTurbocharger ?? this.noiseFromTurbocharger,
+        noiseFromTurbocharger:
+            noiseFromTurbocharger ?? this.noiseFromTurbocharger,
       );
 
-  factory AccelerateToCheckClutch.fromJson(String str) => AccelerateToCheckClutch.fromMap(json.decode(str));
+  factory AccelerateToCheckClutch.fromJson(String str) =>
+      AccelerateToCheckClutch.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory AccelerateToCheckClutch.fromMap(Map<String, dynamic> json) => AccelerateToCheckClutch(
+  factory AccelerateToCheckClutch.fromMap(Map<String, dynamic> json) =>
+      AccelerateToCheckClutch(
         clutchPedalVibration: json["clutch_pedal_vibration"],
         noiseFromTurbocharger: json["noise_from_turbocharger"],
       );
@@ -2628,16 +2962,21 @@ class ApplyBrakesTillCarStop {
     bool? rearBrakeNoiseVibration,
   }) =>
       ApplyBrakesTillCarStop(
-        frontBrakeNoiseVibration: frontBrakeNoiseVibration ?? this.frontBrakeNoiseVibration,
-        idleStartStopNotWorking: idleStartStopNotWorking ?? this.idleStartStopNotWorking,
-        rearBrakeNoiseVibration: rearBrakeNoiseVibration ?? this.rearBrakeNoiseVibration,
+        frontBrakeNoiseVibration:
+            frontBrakeNoiseVibration ?? this.frontBrakeNoiseVibration,
+        idleStartStopNotWorking:
+            idleStartStopNotWorking ?? this.idleStartStopNotWorking,
+        rearBrakeNoiseVibration:
+            rearBrakeNoiseVibration ?? this.rearBrakeNoiseVibration,
       );
 
-  factory ApplyBrakesTillCarStop.fromJson(String str) => ApplyBrakesTillCarStop.fromMap(json.decode(str));
+  factory ApplyBrakesTillCarStop.fromJson(String str) =>
+      ApplyBrakesTillCarStop.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory ApplyBrakesTillCarStop.fromMap(Map<String, dynamic> json) => ApplyBrakesTillCarStop(
+  factory ApplyBrakesTillCarStop.fromMap(Map<String, dynamic> json) =>
+      ApplyBrakesTillCarStop(
         frontBrakeNoiseVibration: json["front_brake_noise_vibration"],
         idleStartStopNotWorking: json["idle_start_stop_not_working"],
         rearBrakeNoiseVibration: json["rear_brake_noise_vibration"],

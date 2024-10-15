@@ -7,17 +7,19 @@ import 'package:inspection/pages/loginPage.dart';
 import 'package:inspection/screens/profilePage.dart';
 import 'package:inspection/screens/settingsPage.dart';
 import 'package:inspection/pages/finalVerdict.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(
-    const MyApp());
+  runApp(const MyApp());
 }
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
   _MyAppState createState() => _MyAppState();
 }
+
 class _MyAppState extends State<MyApp> {
   // Variable to hold the initial screen
   Widget _initialScreen = const CircularProgressIndicator();
@@ -38,7 +40,6 @@ class _MyAppState extends State<MyApp> {
         _initialScreen = const LoginPage();
       }
     });
-
   }
 
   @override

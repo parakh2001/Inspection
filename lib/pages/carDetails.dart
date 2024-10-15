@@ -1237,10 +1237,12 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     log("getUID ${getInspectionUID}");
     // _loadCarData();
   }
-  Future<void> _pickMultiImage() async{
+
+  Future<void> _pickMultiImage() async {
     int maxImages = 5;
     int capturedCount = 0;
   }
+
   Future<void> _pickImage() async {
     final List<XFile>? image = await picker.pickMultiImage(
       limit: 10,
