@@ -49,7 +49,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   final TextEditingController extraParts = TextEditingController();
 
   ///Registration details
-  final TextEditingController _registrationYearMonthController = TextEditingController();
+  final TextEditingController _registrationYearMonthController =
+      TextEditingController();
 
   bool _hsrpAvailable = false;
   bool _isChassisNumberOk = false;
@@ -1236,7 +1237,10 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     log("getUID ${getInspectionUID}");
     // _loadCarData();
   }
-
+  Future<void> _pickMultiImage() async{
+    int maxImages = 5;
+    int capturedCount = 0;
+  }
   Future<void> _pickImage() async {
     final List<XFile>? image = await picker.pickMultiImage(
       limit: 10,
@@ -1253,8 +1257,10 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       image.forEach(
         (element) async {
           final File file = File(element.path);
-          final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-          final Reference reference = storage.ref('inspection/$getInspectionUID/car_doc/other_details/images/$fileName');
+          final String fileName =
+              '${DateTime.now().millisecondsSinceEpoch}.jpg';
+          final Reference reference = storage.ref(
+              'inspection/$getInspectionUID/car_doc/other_details/images/$fileName');
           final UploadTask uploadTask = reference.putFile(file);
           final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(
             () {},
@@ -1274,7 +1280,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     }
   }
 
-  Future<String> uploadImage({required XFile imageVar, required imageRef}) async {
+  Future<String> uploadImage(
+      {required XFile imageVar, required imageRef}) async {
     final File file = File(imageVar.path);
     final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
     final Reference reference = storage.ref('$imageRef/$fileName');
@@ -2299,7 +2306,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   // }
 
   // Function to show max bid reached SnackBar
-  void showErrorSnackBar({required BuildContext context, required String errorMsg}) {
+  void showErrorSnackBar(
+      {required BuildContext context, required String errorMsg}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(errorMsg),
@@ -2333,7 +2341,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           engineNumber: _engineNumberController.text,
           isChassisNumberOk: _isChassisNumberOk,
           chassisNumberImage: selectedChassisNumberImage,
-          noOfKeys: int.tryParse(_numberOfKeyController.text), // Example static data, you can replace
+          noOfKeys: int.tryParse(_numberOfKeyController
+              .text), // Example static data, you can replace
           images: selectedOtherImages, // Replace with logic for multiple images
         ),
       );
@@ -2345,10 +2354,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   void _saveCarInspection() async {
-    DatabaseReference carAuctionRef = FirebaseDatabase.instance.ref('car_auction');
+    DatabaseReference carAuctionRef =
+        FirebaseDatabase.instance.ref('car_auction');
     await engineRatingCheck();
     num engineRatingValue = 0.0;
-    num carPrice = _carFairPriceController.text.isEmpty ? num.parse(widget.carDetails.carCarPrice) : num.parse(_carFairPriceController.text);
+    num carPrice = _carFairPriceController.text.isEmpty
+        ? num.parse(widget.carDetails.carCarPrice)
+        : num.parse(_carFairPriceController.text);
     setState(() {
       var trueBool = engineRating.where(
         (element) => element == true,
@@ -3228,7 +3240,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
               dickeySidewalls: DickeySidewalls(
                 leftDickeySidewall: FrontLeftExterior(
                   images: selectedLeftDickeySidewallImage,
-                  sealantMissingCrackRepaired: leftDickeySidewallSealantMissingCrackRepaired,
+                  sealantMissingCrackRepaired:
+                      leftDickeySidewallSealantMissingCrackRepaired,
                   replaced: leftDickeySidewallReplaced,
                   crackMajor: leftDickeySidewallCrackMajor,
                   crackMinor: leftDickeySidewallCrackMinor,
@@ -3241,7 +3254,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 rightDickeySidewall: FrontLeftExterior(
                   images: selectedRightDickeySidewallImage,
                   replaced: rightDickeySidewallReplaced,
-                  sealantMissingCrackRepaired: rightDickeySidewallSealantMissingCrackRepaired,
+                  sealantMissingCrackRepaired:
+                      rightDickeySidewallSealantMissingCrackRepaired,
                   crackMajor: rightDickeySidewallCrackMajor,
                   crackMinor: rightDickeySidewallCrackMinor,
                   corrosionMinor: rightDickeySidewallCorrosionMinor,
@@ -3254,7 +3268,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
               dickeyStrutTowers: DickeyStrutTowers(
                 leftDickeyStrutTower: FrontLeftExterior(
                   images: selectedLeftDickeyStrutTowerImage,
-                  sealantMissingCrackRepaired: leftDickeyStrutTowerSealantMissingCrackRepaired,
+                  sealantMissingCrackRepaired:
+                      leftDickeyStrutTowerSealantMissingCrackRepaired,
                   replaced: leftDickeyStrutTowerReplaced,
                   crackMajor: leftDickeyStrutTowerCrackMajor,
                   crackMinor: leftDickeyStrutTowerCrackMinor,
@@ -3266,7 +3281,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 ),
                 rightDickeyStrutTower: FrontLeftExterior(
                   images: selectedRightDickeyStrutTowerImage,
-                  sealantMissingCrackRepaired: rightDickeyStrutTowerSealantMissingCrackRepaired,
+                  sealantMissingCrackRepaired:
+                      rightDickeyStrutTowerSealantMissingCrackRepaired,
                   replaced: rightDickeyStrutTowerReplaced,
                   crackMajor: rightDickeyStrutTowerCrackMajor,
                   crackMinor: rightDickeyStrutTowerCrackMinor,
@@ -3379,10 +3395,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
               punchesOpenRepaired: frontRightBrakeAssemblyPunchesOpenRepaired,
             ),
             frontRightSuspension: FrontRightSuspension(
-              frontJumpingRodAssembly: frontRightSuspensionFrontJumpingRodAssembly,
+              frontJumpingRodAssembly:
+                  frontRightSuspensionFrontJumpingRodAssembly,
               frontRightLinkRod: frontRightSuspensionFrontRightLinkRod,
-              frontRightLowerControlArmAssembly: frontRightSuspensionFrontRightLowerControlArmAssembly,
-              frontRightStrutAssembly: frontRightSuspensionFrontRightStrutAssembly,
+              frontRightLowerControlArmAssembly:
+                  frontRightSuspensionFrontRightLowerControlArmAssembly,
+              frontRightStrutAssembly:
+                  frontRightSuspensionFrontRightStrutAssembly,
             ),
             frontRightTyreAssembly: FrontLeftExterior(
               images: selectedFrontRightTyreAssemblyImage,
@@ -3659,7 +3678,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedRcImage == null) {
-                      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image =
+                          await picker.pickImage(source: ImageSource.camera);
 
                       if (image != null) {
                         setState(() {
@@ -3667,7 +3687,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                         });
                         final result = await uploadImage(
                           imageVar: image,
-                          imageRef: 'inspection/$getInspectionUID/car_doc/rc_details',
+                          imageRef:
+                              'inspection/$getInspectionUID/car_doc/rc_details',
                         );
                         if (result.isNotEmpty) {
                           setState(() {
@@ -3768,7 +3789,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedCarImage == null) {
-                      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image =
+                          await picker.pickImage(source: ImageSource.camera);
 
                       if (image != null) {
                         setState(() {
@@ -3776,7 +3798,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                         });
                         final result = await uploadImage(
                           imageVar: image,
-                          imageRef: 'inspection/$getInspectionUID/car_doc/car_details',
+                          imageRef:
+                              'inspection/$getInspectionUID/car_doc/car_details',
                         );
                         if (result.isNotEmpty) {
                           setState(() {
@@ -3869,7 +3892,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedChassisNumberImage == null) {
-                      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image =
+                          await picker.pickImage(source: ImageSource.camera);
 
                       if (image != null) {
                         setState(() {
@@ -3877,7 +3901,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                         });
                         final result = await uploadImage(
                           imageVar: image,
-                          imageRef: 'inspection/$getInspectionUID/car_doc/other_details/chassis_number_image/',
+                          imageRef:
+                              'inspection/$getInspectionUID/car_doc/other_details/chassis_number_image/',
                         );
                         if (result.isNotEmpty) {
                           setState(() {
@@ -3953,7 +3978,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                   width: 100,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(width: 1, color: Colors.grey),
+                                    border: Border.all(
+                                        width: 1, color: Colors.grey),
                                   ),
                                   child: const Center(
                                     child: Text(
@@ -4002,33 +4028,51 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           ElevatedButton(
             onPressed: () {
               if (_rcNumberController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Your RC Number");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Your RC Number");
               } else if (_selectedRcImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rc image");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please selcted rc image");
               } else if (_mfgYearMonthController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Manufacturing Year/Month");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Enter Manufacturing Year/Month");
               } else if (_carMakeController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Car Make");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Car Make");
               } else if (_carModelController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Car Model");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Car Model");
               } else if (_fuelTypeController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Fuel Type");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Fuel Type");
               } else if (_transmissionController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Transmission Type");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Transmission Type");
               } else if (_selectedCarImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted car details image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted car details image");
               } else if (_ownersController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Number of Owners");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Number of Owners");
               } else if (_numberOfKeyController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Number of Keys");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Number of Keys");
               } else if (_engineNumberController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Engine Number");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Engine Number");
               } else if (_selectedChassisNumberImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted chassis number image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted chassis number image");
               } else if (_selectedOtherImages.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted other image");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please selcted other image");
               } else if (_registrationYearMonthController.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Registration Year/Month");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Enter Registration Year/Month");
               }
 
               if (_formKey.currentState!.validate()) {
@@ -4101,7 +4145,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedBatteryImage == null) {
-                      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image =
+                          await picker.pickImage(source: ImageSource.camera);
 
                       if (image != null) {
                         setState(() {
@@ -4109,7 +4154,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                         });
                         final result = await uploadImage(
                           imageVar: image,
-                          imageRef: 'inspection/$getInspectionUID/car_health/battery',
+                          imageRef:
+                              'inspection/$getInspectionUID/car_health/battery',
                         );
                         if (result.isNotEmpty) {
                           setState(() {
@@ -4451,7 +4497,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedBonnetImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -4459,7 +4506,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/bonnet_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/bonnet_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -4488,7 +4536,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -4555,7 +4604,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedCarKeyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -4563,7 +4613,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/car_key',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/car_key',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -4592,7 +4643,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -4659,19 +4711,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedCentralLockingRemoteHousingImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedCentralLockingRemoteHousingImage = File(image.path);
+                              _selectedCentralLockingRemoteHousingImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/central_locking_remote_housing',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/central_locking_remote_housing',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedCentralLockingRemoteHousingImage = result.toString();
+                                selectedCentralLockingRemoteHousingImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedCentralLockingRemoteHousingImage}");
                               });
@@ -4686,7 +4742,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedCentralLockingRemoteHousingImage!),
+                                  image: FileImage(
+                                      _selectedCentralLockingRemoteHousingImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -4696,7 +4753,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -4774,7 +4832,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontBumperGrillImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -4782,11 +4841,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/front_bumper_grill',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/front_bumper_grill',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontBumperGrillImage = result.toString();
+                                selectedFrontBumperGrillImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontBumperGrillImage}");
                               });
@@ -4801,7 +4862,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontBumperGrillImage!),
+                                  image: FileImage(
+                                      _selectedFrontBumperGrillImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -4811,7 +4873,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -4878,7 +4941,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontBumperPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -4886,11 +4950,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/front_bumper_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/front_bumper_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontBumperPanelImage = result.toString();
+                                selectedFrontBumperPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontBumperPanelImage}");
                               });
@@ -4905,7 +4971,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontBumperPanelImage!),
+                                  image: FileImage(
+                                      _selectedFrontBumperPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -4915,7 +4982,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -4982,19 +5050,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontRegistrationPlateImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedFrontRegistrationPlateImage = File(image.path);
+                              _selectedFrontRegistrationPlateImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/front_registration_plate',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_1/front_registration_plate',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontRegistrationPlateImage = result.toString();
+                                selectedFrontRegistrationPlateImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontRegistrationPlateImage}");
                               });
@@ -5009,7 +5081,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontRegistrationPlateImage!),
+                                  image: FileImage(
+                                      _selectedFrontRegistrationPlateImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -5019,7 +5092,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -5143,19 +5217,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontLeftFogLightHousingImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedFrontLeftFogLightHousingImage = File(image.path);
+                              _selectedFrontLeftFogLightHousingImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/front_left_fog_light_housing',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/front_left_fog_light_housing',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontLeftFogLightHousingImage = result.toString();
+                                selectedFrontLeftFogLightHousingImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontLeftFogLightHousingImage}");
                               });
@@ -5170,7 +5248,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontLeftFogLightHousingImage!),
+                                  image: FileImage(
+                                      _selectedFrontLeftFogLightHousingImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -5180,7 +5259,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -5302,19 +5382,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontRightFogLightHousingImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedFrontRightFogLightHousingImage = File(image.path);
+                              _selectedFrontRightFogLightHousingImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/front_right_fog_light_housing',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/front_right_fog_light_housing',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontRightFogLightHousingImage = result.toString();
+                                selectedFrontRightFogLightHousingImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontRightFogLightHousingImage}");
                               });
@@ -5329,7 +5413,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontRightFogLightHousingImage!),
+                                  image: FileImage(
+                                      _selectedFrontRightFogLightHousingImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -5339,7 +5424,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -5461,7 +5547,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftDrlImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -5469,7 +5556,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/left_DRL',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/left_DRL',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -5498,7 +5586,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -5620,19 +5709,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftHeadlightAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedLeftHeadlightAssemblyImage = File(image.path);
+                              _selectedLeftHeadlightAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/left_headlight_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/left_headlight_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftHeadlightAssemblyImage = result.toString();
+                                selectedLeftHeadlightAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftHeadlightAssemblyImage}");
                               });
@@ -5647,7 +5740,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftHeadlightAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedLeftHeadlightAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -5657,7 +5751,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -5779,19 +5874,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftHeadlightHousingImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedLeftHeadlightHousingImage = File(image.path);
+                              _selectedLeftHeadlightHousingImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/left_headlight_housing',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/left_headlight_housing',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftHeadlightHousingImage = result.toString();
+                                selectedLeftHeadlightHousingImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftHeadlightHousingImage}");
                               });
@@ -5806,7 +5905,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftHeadlightHousingImage!),
+                                  image: FileImage(
+                                      _selectedLeftHeadlightHousingImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -5816,7 +5916,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -5938,7 +6039,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightDrlImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -5946,7 +6048,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/right_DRL',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/right_DRL',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -5975,7 +6078,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -6097,19 +6201,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightHeadlightAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRightHeadlightAssemblyImage = File(image.path);
+                              _selectedRightHeadlightAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/right_headlight_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/right_headlight_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightHeadlightAssemblyImage = result.toString();
+                                selectedRightHeadlightAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightHeadlightAssemblyImage}");
                               });
@@ -6124,7 +6232,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightHeadlightAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedRightHeadlightAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -6134,7 +6243,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -6256,19 +6366,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightHeadlightHousingImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRightHeadlightHousingImage = File(image.path);
+                              _selectedRightHeadlightHousingImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/right_headlight_housing',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_exterior_2/right_headlight_housing',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightHeadlightHousingImage = result.toString();
+                                selectedRightHeadlightHousingImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightHeadlightHousingImage}");
                               });
@@ -6283,7 +6397,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightHeadlightHousingImage!),
+                                  image: FileImage(
+                                      _selectedRightHeadlightHousingImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -6293,7 +6408,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -6520,7 +6636,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontLeftLegImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -6528,7 +6645,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_structure_1/front_left_leg',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_structure_1/front_left_leg',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -6557,7 +6675,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -6679,7 +6798,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontRightLeftImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -6687,7 +6807,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/front_side/front_structure_1/front_right_leg',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/front_side/front_structure_1/front_right_leg',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -6706,7 +6827,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontRightLeftImage!),
+                                  image:
+                                      FileImage(_selectedFrontRightLeftImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -6716,7 +6838,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -6975,7 +7098,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedAcAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -6983,7 +7107,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_1/ac_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_1/ac_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
@@ -7200,7 +7325,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedAirBagsImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -7208,7 +7334,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_1/airBags',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_1/airBags',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
@@ -7425,19 +7552,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedClusterPanelAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedClusterPanelAssemblyImage = File(image.path);
+                            _selectedClusterPanelAssemblyImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_1/cluster_panel_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_1/cluster_panel_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedClusterPanelAssemblyImage = result.toString();
+                              selectedClusterPanelAssemblyImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedClusterPanelAssemblyImage}");
                             });
@@ -7452,7 +7583,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedClusterPanelAssemblyImage!),
+                                image: FileImage(
+                                    _selectedClusterPanelAssemblyImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -7650,7 +7782,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedDashboardAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -7658,11 +7791,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_1/dashboard_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_1/dashboard_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedDashboardAssemblyImage = result.toString();
+                              selectedDashboardAssemblyImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedDashboardAssemblyImage}");
                             });
@@ -7677,7 +7812,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedDashboardAssemblyImage!),
+                                image:
+                                    FileImage(_selectedDashboardAssemblyImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -7875,19 +8011,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedFrontWindshieldGlassImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedFrontWindshieldGlassImage = File(image.path);
+                            _selectedFrontWindshieldGlassImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_1/front_windshield_glass',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_1/front_windshield_glass',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedFrontWindshieldGlassImage = result.toString();
+                              selectedFrontWindshieldGlassImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedFrontWindshieldGlassImage}");
                             });
@@ -7902,7 +8042,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedFrontWindshieldGlassImage!),
+                                image: FileImage(
+                                    _selectedFrontWindshieldGlassImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -8100,7 +8241,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedSeatsImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -8108,7 +8250,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_1/seats',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_1/seats',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
@@ -8316,19 +8459,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedAudioStereoAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedAudioStereoAssemblyImage = File(image.path);
+                            _selectedAudioStereoAssemblyImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/audio_stereo_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/audio_stereo_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedAudioStereoAssemblyImage = result.toString();
+                              selectedAudioStereoAssemblyImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedAudioStereoAssemblyImage}");
                             });
@@ -8343,7 +8490,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedAudioStereoAssemblyImage!),
+                                image: FileImage(
+                                    _selectedAudioStereoAssemblyImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -8530,19 +8678,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedCentreConsoleAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedCentreConsoleAssemblyImage = File(image.path);
+                            _selectedCentreConsoleAssemblyImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/centre_console_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/centre_console_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedCentreConsoleAssemblyImage = result.toString();
+                              selectedCentreConsoleAssemblyImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedCentreConsoleAssemblyImage}");
                             });
@@ -8557,7 +8709,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedCentreConsoleAssemblyImage!),
+                                image: FileImage(
+                                    _selectedCentreConsoleAssemblyImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -8744,19 +8897,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedForwardParkingSensorsImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedForwardParkingSensorsImage = File(image.path);
+                            _selectedForwardParkingSensorsImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/forward_parking_sensors',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/forward_parking_sensors',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedForwardParkingSensorsImage = result.toString();
+                              selectedForwardParkingSensorsImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedForwardParkingSensorsImage}");
                             });
@@ -8771,7 +8928,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedForwardParkingSensorsImage!),
+                                image: FileImage(
+                                    _selectedForwardParkingSensorsImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -8958,19 +9116,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedFrontLeftDoorAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedFrontLeftDoorAssemblyImage = File(image.path);
+                            _selectedFrontLeftDoorAssemblyImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/front_left_door_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/front_left_door_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedFrontLeftDoorAssemblyImage = result.toString();
+                              selectedFrontLeftDoorAssemblyImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedFrontLeftDoorAssemblyImage}");
                             });
@@ -8985,7 +9147,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedFrontLeftDoorAssemblyImage!),
+                                image: FileImage(
+                                    _selectedFrontLeftDoorAssemblyImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -9172,19 +9335,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedFrontRightDoorAssemblyImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedFrontRightDoorAssemblyImage = File(image.path);
+                            _selectedFrontRightDoorAssemblyImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/front_right_door_assembly',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/front_right_door_assembly',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedFrontRightDoorAssemblyImage = result.toString();
+                              selectedFrontRightDoorAssemblyImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedFrontRightDoorAssemblyImage}");
                             });
@@ -9199,7 +9366,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedFrontRightDoorAssemblyImage!),
+                                image: FileImage(
+                                    _selectedFrontRightDoorAssemblyImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -9386,19 +9554,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedReverseParkingCameraImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedReverseParkingCameraImage = File(image.path);
+                            _selectedReverseParkingCameraImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/reverse_parking_camera',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/reverse_parking_camera',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedReverseParkingCameraImage = result.toString();
+                              selectedReverseParkingCameraImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedReverseParkingCameraImage}");
                             });
@@ -9413,7 +9585,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedReverseParkingCameraImage!),
+                                image: FileImage(
+                                    _selectedReverseParkingCameraImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -9600,19 +9773,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedReverseParkingSensorsImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedReverseParkingSensorsImage = File(image.path);
+                            _selectedReverseParkingSensorsImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/Interior_2/reverse_parking_sensors',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/Interior_2/reverse_parking_sensors',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedReverseParkingSensorsImage = result.toString();
+                              selectedReverseParkingSensorsImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedReverseParkingSensorsImage}");
                             });
@@ -9627,7 +9804,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedReverseParkingSensorsImage!),
+                                image: FileImage(
+                                    _selectedReverseParkingSensorsImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -9761,7 +9939,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedFrontLeftExteriorImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -9769,11 +9948,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_exterior',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/left_side/front_left_exterior',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedFrontLeftExteriorImage = result.toString();
+                              selectedFrontLeftExteriorImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedFrontLeftExteriorImage}");
                             });
@@ -9788,7 +9969,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedFrontLeftExteriorImage!),
+                                image:
+                                    FileImage(_selectedFrontLeftExteriorImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -9975,19 +10157,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedFrontLeftMechanicalImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
-                            _selectedFrontLeftMechanicalImage = File(image.path);
+                            _selectedFrontLeftMechanicalImage =
+                                File(image.path);
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_mechanical',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/left_side/front_left_mechanical',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedFrontLeftMechanicalImage = result.toString();
+                              selectedFrontLeftMechanicalImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedFrontLeftMechanicalImage}");
                             });
@@ -10002,7 +10188,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedFrontLeftMechanicalImage!),
+                                image: FileImage(
+                                    _selectedFrontLeftMechanicalImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -10190,19 +10377,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftFloorPanChannelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedLeftFloorPanChannelImage = File(image.path);
+                              _selectedLeftFloorPanChannelImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_floor_pan_channel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_floor_pan_channel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftFloorPanChannelImage = result.toString();
+                                selectedLeftFloorPanChannelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftFloorPanChannelImage}");
                               });
@@ -10217,7 +10408,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftFloorPanChannelImage!),
+                                  image: FileImage(
+                                      _selectedLeftFloorPanChannelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -10227,7 +10419,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -10404,7 +10597,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftPillarBImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -10412,7 +10606,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_pillar_B',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_pillar_B',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -10441,7 +10636,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -10618,7 +10814,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftPillarCImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -10626,7 +10823,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_pillar_C',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_pillar_C',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -10655,7 +10853,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -10766,7 +10965,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftRunningBoardImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -10774,11 +10974,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_running_board',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/left_running_board',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftRunningBoardImage = result.toString();
+                                selectedLeftRunningBoardImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftRunningBoardImage}");
                               });
@@ -10793,7 +10995,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftRunningBoardImage!),
+                                  image: FileImage(
+                                      _selectedLeftRunningBoardImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -10803,7 +11006,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -10980,19 +11184,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearLeftDoorChannelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearLeftDoorChannelImage = File(image.path);
+                              _selectedRearLeftDoorChannelImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/rear_left_door_channel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/rear_left_door_channel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearLeftDoorChannelImage = result.toString();
+                                selectedRearLeftDoorChannelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearLeftDoorChannelImage}");
                               });
@@ -11007,7 +11215,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearLeftDoorChannelImage!),
+                                  image: FileImage(
+                                      _selectedRearLeftDoorChannelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -11017,7 +11226,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -11194,7 +11404,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearLeftFloorPanImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -11202,11 +11413,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/rear_left_floor_pan',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/rear_left_floor_pan',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearLeftFloorPanImage = result.toString();
+                                selectedRearLeftFloorPanImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearLeftFloorPanImage}");
                               });
@@ -11221,7 +11434,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearLeftFloorPanImage!),
+                                  image: FileImage(
+                                      _selectedRearLeftFloorPanImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -11231,7 +11445,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -11408,19 +11623,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearLeftWheelHouseImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearLeftWheelHouseImage = File(image.path);
+                              _selectedRearLeftWheelHouseImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/front_left_structure/rear_left_wheel_house',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/front_left_structure/rear_left_wheel_house',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearLeftWheelHouseImage = result.toString();
+                                selectedRearLeftWheelHouseImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearLeftWheelHouseImage}");
                               });
@@ -11435,7 +11654,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearLeftWheelHouseImage!),
+                                  image: FileImage(
+                                      _selectedRearLeftWheelHouseImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -11445,7 +11665,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -11568,7 +11789,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedRearLeftExteriorImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -11576,7 +11798,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/left_side/rear_left_exterior',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/left_side/rear_left_exterior',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
@@ -11595,7 +11818,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedRearLeftExteriorImage!),
+                                image:
+                                    FileImage(_selectedRearLeftExteriorImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -11727,7 +11951,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedRearLeftMechanicalImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -11735,11 +11960,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/left_side/rear_left_mechanical',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/left_side/rear_left_mechanical',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
-                              selectedRearLeftMechanicalImage = result.toString();
+                              selectedRearLeftMechanicalImage =
+                                  result.toString();
                               selectedAllImages.add(result);
                               log("message ${selectedRearLeftMechanicalImage}");
                             });
@@ -11754,7 +11981,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedRearLeftMechanicalImage!),
+                                image: FileImage(
+                                    _selectedRearLeftMechanicalImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -11887,7 +12115,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftFenderLiningImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -11895,11 +12124,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/left_fender_lining',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/left_fender_lining',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftFenderLiningImage = result.toString();
+                                selectedLeftFenderLiningImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftFenderLiningImage}");
                               });
@@ -11914,7 +12145,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftFenderLiningImage!),
+                                  image: FileImage(
+                                      _selectedLeftFenderLiningImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -11924,7 +12156,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -12046,7 +12279,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftFenderPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -12054,11 +12288,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/left_fender_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/left_fender_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftFenderPanelImage = result.toString();
+                                selectedLeftFenderPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftFenderPanelImage}");
                               });
@@ -12073,7 +12309,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftFenderPanelImage!),
+                                  image:
+                                      FileImage(_selectedLeftFenderPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -12083,7 +12320,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -12205,7 +12443,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftSvmAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -12213,11 +12452,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/left_svm_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/left_svm_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftSvmAssemblyImage = result.toString();
+                                selectedLeftSvmAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftSvmAssemblyImage}");
                               });
@@ -12232,7 +12473,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftSvmAssemblyImage!),
+                                  image:
+                                      FileImage(_selectedLeftSvmAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -12242,7 +12484,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -12364,19 +12607,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearLeftDoorPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearLeftDoorPanelImage = File(image.path);
+                              _selectedRearLeftDoorPanelImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/rear_left_door_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/left_side/rear_left_structure/rear_left_door_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearLeftDoorPanelImage = result.toString();
+                                selectedRearLeftDoorPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearLeftDoorPanelImage}");
                               });
@@ -12391,7 +12638,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearLeftDoorPanelImage!),
+                                  image: FileImage(
+                                      _selectedRearLeftDoorPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -12401,7 +12649,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -12538,7 +12787,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyDoorPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -12546,11 +12796,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/dickey_door_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/dickey_door_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedDickeyDoorPanelImage = result.toString();
+                                selectedDickeyDoorPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedDickeyDoorPanelImage}");
                               });
@@ -12565,7 +12817,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedDickeyDoorPanelImage!),
+                                  image:
+                                      FileImage(_selectedDickeyDoorPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -12575,7 +12828,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -12708,19 +12962,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyLeftStayRodShockerImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedDickeyLeftStayRodShockerImage = File(image.path);
+                              _selectedDickeyLeftStayRodShockerImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/dickey_left_stay_rod_shocker',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/dickey_left_stay_rod_shocker',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedDickeyLeftStayRodShockerImage = result.toString();
+                                selectedDickeyLeftStayRodShockerImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedDickeyLeftStayRodShockerImage}");
                               });
@@ -12735,7 +12993,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedDickeyLeftStayRodShockerImage!),
+                                  image: FileImage(
+                                      _selectedDickeyLeftStayRodShockerImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -12745,7 +13004,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -12878,19 +13138,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyRightStayRodShockerImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedDickeyRightStayRodShockerImage = File(image.path);
+                              _selectedDickeyRightStayRodShockerImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/dickey_right_stay_rod_shocker',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/dickey_right_stay_rod_shocker',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedDickeyRightStayRodShockerImage = result.toString();
+                                selectedDickeyRightStayRodShockerImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedDickeyRightStayRodShockerImage}");
                               });
@@ -12905,7 +13169,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedDickeyRightStayRodShockerImage!),
+                                  image: FileImage(
+                                      _selectedDickeyRightStayRodShockerImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -12915,7 +13180,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -13092,19 +13358,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedLeftTailLightAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedLeftTailLightAssemblyImage = File(image.path);
+                              _selectedLeftTailLightAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/left_tail_light_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/left_tail_light_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedLeftTailLightAssemblyImage = result.toString();
+                                selectedLeftTailLightAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedLeftTailLightAssemblyImage}");
                               });
@@ -13119,7 +13389,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedLeftTailLightAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedLeftTailLightAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -13129,7 +13400,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -13306,7 +13578,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearBumperPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -13314,11 +13587,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/rear_bumper_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/rear_bumper_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearBumperPanelImage = result.toString();
+                                selectedRearBumperPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearBumperPanelImage}");
                               });
@@ -13333,7 +13608,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearBumperPanelImage!),
+                                  image:
+                                      FileImage(_selectedRearBumperPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -13343,7 +13619,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -13520,19 +13797,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearRegistrationPlateImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearRegistrationPlateImage = File(image.path);
+                              _selectedRearRegistrationPlateImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/rear_registration_plate',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/rear_registration_plate',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearRegistrationPlateImage = result.toString();
+                                selectedRearRegistrationPlateImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearRegistrationPlateImage}");
                               });
@@ -13547,7 +13828,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearRegistrationPlateImage!),
+                                  image: FileImage(
+                                      _selectedRearRegistrationPlateImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -13557,7 +13839,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -13734,19 +14017,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearWindshieldGlassImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearWindshieldGlassImage = File(image.path);
+                              _selectedRearWindshieldGlassImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/rear_windshield_glass',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/rear_windshield_glass',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearWindshieldGlassImage = result.toString();
+                                selectedRearWindshieldGlassImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearWindshieldGlassImage}");
                               });
@@ -13761,7 +14048,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearWindshieldGlassImage!),
+                                  image: FileImage(
+                                      _selectedRearWindshieldGlassImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -13771,7 +14059,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -13948,19 +14237,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightTailLightAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRightTailLightAssemblyImage = File(image.path);
+                              _selectedRightTailLightAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/right_tail_light_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/rear_exterior/right_tail_light_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightTailLightAssemblyImage = result.toString();
+                                selectedRightTailLightAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightTailLightAssemblyImage}");
                               });
@@ -13975,7 +14268,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightTailLightAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedRightTailLightAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -13985,7 +14279,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -14120,7 +14415,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyBackPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -14128,11 +14424,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_back_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_back_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedDickeyBackPanelImage = result.toString();
+                                selectedDickeyBackPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedDickeyBackPanelImage}");
                               });
@@ -14147,7 +14445,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedDickeyBackPanelImage!),
+                                  image:
+                                      FileImage(_selectedDickeyBackPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -14157,7 +14456,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -14290,7 +14590,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyFloorImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -14298,7 +14599,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_floor',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_floor',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -14327,7 +14629,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -14471,7 +14774,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyLeftLegImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -14479,7 +14783,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_left_leg',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_left_leg',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -14498,7 +14803,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedDickeyLeftLegImage!),
+                                  image:
+                                      FileImage(_selectedDickeyLeftLegImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -14508,7 +14814,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -14652,7 +14959,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedDickeyRightLegImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -14660,7 +14968,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_right_leg',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/dickey_right_leg',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -14679,7 +14988,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedDickeyRightLegImage!),
+                                  image:
+                                      FileImage(_selectedDickeyRightLegImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -14689,7 +14999,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -14812,11 +15123,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                       child: GestureDetector(
                         onTap: () async {
                           if (selectedLeftDickeySidewallImage == null) {
-                            final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.camera);
 
                             if (image != null) {
                               setState(() {
-                                _selectedLeftDickeySidewallImage = File(image.path);
+                                _selectedLeftDickeySidewallImage =
+                                    File(image.path);
                               });
                               final result = await uploadImage(
                                 imageVar: image,
@@ -14825,7 +15138,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               );
                               if (result.isNotEmpty) {
                                 setState(() {
-                                  selectedLeftDickeySidewallImage = result.toString();
+                                  selectedLeftDickeySidewallImage =
+                                      result.toString();
                                   selectedAllImages.add(result);
                                   log("message ${selectedLeftDickeySidewallImage}");
                                 });
@@ -14840,7 +15154,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: FileImage(_selectedLeftDickeySidewallImage!),
+                                    image: FileImage(
+                                        _selectedLeftDickeySidewallImage!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -14850,7 +15165,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 width: 100,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(width: 1, color: Colors.grey),
+                                  border:
+                                      Border.all(width: 1, color: Colors.grey),
                                 ),
                                 child: const Center(
                                   child: Text(
@@ -14972,11 +15288,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                       child: GestureDetector(
                         onTap: () async {
                           if (selectedRightDickeySidewallImage == null) {
-                            final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.camera);
 
                             if (image != null) {
                               setState(() {
-                                _selectedRightDickeySidewallImage = File(image.path);
+                                _selectedRightDickeySidewallImage =
+                                    File(image.path);
                               });
                               final result = await uploadImage(
                                 imageVar: image,
@@ -14985,7 +15303,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               );
                               if (result.isNotEmpty) {
                                 setState(() {
-                                  selectedRightDickeySidewallImage = result.toString();
+                                  selectedRightDickeySidewallImage =
+                                      result.toString();
                                   selectedAllImages.add(result);
                                   log("message ${selectedRightDickeySidewallImage}");
                                 });
@@ -15000,7 +15319,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: FileImage(_selectedRightDickeySidewallImage!),
+                                    image: FileImage(
+                                        _selectedRightDickeySidewallImage!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -15010,7 +15330,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 width: 100,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(width: 1, color: Colors.grey),
+                                  border:
+                                      Border.all(width: 1, color: Colors.grey),
                                 ),
                                 child: const Center(
                                   child: Text(
@@ -15134,11 +15455,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                       child: GestureDetector(
                         onTap: () async {
                           if (selectedLeftDickeyStrutTowerImage == null) {
-                            final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.camera);
 
                             if (image != null) {
                               setState(() {
-                                _selectedLeftDickeyStrutTowerImage = File(image.path);
+                                _selectedLeftDickeyStrutTowerImage =
+                                    File(image.path);
                               });
                               final result = await uploadImage(
                                 imageVar: image,
@@ -15147,7 +15470,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               );
                               if (result.isNotEmpty) {
                                 setState(() {
-                                  selectedLeftDickeyStrutTowerImage = result.toString();
+                                  selectedLeftDickeyStrutTowerImage =
+                                      result.toString();
                                   selectedAllImages.add(result);
                                   log("message ${selectedLeftDickeyStrutTowerImage}");
                                 });
@@ -15162,7 +15486,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: FileImage(_selectedLeftDickeyStrutTowerImage!),
+                                    image: FileImage(
+                                        _selectedLeftDickeyStrutTowerImage!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -15172,7 +15497,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 width: 100,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(width: 1, color: Colors.grey),
+                                  border:
+                                      Border.all(width: 1, color: Colors.grey),
                                 ),
                                 child: const Center(
                                   child: Text(
@@ -15294,11 +15620,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                       child: GestureDetector(
                         onTap: () async {
                           if (selectedRightDickeyStrutTowerImage == null) {
-                            final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                            final XFile? image = await picker.pickImage(
+                                source: ImageSource.camera);
 
                             if (image != null) {
                               setState(() {
-                                _selectedRightDickeyStrutTowerImage = File(image.path);
+                                _selectedRightDickeyStrutTowerImage =
+                                    File(image.path);
                               });
                               final result = await uploadImage(
                                 imageVar: image,
@@ -15307,7 +15635,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               );
                               if (result.isNotEmpty) {
                                 setState(() {
-                                  selectedRightDickeyStrutTowerImage = result.toString();
+                                  selectedRightDickeyStrutTowerImage =
+                                      result.toString();
                                   selectedAllImages.add(result);
                                   log("message ${selectedRightDickeyStrutTowerImage}");
                                 });
@@ -15322,7 +15651,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   image: DecorationImage(
-                                    image: FileImage(_selectedRightDickeyStrutTowerImage!),
+                                    image: FileImage(
+                                        _selectedRightDickeyStrutTowerImage!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -15332,7 +15662,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 width: 100,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(width: 1, color: Colors.grey),
+                                  border:
+                                      Border.all(width: 1, color: Colors.grey),
                                 ),
                                 child: const Center(
                                   child: Text(
@@ -15521,7 +15852,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRoofPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -15529,7 +15861,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/roof_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/roof_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -15558,7 +15891,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -15592,19 +15926,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedSpareTyreAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedSpareTyreAssemblyImage = File(image.path);
+                              _selectedSpareTyreAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/spare_tyre_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/roof_structure_and_root/spare_tyre_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedSpareTyreAssemblyImage = result.toString();
+                                selectedSpareTyreAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedSpareTyreAssemblyImage}");
                               });
@@ -15619,7 +15957,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedSpareTyreAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedSpareTyreAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -15629,7 +15968,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -15755,19 +16095,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontRightDoorPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedFrontRightDoorPanelImage = File(image.path);
+                              _selectedFrontRightDoorPanelImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_exterior/front_right_door_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_exterior/front_right_door_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontRightDoorPanelImage = result.toString();
+                                selectedFrontRightDoorPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontRightDoorPanelImage}");
                               });
@@ -15782,7 +16126,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontRightDoorPanelImage!),
+                                  image: FileImage(
+                                      _selectedFrontRightDoorPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -15792,7 +16137,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -15914,19 +16260,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightFenderLiningImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRightFenderLiningImage = File(image.path);
+                              _selectedRightFenderLiningImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_exterior/right_fender_lining',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_exterior/right_fender_lining',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightFenderLiningImage = result.toString();
+                                selectedRightFenderLiningImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightFenderLiningImage}");
                               });
@@ -15941,7 +16291,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightFenderLiningImage!),
+                                  image: FileImage(
+                                      _selectedRightFenderLiningImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -15951,7 +16302,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -16073,7 +16425,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightFenderPanelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -16081,11 +16434,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/rear_side/front_right_exterior/right_fender_panel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/rear_side/front_right_exterior/right_fender_panel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightFenderPanelImage = result.toString();
+                                selectedRightFenderPanelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightFenderPanelImage}");
                               });
@@ -16100,7 +16455,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightFenderPanelImage!),
+                                  image: FileImage(
+                                      _selectedRightFenderPanelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -16110,7 +16466,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -16232,7 +16589,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightSvmAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -16240,11 +16598,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_exterior/right_svm_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_exterior/right_svm_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightSvmAssemblyImage = result.toString();
+                                selectedRightSvmAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightSvmAssemblyImage}");
                               });
@@ -16259,7 +16619,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightSvmAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedRightSvmAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -16269,7 +16630,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -16404,7 +16766,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFourWheelDriveImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -16412,7 +16775,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/four_wheel_drive',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/four_wheel_drive',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -16431,7 +16795,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFourWheelDriveImage!),
+                                  image:
+                                      FileImage(_selectedFourWheelDriveImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -16441,7 +16806,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -16563,19 +16929,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontRightBrakeAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedFrontRightBrakeAssemblyImage = File(image.path);
+                              _selectedFrontRightBrakeAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/front_right_brake_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/front_right_brake_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontRightBrakeAssemblyImage = result.toString();
+                                selectedFrontRightBrakeAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontRightBrakeAssemblyImage}");
                               });
@@ -16590,7 +16960,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontRightBrakeAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedFrontRightBrakeAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -16600,7 +16971,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -16645,7 +17017,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   value: frontRightSuspensionFrontRightLowerControlArmAssembly,
                   onChanged: (val) {
                     setState(() {
-                      frontRightSuspensionFrontRightLowerControlArmAssembly = val;
+                      frontRightSuspensionFrontRightLowerControlArmAssembly =
+                          val;
                     });
                   },
                 ),
@@ -16768,19 +17141,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontRightTyreAssemblyImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedFrontRightTyreAssemblyImage = File(image.path);
+                              _selectedFrontRightTyreAssemblyImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/front_right_tyre_assembly',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/front_right_tyre_assembly',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontRightTyreAssemblyImage = result.toString();
+                                selectedFrontRightTyreAssemblyImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontRightTyreAssemblyImage}");
                               });
@@ -16795,7 +17172,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontRightTyreAssemblyImage!),
+                                  image: FileImage(
+                                      _selectedFrontRightTyreAssemblyImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -16805,7 +17183,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -16927,7 +17306,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedFrontWheelDriveImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -16935,11 +17315,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/front_wheel_drive',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/front_right_mechanical/front_wheel_drive',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedFrontWheelDriveImage = result.toString();
+                                selectedFrontWheelDriveImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedFrontWheelDriveImage}");
                               });
@@ -16954,7 +17336,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedFrontWheelDriveImage!),
+                                  image:
+                                      FileImage(_selectedFrontWheelDriveImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -16964,7 +17347,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -17154,19 +17538,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearRightDoorChannelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearRightDoorChannelImage = File(image.path);
+                              _selectedRearRightDoorChannelImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/rear_right_door_channel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/rear_right_door_channel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearRightDoorChannelImage = result.toString();
+                                selectedRearRightDoorChannelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearRightDoorChannelImage}");
                               });
@@ -17181,7 +17569,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearRightDoorChannelImage!),
+                                  image: FileImage(
+                                      _selectedRearRightDoorChannelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -17191,7 +17580,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -17379,19 +17769,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearRightFloorPanImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearRightFloorPanImage = File(image.path);
+                              _selectedRearRightFloorPanImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/rear_right_floor_pan',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/rear_right_floor_pan',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearRightFloorPanImage = result.toString();
+                                selectedRearRightFloorPanImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearRightFloorPanImage}");
                               });
@@ -17406,7 +17800,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearRightFloorPanImage!),
+                                  image: FileImage(
+                                      _selectedRearRightFloorPanImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -17416,7 +17811,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -17604,19 +18000,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRearRightWheelHouseImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRearRightWheelHouseImage = File(image.path);
+                              _selectedRearRightWheelHouseImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/rear_right_wheel_house',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/rear_right_wheel_house',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRearRightWheelHouseImage = result.toString();
+                                selectedRearRightWheelHouseImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRearRightWheelHouseImage}");
                               });
@@ -17631,7 +18031,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRearRightWheelHouseImage!),
+                                  image: FileImage(
+                                      _selectedRearRightWheelHouseImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -17641,7 +18042,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -17829,19 +18231,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightFloorPanChannelImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRightFloorPanChannelImage = File(image.path);
+                              _selectedRightFloorPanChannelImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_floor_pan_channel',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_floor_pan_channel',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightFloorPanChannelImage = result.toString();
+                                selectedRightFloorPanChannelImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightFloorPanChannelImage}");
                               });
@@ -17856,7 +18262,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightFloorPanChannelImage!),
+                                  image: FileImage(
+                                      _selectedRightFloorPanChannelImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -17866,7 +18273,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -18054,7 +18462,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightPillarBImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -18062,7 +18471,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_pillar_B',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_pillar_B',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -18091,7 +18501,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -18279,7 +18690,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightPillarCImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
@@ -18287,7 +18699,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_pillar_c',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_pillar_c',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
@@ -18316,7 +18729,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -18427,19 +18841,23 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     child: GestureDetector(
                       onTap: () async {
                         if (selectedRightRunningBoardImage == null) {
-                          final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          final XFile? image = await picker.pickImage(
+                              source: ImageSource.camera);
 
                           if (image != null) {
                             setState(() {
-                              _selectedRightRunningBoardImage = File(image.path);
+                              _selectedRightRunningBoardImage =
+                                  File(image.path);
                             });
                             final result = await uploadImage(
                               imageVar: image,
-                              imageRef: 'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_running_board',
+                              imageRef:
+                                  'inspection/$getInspectionUID/car_health/right_side/rear_right_structure/right_running_board',
                             );
                             if (result.isNotEmpty) {
                               setState(() {
-                                selectedRightRunningBoardImage = result.toString();
+                                selectedRightRunningBoardImage =
+                                    result.toString();
                                 selectedAllImages.add(result);
                                 log("message ${selectedRightRunningBoardImage}");
                               });
@@ -18454,7 +18872,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 image: DecorationImage(
-                                  image: FileImage(_selectedRightRunningBoardImage!),
+                                  image: FileImage(
+                                      _selectedRightRunningBoardImage!),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -18464,7 +18883,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                               width: 100,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(width: 1, color: Colors.grey),
+                                border:
+                                    Border.all(width: 1, color: Colors.grey),
                               ),
                               child: const Center(
                                 child: Text(
@@ -18653,7 +19073,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedRightMechanicalImage == null) {
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
 
                         if (image != null) {
                           setState(() {
@@ -18661,7 +19082,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           });
                           final result = await uploadImage(
                             imageVar: image,
-                            imageRef: 'inspection/$getInspectionUID/car_health/right_side/right_right_mechanical',
+                            imageRef:
+                                'inspection/$getInspectionUID/car_health/right_side/right_right_mechanical',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
@@ -18680,7 +19102,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: FileImage(_selectedRightMechanicalImage!),
+                                image:
+                                    FileImage(_selectedRightMechanicalImage!),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -18781,170 +19204,331 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           ElevatedButton(
             onPressed: () {
               if (_selectedBatteryImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted battery image");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please selcted battery image");
               } else if (_selectedBonnetImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted bonnet image");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please selcted bonnet image");
               } else if (extraParts.text.isEmpty) {
-                return showErrorSnackBar(context: context, errorMsg: "Enter Extra Parts");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Extra Parts");
               } else if (_selectedCarKeyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted car key image");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please selcted car key image");
               } else if (_selectedCentralLockingRemoteHousingImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted central locking remote housing image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg:
+                        "Please selcted central locking remote housing image");
               } else if (_selectedFrontBumperGrillImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front bumper grill image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front bumper grill image");
               } else if (_selectedFrontBumperPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front bumper panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front bumper panel image");
               } else if (_selectedFrontRegistrationPlateImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front registration plate image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front registration plate image");
               } else if (_selectedFrontLeftFogLightHousingImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front left fog light housing image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg:
+                        "Please selcted front left fog light housing image");
               } else if (_selectedFrontRightFogLightHousingImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front right fog light housing image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg:
+                        "Please selcted front right fog light housing image");
               } else if (_selectedLeftHeadlightAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left headlight assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left headlight assembly image");
               } else if (_selectedLeftHeadlightHousingImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left headlight housing image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left headlight housing image");
               } else if (_selectedLeftDrlImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left drl image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left drl image");
               } else if (_selectedRightHeadlightAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right headlight assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right headlight assembly image");
               } else if (_selectedRightHeadlightHousingImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right headlight housing image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right headlight housing image");
               } else if (_selectedRightDrlImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right drl image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right drl image");
               } else if (_selectedFrontLeftLegImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front left leg image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front left leg image");
               } else if (_selectedFrontRightLeftImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front right left image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front right left image");
               } else if (_selectedAcAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted ac assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted ac assembly image");
               } else if (_selectedAirBagsImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted air bags image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted air bags image");
               } else if (_selectedClusterPanelAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted cluster panel assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted cluster panel assembly image");
               } else if (_selectedDashboardAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dashboard assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted dashboard assembly image");
               } else if (_selectedFrontWindshieldGlassImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front windshield glass image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front windshield glass image");
               } else if (_selectedSeatsImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted seats image");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please selcted seats image");
               } else if (_selectedAudioStereoAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted audio stereo assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted audio stereo assembly image");
               } else if (_selectedCentreConsoleAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted centre console assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted centre console assembly image");
               } else if (_selectedForwardParkingSensorsImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted forward parking sensors image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted forward parking sensors image");
               } else if (_selectedFrontRightDoorAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front right Door assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front right Door assembly image");
               } else if (_selectedFrontLeftDoorAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front left door assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front left door assembly image");
               } else if (_selectedReverseParkingCameraImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted reverse parking camera image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted reverse parking camera image");
               } else if (_selectedReverseParkingSensorsImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted reverse parking sensors image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted reverse parking sensors image");
               } else if (_selectedFrontLeftExteriorImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front left exterior image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front left exterior image");
               } else if (_selectedFrontLeftMechanicalImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front left mechanical image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front left mechanical image");
               } else if (_selectedRearLeftExteriorImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear left exterior image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear left exterior image");
               } else if (_selectedRearLeftMechanicalImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear left mechanical image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear left mechanical image");
               } else if (_selectedLeftFloorPanChannelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left floor pan channel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left floor pan channel image");
               } else if (_selectedLeftPillarBImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left pillar B image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left pillar B image");
               } else if (_selectedLeftPillarCImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left pillar C image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left pillar C image");
               } else if (_selectedLeftRunningBoardImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left running board image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left running board image");
               } else if (_selectedRearLeftFloorPanImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear left floor pan image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear left floor pan image");
               } else if (_selectedRearLeftDoorChannelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear left door channel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear left door channel image");
               } else if (_selectedRearLeftWheelHouseImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear left wheel house image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear left wheel house image");
               } else if (_selectedLeftFenderLiningImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left fender lining image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left fender lining image");
               } else if (_selectedLeftFenderPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left fender panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left fender panel image");
               } else if (_selectedLeftSvmAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left svm assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left svm assembly image");
               } else if (_selectedRearLeftDoorPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear left door panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear left door panel image");
               } else if (_selectedDickeyDoorPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey door panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted dickey door panel image");
               } else if (_selectedDickeyLeftStayRodShockerImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey left stay rod shocker image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg:
+                        "Please selcted dickey left stay rod shocker image");
               } else if (_selectedDickeyRightStayRodShockerImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey right stay rod shocker image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg:
+                        "Please selcted dickey right stay rod shocker image");
               } else if (_selectedLeftTailLightAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left tail light assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left tail light assembly image");
               } else if (_selectedRearBumperPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear bumper panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear bumper panel image");
               } else if (_selectedRearWindshieldGlassImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear Windshield glass image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear Windshield glass image");
               } else if (_selectedRearRegistrationPlateImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear registration plate image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear registration plate image");
               } else if (_selectedRightTailLightAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right tail light assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right tail light assembly image");
               } else if (_selectedDickeyBackPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey back panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted dickey back panel image");
               } else if (_selectedDickeyFloorImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey floor image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted dickey floor image");
               } else if (_selectedDickeyLeftLegImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey left leg image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted dickey left leg image");
               } else if (_selectedDickeyRightLegImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted dickey right leg image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted dickey right leg image");
               } else if (_selectedLeftDickeySidewallImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left dickey sidewall image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left dickey sidewall image");
               } else if (_selectedRightDickeySidewallImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear registration plate image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear registration plate image");
               } else if (_selectedLeftDickeyStrutTowerImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted left dickey strut tower image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted left dickey strut tower image");
               } else if (_selectedRightDickeyStrutTowerImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right dickey strut tower image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right dickey strut tower image");
               } else if (_selectedRoofPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted roof panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted roof panel image");
               } else if (_selectedSpareTyreAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted spare tyre assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted spare tyre assembly image");
               } else if (_selectedFrontRightDoorPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front right door panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front right door panel image");
               } else if (_selectedRightFenderLiningImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right fender lining image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right fender lining image");
               } else if (_selectedRightFenderPanelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right fender panel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right fender panel image");
               } else if (_selectedRightSvmAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right svm assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right svm assembly image");
               } else if (_selectedFourWheelDriveImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted four wheel drive image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted four wheel drive image");
               } else if (_selectedFrontRightBrakeAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front right brake assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg:
+                        "Please selcted front right brake assembly image");
               } else if (_selectedFrontWheelDriveImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front wheel drive image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front wheel drive image");
               } else if (_selectedFrontRightTyreAssemblyImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted front right tyre assembly image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted front right tyre assembly image");
               } else if (_selectedRightMechanicalImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right mechanical image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right mechanical image");
               } else if (_selectedRearRightDoorChannelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear right door channel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear right door channel image");
               } else if (_selectedRearRightWheelHouseImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted rear right wheel house image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted rear right wheel house image");
               } else if (_selectedRightFloorPanChannelImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right floor pan channel image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right floor pan channel image");
               } else if (_selectedRightPillarBImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right pillar B image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right pillar B image");
               } else if (_selectedRightPillarCImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right pillar C image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right pillar C image");
               } else if (_selectedRightRunningBoardImage == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please selcted right running board image");
+                return showErrorSnackBar(
+                    context: context,
+                    errorMsg: "Please selcted right running board image");
               } else if (carDoc == null) {
-                return showErrorSnackBar(context: context, errorMsg: "Please save car details");
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Please save car details");
               }
 
               if (_formInspectionKey.currentState!.validate()) {
                 setState(() {
-                  _carFairPriceController.text = widget.carDetails.carCarPrice.toString();
+                  _carFairPriceController.text =
+                      widget.carDetails.carCarPrice.toString();
                   _showReMarksOptions(context);
                 });
               }
@@ -18959,12 +19543,15 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   void _showReMarksOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // This makes sure the modal adjusts with the keyboard
+      isScrollControlled:
+          true, // This makes sure the modal adjusts with the keyboard
       builder: (context) {
         return SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom, // Adjusts for keyboard height
+              bottom: MediaQuery.of(context)
+                  .viewInsets
+                  .bottom, // Adjusts for keyboard height
             ),
             child: Form(
               key: _formBottomKey,
@@ -19018,7 +19605,9 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   // Helper method to create text fields
-  Widget _buildTextField(TextEditingController controller, String labelText, String? Function(String?)? validator, {bool isNumber = false}) {
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      String? Function(String?)? validator,
+      {bool isNumber = false}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
@@ -19052,7 +19641,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   // Helper method to create sections with an expandable tile
-  Widget _buildCardExpansionTile(String title, List<Widget> children, {int? count = 0}) {
+  Widget _buildCardExpansionTile(String title, List<Widget> children,
+      {int? count = 0}) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ExpansionTile(

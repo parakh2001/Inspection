@@ -9,6 +9,7 @@ class Lead {
   final String operationId;
   final String evaluationTime;
   final String evaluationType;
+  final DateTime? evaluationDate; // Nullable since it might be null
   final String customerName;
   final String customerCity;
   final String customerAddress;
@@ -25,6 +26,7 @@ class Lead {
   final String carCarPrice;
   final String carTransmission;
   final String carVariant;
+
   Lead({
     required this.carId,
     required this.customerId,
@@ -35,6 +37,7 @@ class Lead {
     required this.salespersonId,
     required this.operationId,
     required this.evaluationTime,
+    this.evaluationDate, // Allow nullable
     required this.evaluationType,
     required this.customerName,
     required this.customerCity,
@@ -53,34 +56,50 @@ class Lead {
     required this.carTransmission,
     required this.carVariant,
   });
-  factory Lead.fromJson(Map<dynamic, dynamic> leadData, Map<dynamic, dynamic> customerData, Map<dynamic, dynamic> carData) {
+
+  factory Lead.fromJson(Map<dynamic, dynamic> leadData,
+      Map<dynamic, dynamic> customerData, Map<dynamic, dynamic> carData) {
     return Lead(
-      carId: leadData['car_id'].toString() ?? 'N/A',
-      customerId: customerData['customer_id'].toString() ?? 'N/A',
-      evaluatorId: leadData['evaluator_id'].toString() ?? 'N/A',
-      leadId: leadData['lead_id'] ?? 'N/A',
-      leadRank: leadData['lead_rank'] ?? 'N/A',
-      leadStatus: leadData['lead_status'] ?? 'N/A',
-      salespersonId: leadData['salesperson_id'] ?? 'N/A',
-      operationId: leadData['operation_id'].toString() ?? 'N/A',
-      evaluationTime: customerData['evaluation_time'] ?? 'N/A',
-      evaluationType: leadData['evaluation_type'] ?? 'N/A',
-      customerName: customerData['name'] ?? 'N/A',
-      customerCity: customerData['city'] ?? 'N/A',
-      customerAddress: customerData['address'] ?? 'N/A',
-      customerMobileNumber: customerData['mobile_number'] ?? 'N/A',
-      carBuild: carData["build"].toString() ?? 'N/A',
-      carColor: carData["color"] ?? 'N/A',
-      carCompany: carData["company"] ?? 'N/A',
-      carDistanceTravelled: carData["distance_travelled"].toString() ?? 'N/A',
-      carFueltype: carData["fueltype"] ?? 'N/A',
-      carMake: carData["make"] ?? 'N/A',
-      carModel: carData["model"] ?? 'N/A',
-      carNumber: carData["number"] ?? 'N/A',
-      carOwnership: carData["ownership"] ?? 'N/A',
-      carCarPrice: carData["car_Price"].toString() ?? 'N/A',
-      carTransmission: carData["transmission"] ?? 'N/A',
-      carVariant: carData["variant"] ?? 'N/A',
+      carId: leadData['car_id']?.toString() ?? 'N/A',
+      customerId: customerData['customer_id']?.toString() ?? 'N/A',
+      evaluatorId: leadData['evaluator_id']?.toString() ?? 'N/A',
+      leadId: leadData['lead_id']?.toString() ?? 'N/A',
+      leadRank: leadData['lead_rank']?.toString() ?? 'N/A',
+      leadStatus: leadData['lead_status']?.toString() ?? 'N/A',
+      salespersonId: leadData['salesperson_id']?.toString() ?? 'N/A',
+      operationId: leadData['operation_id']?.toString() ?? 'N/A',
+      evaluationTime: customerData['evaluation_time']?.toString() ?? 'N/A',
+      evaluationDate: _parseEvaluationDate(customerData['evaluation_date']),
+      evaluationType: customerData['evaluation_type']?.toString() ?? 'N/A',
+      customerName: customerData['name']?.toString() ?? 'N/A',
+      customerCity: customerData['city']?.toString() ?? 'N/A',
+      customerAddress: customerData['address']?.toString() ?? 'N/A',
+      customerMobileNumber: customerData['mobile_number']?.toString() ?? 'N/A',
+      carBuild: carData["build"]?.toString() ?? 'N/A',
+      carColor: carData["color"]?.toString() ?? 'N/A',
+      carCompany: carData["company"]?.toString() ?? 'N/A',
+      carDistanceTravelled: carData["distance_travelled"]?.toString() ?? 'N/A',
+      carFueltype: carData["fueltype"]?.toString() ?? 'N/A',
+      carMake: carData["make"]?.toString() ?? 'N/A',
+      carModel: carData["model"]?.toString() ?? 'N/A',
+      carNumber: carData["number"]?.toString() ?? 'N/A',
+      carOwnership: carData["ownership"]?.toString() ?? 'N/A',
+      carCarPrice: carData["car_price"]?.toString() ??
+          'N/A', // Fixed typo: car_price instead of car_Price
+      carTransmission: carData["transmission"]?.toString() ?? 'N/A',
+      carVariant: carData["variant"]?.toString() ?? 'N/A',
     );
+  }
+
+  // Helper method to parse the evaluation date safely
+  static DateTime? _parseEvaluationDate(dynamic dateData) {
+    if (dateData == null) return null;
+    if (dateData is String) {
+      return DateTime.tryParse(dateData); // Try to parse string to DateTime
+    } else if (dateData is int) {
+      return DateTime.fromMillisecondsSinceEpoch(
+          dateData); // Assume it is a timestamp in milliseconds
+    }
+    return null;
   }
 }

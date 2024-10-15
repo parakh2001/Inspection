@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -23,7 +22,6 @@ class _HomepageState extends State<Homepage> {
   Evaluator? evaluator;
   final User? user = FirebaseAuth.instance.currentUser;
   bool loadingEvaluatorData = false;
-
   // Get the logged-in user's email
   String? getCurrentUserEmail() {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -46,19 +44,19 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       loadingEvaluatorData = true;
     });
-
     final databaseReference = FirebaseDatabase.instance.ref('evaluator');
     final snapshot = await databaseReference.once();
-
     if (snapshot.snapshot.value != null && snapshot.snapshot.value is Map) {
-      final Map<Object?, Object?> evaluators = snapshot.snapshot.value as Map<Object?, Object?>;
-
+      final Map<Object?, Object?> evaluators =
+          snapshot.snapshot.value as Map<Object?, Object?>;
       // Iterate through the evaluators to find a match by email
       for (var entry in evaluators.entries) {
-        final Map<Object?, Object?> evaluatorData = entry.value as Map<Object?, Object?>;
+        final Map<Object?, Object?> evaluatorData =
+            entry.value as Map<Object?, Object?>;
         if (evaluatorData['evaluator_email'] == getCurrentUserEmail()) {
           // Convert Map<Object?, Object?> to Map<String, dynamic>
-          Map<String, dynamic> evaluatorUserData = evaluatorData.map((key, value) => MapEntry(key.toString(), value));
+          Map<String, dynamic> evaluatorUserData = evaluatorData
+              .map((key, value) => MapEntry(key.toString(), value));
           evaluator = Evaluator.fromJson(jsonEncode(evaluatorUserData));
         }
       }
@@ -89,7 +87,7 @@ class _HomepageState extends State<Homepage> {
 
   Future<void> _contactSalesperson(String salespersonId) async {
     // Example implementation: Open the phone dialer
-    final Uri url = Uri(scheme: 'tel', path: 'salesperson_phone_number'); // Replace with actual logic
+    final Uri url = Uri(scheme: 'tel', path: 'salesperson_phone_number');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
@@ -106,7 +104,8 @@ class _HomepageState extends State<Homepage> {
       );
       return;
     }
-    final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
+    final Uri url = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
     try {
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
@@ -133,19 +132,6 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  Widget _buildCarIcon(String? fuelType) {
-    switch (fuelType) {
-      case 'Petrol':
-        return Icon(Icons.local_gas_station, color: Colors.red);
-      case 'Diesel':
-        return Icon(Icons.local_gas_station, color: Colors.green);
-      case 'CNG':
-        return Icon(Icons.nature_people, color: Colors.orange);
-      default:
-        return Icon(Icons.error, color: Colors.grey);
-    }
-  }
-
   Widget _buildTransmissionIcon(String? transmission) {
     return Icon(
       transmission == 'Automatic' ? Icons.autorenew : Icons.drive_eta,
@@ -153,105 +139,58 @@ class _HomepageState extends State<Homepage> {
     );
   }
 
-  // Future<List<Lead>> _fetchLeads() async {
-  //   try {
-  //     final dataSnapshot = await _database.once();
-  //     final data = dataSnapshot.snapshot.value;
-  //     List<Lead> leads = [];
-  //     if (data != null) {
-  //       List<Future<void>> futures = [];
-  //
-  //       if (data is List) {
-  //         // Handle list case
-  //         for (var leadItem in data) {
-  //           if (leadItem is Map) {
-  //             final leadData = Map<String, dynamic>.from(leadItem);
-  //             String customerId = leadData['customer_id'].toString();
-  //             String carId = leadData['car_id'].toString();
-  //
-  //             // Fetch customer and car data
-  //             futures.add(
-  //               FirebaseDatabase.instance.ref('customer/$customerId').once().then((customerSnapshot) {
-  //                 final customerData =
-  //                     customerSnapshot.snapshot.value != null ? Map<String, dynamic>.from(customerSnapshot.snapshot.value as Map) : {};
-  //                 return customerData;
-  //               }).then((customerData) {
-  //                 return FirebaseDatabase.instance.ref('cars/$carId').once().then((carSnapshot) {
-  //                   final carData = carSnapshot.snapshot.value != null ? Map<String, dynamic>.from(carSnapshot.snapshot.value as Map) : {};
-  //                   Lead lead = Lead.fromJson(leadData, customerData, carData);
-  //                   // Filter leads with lead_rank as 'L3'
-  //                   if (lead.leadRank == 'L3') {
-  //                     leads.add(lead);
-  //                   }
-  //                 });
-  //               }),
-  //             );
-  //           }
-  //         }
-  //       }
-  //       // for (var entry in data.entries) {
-  //       //   final leadData = Map<String, dynamic>.from(entry.value);
-  //       //   String customerId = leadData['customer_id'];
-  //       //   String carId = leadData['car_id'];
-  //       //
-  //       //   // Fetch customer and car data
-  //       //   futures.add(FirebaseDatabase.instance.ref('customer/$customerId').once().then((customerSnapshot) {
-  //       //     final customerData = customerSnapshot.snapshot.value != null ? Map<String, dynamic>.from(customerSnapshot.snapshot.value as Map) : {};
-  //       //     return customerData;
-  //       //   }).then((customerData) {
-  //       //     return FirebaseDatabase.instance.ref('cars/$carId').once().then((carSnapshot) {
-  //       //       final carData = carSnapshot.snapshot.value != null ? Map<String, dynamic>.from(carSnapshot.snapshot.value as Map) : {};
-  //       //       Lead lead = Lead.fromJson(leadData, customerData, carData);
-  //       //       // Filter leads with lead_rank as 'L3'
-  //       //       if (lead.leadRank == 'L3') {
-  //       //         leads.add(lead);
-  //       //       }
-  //       //     });
-  //       //   }));
-  //       // }
-  //
-  //       // Wait for all futures to complete
-  //       await Future.wait(futures);
-  //     }
-  //
-  //     return leads;
-  //   } catch (e, stackTrace) {
-  //     debugPrint('Error fetching leads: $e');
-  //     debugPrint('Stack trace: $stackTrace');
-  //     rethrow;
-  //   }
-  // }
-
   Future<List<Lead>> _fetchLeads() async {
     try {
       final dataSnapshot = await _database.once();
       final data = dataSnapshot.snapshot.value;
-
       List<Lead> leads = [];
-
       if (data != null) {
         List<Future<void>> futures = [];
 
+        // Handle map or list cases separately
         if (data is Map<dynamic, dynamic>) {
-          // Handle map case
           for (var entry in data.entries) {
             final leadData = Map<String, dynamic>.from(entry.value);
             String customerId = leadData['customer_id'].toString();
             String carId = leadData['car_id'].toString();
 
-            // Fetch customer and car data
             futures.add(
-              FirebaseDatabase.instance.ref('customer/$customerId').once().then((customerSnapshot) {
-                final customerData = customerSnapshot.snapshot.value != null ? Map<String, dynamic>.from(customerSnapshot.snapshot.value as Map) : {};
+              FirebaseDatabase.instance
+                  .ref('customer/$customerId')
+                  .once()
+                  .then((customerSnapshot) {
+                final customerData = customerSnapshot.snapshot.value != null
+                    ? Map<String, dynamic>.from(
+                        customerSnapshot.snapshot.value as Map)
+                    : {};
                 return customerData;
               }).then((customerData) {
-                return FirebaseDatabase.instance.ref('cars/$carId').once().then((carSnapshot) {
-                  final carData = carSnapshot.snapshot.value != null ? Map<String, dynamic>.from(carSnapshot.snapshot.value as Map) : {};
+                return FirebaseDatabase.instance
+                    .ref('cars/$carId')
+                    .once()
+                    .then((carSnapshot) {
+                  final carData = carSnapshot.snapshot.value != null
+                      ? Map<String, dynamic>.from(
+                          carSnapshot.snapshot.value as Map)
+                      : {};
+
+                  // Create a Lead instance
                   Lead lead = Lead.fromJson(leadData, customerData, carData);
-                  // Filter leads with lead_rank as 'L3'
+
+                  // Check if lead is L3
                   if (lead.leadRank == 'L3') {
-                    if (evaluator!.evaluatorLocation!.contains(lead.customerCity)) {
-                      leads.add(lead);
+                    String evaluationDate = lead.evaluationDate.toString();
+                    DateTime today = DateTime.now();
+                    String todayDate = today.toString();
+
+                    // Check if the evaluation date is today
+                    if (evaluationDate != todayDate) {
+                      if (evaluator?.evaluatorLocation
+                              ?.contains(lead.customerCity) ??
+                          false) {
+                        print(evaluationDate);
+                        leads.add(lead);
+                      }
                     }
                   }
                 });
@@ -259,27 +198,50 @@ class _HomepageState extends State<Homepage> {
             );
           }
         } else if (data is List) {
-          // Handle list case
           for (var leadItem in data) {
             if (leadItem is Map) {
               final leadData = Map<String, dynamic>.from(leadItem);
               String customerId = leadData['customer_id'].toString();
               String carId = leadData['car_id'].toString();
 
-              // Fetch customer and car data
               futures.add(
-                FirebaseDatabase.instance.ref('customer/$customerId').once().then((customerSnapshot) {
-                  final customerData =
-                      customerSnapshot.snapshot.value != null ? Map<String, dynamic>.from(customerSnapshot.snapshot.value as Map) : {};
+                FirebaseDatabase.instance
+                    .ref('customer/$customerId')
+                    .once()
+                    .then((customerSnapshot) {
+                  final customerData = customerSnapshot.snapshot.value != null
+                      ? Map<String, dynamic>.from(
+                          customerSnapshot.snapshot.value as Map)
+                      : {};
                   return customerData;
                 }).then((customerData) {
-                  return FirebaseDatabase.instance.ref('cars/$carId').once().then((carSnapshot) {
-                    final carData = carSnapshot.snapshot.value != null ? Map<String, dynamic>.from(carSnapshot.snapshot.value as Map) : {};
+                  return FirebaseDatabase.instance
+                      .ref('cars/$carId')
+                      .once()
+                      .then((carSnapshot) {
+                    final carData = carSnapshot.snapshot.value != null
+                        ? Map<String, dynamic>.from(
+                            carSnapshot.snapshot.value as Map)
+                        : {};
+
+                    // Create a Lead instance
                     Lead lead = Lead.fromJson(leadData, customerData, carData);
-                    // Filter leads with lead_rank as 'L3'
+
+                    // Check if lead is L3
                     if (lead.leadRank == 'L3') {
-                      if (evaluator!.evaluatorLocation!.contains(lead.customerCity)) {
-                        leads.add(lead);
+                      DateTime? evaluationDate = lead.evaluationDate;
+                      DateTime today = DateTime.now();
+
+                      // Check if the evaluation date is today
+                      if (evaluationDate != null &&
+                          evaluationDate.year == today.year &&
+                          evaluationDate.month == today.month &&
+                          evaluationDate.day == today.day) {
+                        if (evaluator?.evaluatorLocation
+                                ?.contains(lead.customerCity) ??
+                            false) {
+                          leads.add(lead);
+                        }
                       }
                     }
                   });
@@ -292,7 +254,6 @@ class _HomepageState extends State<Homepage> {
         // Wait for all futures to complete
         await Future.wait(futures);
       }
-
       return leads;
     } catch (e, stackTrace) {
       debugPrint('Error fetching leads: $e');
@@ -304,7 +265,7 @@ class _HomepageState extends State<Homepage> {
   Future<void> _refreshLeads() async {
     await fetchEvaluatorByEmail();
     setState(() {
-      _futureLeads = _fetchLeads(); // Refresh leads by calling the fetch function again
+      _futureLeads = _fetchLeads();
     });
   }
 
@@ -317,12 +278,12 @@ class _HomepageState extends State<Homepage> {
           actions: [
             IconButton(
               icon: const Icon(Icons.refresh),
-              onPressed: _refreshLeads, // Refresh button
+              onPressed: _refreshLeads,
             ),
           ],
         ),
         drawer: Container(
-          width: MediaQuery.of(context).size.width * 0.75, // Set drawer width to 75% of screen width
+          width: MediaQuery.of(context).size.width * 0.75,
           child: Drawer(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -343,7 +304,8 @@ class _HomepageState extends State<Homepage> {
                         'Gowaggon',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: MediaQuery.of(context).size.width < 600 ? 20 : 24, // Adjust font size for smaller screens
+                          fontSize:
+                              MediaQuery.of(context).size.width < 600 ? 20 : 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -352,7 +314,12 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Profile', style: TextStyle(fontSize: MediaQuery.of(context).size.width < 600 ? 16 : 18)), // Responsive font size
+                  title: Text(
+                    'Profile',
+                    style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 16 : 18),
+                  ), // Responsive font size
                   onTap: () {
                     Navigator.push(
                       context,
@@ -364,7 +331,11 @@ class _HomepageState extends State<Homepage> {
                 ),
                 ListTile(
                   leading: Icon(Icons.settings),
-                  title: Text('Settings', style: TextStyle(fontSize: MediaQuery.of(context).size.width < 600 ? 16 : 18)), // Responsive font size
+                  title: Text('Settings',
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width < 600
+                              ? 16
+                              : 18)), // Responsive font size
                   onTap: () {
                     Navigator.push(
                       context,
@@ -378,7 +349,9 @@ class _HomepageState extends State<Homepage> {
                   leading: Icon(Icons.logout),
                   title: Text(
                     'Logout',
-                    style: TextStyle(fontSize: MediaQuery.of(context).size.width < 600 ? 16 : 18),
+                    style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 16 : 18),
                   ),
                   onTap: () {
                     Navigator.pushReplacement(
@@ -394,12 +367,16 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
         body: loadingEvaluatorData == true
-            ? Center(child: CircularProgressIndicator())
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
             : FutureBuilder<List<Lead>>(
                 future: _futureLeads,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   }
                   if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
@@ -420,7 +397,9 @@ class _HomepageState extends State<Homepage> {
                       ),
                       Expanded(
                         child: leads.isEmpty
-                            ? const Center(child: Text('No upcoming leads'))
+                            ? const Center(
+                                child: Text('No upcoming leads'),
+                              )
                             : ListView.builder(
                                 itemCount: leads.length,
                                 itemBuilder: (context, index) {
@@ -434,55 +413,65 @@ class _HomepageState extends State<Homepage> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Flexible(
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       lead.customerName,
                                                       style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 16,
                                                         color: Colors.black87,
                                                       ),
                                                     ),
                                                     Text(
                                                       'Evaluation Time: ${lead.evaluationTime}',
-                                                      style: const TextStyle(fontSize: 14, color: Colors.red),
+                                                      style: const TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.red),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               IconButton(
-                                                icon: const Icon(Icons.more_vert),
-                                                onPressed: () {
-                                                  // Show options or menu
-                                                },
+                                                icon:
+                                                    const Icon(Icons.more_vert),
+                                                onPressed: () {},
                                               ),
                                             ],
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
                                             'City: ${lead.customerCity}',
-                                            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14),
                                           ),
                                           const SizedBox(height: 8),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
                                                 children: [
-                                                  Icon(Icons.directions_car, color: Colors.blue),
+                                                  Icon(Icons.directions_car,
+                                                      color: Colors.blue),
                                                   const SizedBox(width: 5),
                                                   Text(
                                                     'Car: ${lead.carModel} (${lead.carCompany})',
                                                     style: const TextStyle(
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -491,12 +480,14 @@ class _HomepageState extends State<Homepage> {
                                               ),
                                               Row(
                                                 children: [
-                                                  _buildTransmissionIcon(lead.carTransmission),
+                                                  _buildTransmissionIcon(
+                                                      lead.carTransmission),
                                                   const SizedBox(width: 5),
                                                   Text(
                                                     lead.carVariant,
                                                     style: const TextStyle(
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -506,17 +497,20 @@ class _HomepageState extends State<Homepage> {
                                           ),
                                           const SizedBox(height: 8),
                                           GestureDetector(
-                                            onTap: () => _makeCall(lead.customerMobileNumber),
+                                            onTap: () => _makeCall(
+                                                lead.customerMobileNumber),
                                             child: Row(
                                               children: [
-                                                const Icon(Icons.phone, color: Colors.blue),
+                                                const Icon(Icons.phone,
+                                                    color: Colors.blue),
                                                 const SizedBox(width: 5),
                                                 Text(
                                                   lead.customerMobileNumber,
                                                   style: const TextStyle(
                                                     fontSize: 14,
                                                     color: Colors.blueAccent,
-                                                    decoration: TextDecoration.underline,
+                                                    decoration: TextDecoration
+                                                        .underline,
                                                   ),
                                                 ),
                                               ],
@@ -524,13 +518,15 @@ class _HomepageState extends State<Homepage> {
                                           ),
                                           const SizedBox(height: 8),
                                           GestureDetector(
-                                            onTap: () => _launchMap(lead.customerAddress),
+                                            onTap: () => _launchMap(
+                                                lead.customerAddress),
                                             child: const Text(
                                               'View on Google Maps',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.blueAccent,
-                                                decoration: TextDecoration.underline,
+                                                decoration:
+                                                    TextDecoration.underline,
                                               ),
                                             ),
                                           ),
@@ -543,28 +539,36 @@ class _HomepageState extends State<Homepage> {
                                               color: Colors.black87,
                                             ),
                                           ),
-                                          const Divider(height: 20, thickness: 1),
+                                          const Divider(
+                                              height: 20, thickness: 1),
                                           ElevatedButton(
                                             onPressed: () {
-                                              // Navigate to the Inspection Page
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) => CarDetailsPage(
-                                                          carDetails: lead,
-                                                        )),
+                                                  builder: (context) =>
+                                                      CarDetailsPage(
+                                                    carDetails: lead,
+                                                  ),
+                                                ),
                                               );
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.blueAccent,
-                                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                                              backgroundColor:
+                                                  Colors.blueAccent,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 8,
+                                                      horizontal: 20),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                             ),
                                             child: const Text(
                                               'Start Inspection',
-                                              style: TextStyle(color: Colors.white),
+                                              style: TextStyle(
+                                                  color: Colors.white),
                                             ),
                                           ),
                                         ],
