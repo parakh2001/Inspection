@@ -42,7 +42,6 @@ class _MyAppState extends State<MyApp> {
         _initialScreen = const LoginPage();
       }
     });
-
   }
 
   @override
