@@ -15,13 +15,11 @@ void main() async {
     const MyApp(),
   );
 }
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
   _MyAppState createState() => _MyAppState();
 }
-
 class _MyAppState extends State<MyApp> {
   // Variable to hold the initial screen
   Widget _initialScreen = const CircularProgressIndicator();
@@ -30,7 +28,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _checkLoginStatus();
   }
-
   Future<void> _checkLoginStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
@@ -43,7 +40,6 @@ class _MyAppState extends State<MyApp> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

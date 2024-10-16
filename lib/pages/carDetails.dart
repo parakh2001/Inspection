@@ -2235,16 +2235,15 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   // // // Load existing data if serialNumber is provided
-  // void _loadCarData() async {
-  //   setState(() {
-  //     _mfgYearMonthController.text  = widget.carDetails.carBuild.toString();
-  //     _carMakeController.text  = widget.carDetails.carCompany;
-  //     _carModelController.text  = widget.carDetails.carModel;
-  //     _fuelTypeController.text  = widget.carDetails.carFueltype;
-  //     _transmissionController.text  = widget.carDetails.carTransmission;
-  //   });
-  // }
-
+  void _loadCarData() async {
+    setState(() {
+      _mfgYearMonthController.text = widget.carDetails.manfYear.toString();
+      _carMakeController.text = widget.carDetails.brand.toString();
+      _carModelController.text = widget.carDetails.model.toString();
+      _fuelTypeController.text = widget.carDetails.fuelType.toString();
+      _transmissionController.text = widget.carDetails.transmission.toString();
+    });
+  }
   // Function to show max bid reached SnackBar
   void showErrorSnackBar(
       {required BuildContext context, required String errorMsg}) {
@@ -2255,7 +2254,6 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       ),
     );
   }
-
   // Save data to Firebase
   void _saveCarDetails() async {
     setState(() {
@@ -2282,8 +2280,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           isChassisNumberOk: _isChassisNumberOk,
           chassisNumberImage: selectedChassisNumberImage,
           noOfKeys: int.tryParse(_numberOfKeyController
-              .text), // Example static data, you can replace
-          images: selectedOtherImages, // Replace with logic for multiple images
+              .text),
+          images: selectedOtherImages,
         ),
       );
     });
@@ -2299,7 +2297,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     await engineRatingCheck();
     num engineRatingValue = 0.0;
     num carPrice = _carFairPriceController.text.isEmpty
-        ? num.parse(widget.carDetails.serialNumber.toString())
+        ? num.parse(widget.carDetails.car_price.toString())
         : num.parse(_carFairPriceController.text);
     setState(() {
       var trueBool = engineRating.where(
