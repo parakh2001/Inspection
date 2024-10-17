@@ -9,6 +9,8 @@ import 'package:inspection/model/car_details.dart';
 // import 'package:inspection/model/lead.dart';
 import '../model/new_lead.dart';
 import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // For jsonEncode
 
 class CarDetailsPage extends StatefulWidget {
   final Lead
@@ -2235,15 +2237,16 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   // // // Load existing data if serialNumber is provided
-  void _loadCarData() async {
-    setState(() {
-      _mfgYearMonthController.text = widget.carDetails.manfYear.toString();
-      _carMakeController.text = widget.carDetails.brand.toString();
-      _carModelController.text = widget.carDetails.model.toString();
-      _fuelTypeController.text = widget.carDetails.fuelType.toString();
-      _transmissionController.text = widget.carDetails.transmission.toString();
-    });
-  }
+  // void _loadCarData() async {
+  //   setState(() {
+  //     _mfgYearMonthController.text = widget.carDetails.manfYear.toString();
+  //     _carMakeController.text = widget.carDetails.brand.toString();
+  //     _carModelController.text = widget.carDetails.model.toString();
+  //     _fuelTypeController.text = widget.carDetails.fuelType.toString();
+  //     _transmissionController.text = widget.carDetails.transmission.toString();
+  //   });
+  // }
+
   // Function to show max bid reached SnackBar
   void showErrorSnackBar(
       {required BuildContext context, required String errorMsg}) {
@@ -2254,6 +2257,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       ),
     );
   }
+
   // Save data to Firebase
   void _saveCarDetails() async {
     setState(() {
@@ -2279,8 +2283,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           engineNumber: _engineNumberController.text,
           isChassisNumberOk: _isChassisNumberOk,
           chassisNumberImage: selectedChassisNumberImage,
-          noOfKeys: int.tryParse(_numberOfKeyController
-              .text),
+          noOfKeys: int.tryParse(_numberOfKeyController.text),
           images: selectedOtherImages,
         ),
       );
@@ -2289,6 +2292,1181 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Car Details Saved!')),
     );
+  }
+
+  Future<void> sendDataToApi() async {
+    // Define the URL for the API
+    final url = Uri.parse('https://gowaggon.com/crm/api/PostInspection');
+    final newCarDoc = CarDetails(
+      serialNumber: widget.carDetails.serialNumber,
+      reMarks: _reMarksController.text,
+      carDoc: carDoc,
+      carHealth: CarHealth(
+        battery: Battery(
+          aftermarketFitment: battryAfterMarketFitment,
+          damaged: battryDamaged,
+          leakage: battryLeakage,
+          wrongSize: battryWrongSize,
+          images: selectedBatteryImage,
+        ),
+        engine: Engine(
+          staticEngineOn: StaticEngineOn(
+            checkForAtGearBoxLeakages: CheckForAtGearBoxLeakages(
+              leakageFromAtGearboxHousing: leakageFromAtGearboxHousing,
+              leakageFromAtInputShaft: leakageFromAtInputShaft,
+            ),
+            checkForEngineLeakages: CheckForEngineLeakages(
+              leakageFromEngineBlock: leakageFromEngineBlock,
+              leakageFromExhaustManifold: leakageFromExhaustManifold,
+              leakageFromTurbocharger: leakageFromTurbocharger,
+              leakgeFromMetalTiming: leakageFromMetalTiming,
+              seepageFromEngineTiming: seepageFromEngineTiming,
+            ),
+            checkForEnginePerformances: CheckForEnginePerformances(
+              backCompressionInEngine: backCompressionInEngine,
+              overheaingDueToRadiatorSystem: overheaingDueToRadiatorSystem,
+              overheatingInEngine: overheatingInEngine,
+            ),
+            checkForManualGearBoxLeakages: CheckForManualGearBoxLeakages(
+              leakageFrom5ThGearHousing: leakageFrom5ThGearHousing,
+              leakageFromDriveAxle: leakageFromDriveAxle,
+              leakageFromMtGearboxHousing: leakageFromMtGearboxHousing,
+              leakageFromMtInputShaft: leakageFromMtInputShaft,
+            ),
+            videos: Videos(
+              engineNoiseVideo: '',
+              testDriveVideo: '',
+            ),
+          ),
+        ),
+        extra: Extra(
+          extraParts: extraParts.text,
+        ),
+        frontSide: FrontSide(
+          frontExterior1: FrontExterior1(
+            bonnetPanel: BonnetPanel(
+              images: selectedBonnetImage,
+              alignmentOut: bonnetAlignmentOut,
+              corrosionMajor: bonnetCorrosionMajor,
+              corrosionMinor: bonnetCorrosionMinor,
+              paintDefective: bonnetPaintDefective,
+              repainted: bonnetRepainted,
+              replaced: bonnetReplaced,
+            ),
+            carKey: CarKey(
+              images: selectedCarKeyImage,
+              damagedMajor: carKeyDamagedMajor,
+              damagedMinor: carKeyDamagedMinor,
+              noFreeMovement: carKeyNoFreeMovement,
+              oneKeyMissing: carKeyOneKeyMissing,
+            ),
+            centralLockingRemoteHousing: CarKey(
+              images: selectedCentralLockingRemoteHousingImage,
+              damagedMajor: centralLockingRemoteHousingDamagedMajor,
+              damagedMinor: centralLockingRemoteHousingDamagedMinor,
+              noFreeMovement: centralLockingRemoteHousingNoFreeMovement,
+              oneKeyMissing: centralLockingRemoteHousingOneKeyMissing,
+            ),
+            frontBumperGrill: FrontBumperGrill(
+              images: selectedFrontBumperGrillImage,
+              crackMajor: frontBumperGrillCrackMajor,
+              crackMinor: frontBumperGrillCrackMinor,
+              repaired: frontBumperGrillRepaired,
+              scratchesMajor: frontBumperGrillScratchesMajor,
+              scratchesMinor: frontBumperGrillScratchesMajor,
+            ),
+            frontBumperPanel: FrontBumperPanel(
+              images: selectedFrontBumperPanelImage,
+              repainted: frontBumperPanelRepainted,
+              paintDefective: frontBumperPanelPaintDefective,
+              wrapping: frontBumperPanelWrapping,
+              tabLocksScrewRepaired: frontBumperPanelTabLocksScrewRepaired,
+              partMissing: frontBumperPanelPartMissing,
+            ),
+            frontRegistrationPlate: FrontRegistrationPlate(
+              images: selectedFrontRegistrationPlateImage,
+              damagedMinor: frontRegistrationPlateDamagedMinor,
+              damagedMajor: frontRegistrationPlateDamagedMajor,
+              aftermarketFitment: frontRegistrationPlateAftermarketFitment,
+              partMissing: frontRegistrationPlatePartMissing,
+            ),
+          ),
+          frontExterior2: FrontExterior2(
+            frontLeftFogLightHousing: FrontLeftExterior(
+              images: selectedFrontLeftFogLightHousingImage,
+              repaired: frontLeftFogLightHousingRepaired,
+              replaced: frontLeftFogLightHousingReplaced,
+              crackMajor: frontLeftFogLightHousingCrackMajor,
+              crackMinor: frontLeftFogLightHousingCrackMinor,
+              corrosionMinor: frontLeftFogLightHousingCorrosionMinor,
+              corrosionMajor: frontLeftFogLightHousingCrackMajor,
+              bendDentMajor: frontLeftFogLightHousingBendDentMajor,
+              bendDentMinor: frontLeftFogLightHousingBendDentMinor,
+              punchesOpenRepaired: frontLeftFogLightHousingPunchesOpenRepaired,
+            ),
+            frontRightFogLightHousing: FrontLeftExterior(
+              images: selectedFrontRightFogLightHousingImage,
+              repaired: frontRightFogLightHousingRepaired,
+              replaced: frontRightFogLightHousingReplaced,
+              crackMajor: frontRightFogLightHousingCrackMajor,
+              crackMinor: frontRightFogLightHousingCrackMinor,
+              corrosionMinor: frontRightFogLightHousingCorrosionMinor,
+              corrosionMajor: frontRightFogLightHousingCrackMajor,
+              bendDentMajor: frontRightFogLightHousingBendDentMajor,
+              bendDentMinor: frontRightFogLightHousingBendDentMinor,
+              punchesOpenRepaired: frontRightFogLightHousingPunchesOpenRepaired,
+            ),
+            leftDrl: FrontLeftExterior(
+              images: selectedLeftDrlImage,
+              repaired: leftDrlRepaired,
+              replaced: leftDrlReplaced,
+              crackMajor: leftDrlCrackMajor,
+              crackMinor: leftDrlCrackMinor,
+              corrosionMinor: leftDrlCorrosionMinor,
+              corrosionMajor: leftDrlCrackMajor,
+              bendDentMajor: leftDrlBendDentMajor,
+              bendDentMinor: leftDrlBendDentMinor,
+              punchesOpenRepaired: leftDrlPunchesOpenRepaired,
+            ),
+            leftHeadlightAssembly: FrontLeftExterior(
+              images: selectedLeftHeadlightAssemblyImage,
+              repaired: leftHeadlightAssemblyRepaired,
+              replaced: leftHeadlightAssemblyReplaced,
+              crackMajor: leftHeadlightAssemblyCrackMajor,
+              crackMinor: leftHeadlightAssemblyCrackMinor,
+              corrosionMinor: leftHeadlightAssemblyCorrosionMinor,
+              corrosionMajor: leftHeadlightAssemblyCrackMajor,
+              bendDentMajor: leftHeadlightAssemblyBendDentMajor,
+              bendDentMinor: leftHeadlightAssemblyBendDentMinor,
+              punchesOpenRepaired: leftHeadlightAssemblyPunchesOpenRepaired,
+            ),
+            leftHeadlightHousing: FrontLeftExterior(
+              images: selectedLeftHeadlightHousingImage,
+              repaired: leftHeadlightHousingRepaired,
+              replaced: leftHeadlightHousingReplaced,
+              crackMajor: leftHeadlightHousingCrackMajor,
+              crackMinor: leftHeadlightHousingCrackMinor,
+              corrosionMinor: leftHeadlightHousingCorrosionMinor,
+              corrosionMajor: leftHeadlightHousingCrackMajor,
+              bendDentMajor: leftHeadlightHousingBendDentMajor,
+              bendDentMinor: leftHeadlightHousingBendDentMinor,
+              punchesOpenRepaired: leftHeadlightHousingPunchesOpenRepaired,
+            ),
+            rightDrl: FrontLeftExterior(
+              images: selectedRightDrlImage,
+              repaired: rightDrlRepaired,
+              replaced: rightDrlReplaced,
+              crackMajor: rightDrlCrackMajor,
+              crackMinor: rightDrlCrackMinor,
+              corrosionMinor: rightDrlCorrosionMinor,
+              corrosionMajor: rightDrlCrackMajor,
+              bendDentMajor: rightDrlBendDentMajor,
+              bendDentMinor: rightDrlBendDentMinor,
+              punchesOpenRepaired: rightDrlPunchesOpenRepaired,
+            ),
+            rightHeadlightAssembly: FrontLeftExterior(
+              images: selectedRightHeadlightAssemblyImage,
+              repaired: rightHeadlightAssemblyRepaired,
+              replaced: rightHeadlightAssemblyReplaced,
+              crackMajor: rightHeadlightAssemblyCrackMajor,
+              crackMinor: rightHeadlightAssemblyCrackMinor,
+              corrosionMinor: rightHeadlightAssemblyCorrosionMinor,
+              corrosionMajor: rightHeadlightAssemblyCrackMajor,
+              bendDentMajor: rightHeadlightAssemblyBendDentMajor,
+              bendDentMinor: rightHeadlightAssemblyBendDentMinor,
+              punchesOpenRepaired: rightHeadlightAssemblyPunchesOpenRepaired,
+            ),
+            rightHeadlightHousing: FrontLeftExterior(
+              images: selectedRightHeadlightHousingImage,
+              repaired: rightHeadlightHousingRepaired,
+              replaced: rightHeadlightHousingReplaced,
+              crackMajor: rightHeadlightHousingCrackMajor,
+              crackMinor: rightHeadlightHousingCrackMinor,
+              corrosionMinor: rightHeadlightHousingCorrosionMinor,
+              corrosionMajor: rightHeadlightHousingCrackMajor,
+              bendDentMajor: rightHeadlightHousingBendDentMajor,
+              bendDentMinor: rightHeadlightHousingBendDentMinor,
+              punchesOpenRepaired: rightHeadlightHousingPunchesOpenRepaired,
+            ),
+          ),
+          frontStructure1: FrontStructure1(
+            boltedRadiatorSupport: EdRadiatorSupport(
+              crackMajor: boltedRadiatorSupportCrackMajor,
+              crackMinor: boltedRadiatorSupportCrackMinor,
+              corrosionMinor: boltedRadiatorSupportCorrosionMinor,
+              corrosionMajor: boltedRadiatorSupportCrackMajor,
+              bendDentMajor: boltedRadiatorSupportBendDentMajor,
+              bendDentMinor: boltedRadiatorSupportBendDentMinor,
+            ),
+            fibreRadiatorSupport: FibreRadiatorSupport(
+              crackMajor: fibreRadiatorSupportCrackMajor,
+              crackMinor: fibreRadiatorSupportCrackMinor,
+              repaired: fibreRadiatorSupportRepaired,
+            ),
+            frontLeftLeg: FrontLeftExterior(
+              images: selectedFrontLeftLegImage,
+              repaired: frontLeftLegRepaired,
+              replaced: frontLeftLegReplaced,
+              crackMajor: frontLeftLegCrackMajor,
+              crackMinor: frontLeftLegCrackMinor,
+              corrosionMinor: frontLeftLegCorrosionMinor,
+              corrosionMajor: frontLeftLegCrackMajor,
+              bendDentMajor: frontLeftLegBendDentMajor,
+              bendDentMinor: frontLeftLegBendDentMinor,
+              punchesOpenRepaired: frontLeftLegPunchesOpenRepaired,
+            ),
+            frontRightLeft: FrontLeftExterior(
+              images: selectedFrontRightLeftImage,
+              repaired: frontRightLeftRepaired,
+              replaced: frontRightLeftReplaced,
+              crackMajor: frontRightLeftCrackMajor,
+              crackMinor: frontRightLeftCrackMinor,
+              corrosionMinor: frontRightLeftCorrosionMinor,
+              corrosionMajor: frontRightLeftCrackMajor,
+              bendDentMajor: frontRightLeftBendDentMajor,
+              bendDentMinor: frontRightLeftBendDentMinor,
+              punchesOpenRepaired: frontRightLeftPunchesOpenRepaired,
+            ),
+            weldedRadiatorSupport: EdRadiatorSupport(
+              crackMajor: weldedRadiatorSupportCrackMajor,
+              crackMinor: weldedRadiatorSupportCrackMinor,
+              corrosionMinor: weldedRadiatorSupportCorrosionMinor,
+              corrosionMajor: weldedRadiatorSupportCrackMajor,
+              bendDentMajor: weldedRadiatorSupportBendDentMajor,
+              bendDentMinor: weldedRadiatorSupportBendDentMinor,
+            ),
+          ),
+        ),
+        interior1: Interior1(
+          acAssembly: AcAssembly(
+            lessEffective: acAssemblyNoise,
+            noise: acAssemblyNoise,
+            notWorking: acAssemblyNotWorking,
+          ),
+          airbags: Airbags(
+            driverSide: airBagsDriverSide,
+            passengerSide: airBagsPassengerSide,
+          ),
+          clusterPanelAssembly: ClusterPanelAssembly(
+            engineChecklight: clusterPanelAssemblyEngineCheckLight,
+            absLight: clusterPanelAssemblyAbsLight,
+            srsLight: clusterPanelAssemblySrsLight,
+            automaticTransmissionLight:
+                clusterPanelAssemblyAutomaticTransmissionLight,
+            speedometer: clusterPanelAssemblySpeedometer,
+            images: selectedClusterPanelAssemblyImage,
+          ),
+          dashboardAssembly: DashboardAssembly(
+            acVent: Ac(
+              working: dashboardAssemblyAcVentWorking,
+              damaged: dashboardAssemblyAcVentDamaged,
+              images: selectedDashboardAssemblyAcVentImage,
+            ),
+            acControls: Ac(
+              working: dashboardAssemblyAcControlsWorking,
+              damaged: dashboardAssemblyAcControlsDamaged,
+              images: selectedDashboardAssemblyAcControlsImage,
+            ),
+          ),
+          frontWindshieldGlass: FrontWindshieldGlass(
+            crackMajor: frontWindshieldGlassCrackMajor,
+            crackMinor: frontWindshieldGlassCrackMinor,
+            scratchesMajor: frontWindshieldGlassScratchesMajor,
+            scratchesMinor: frontWindshieldGlassScratchesMinor,
+            images: selectedFrontWindshieldGlassImage,
+          ),
+          seats: Seats(
+            damageMajor: seatsDamageMajor,
+            damageMinor: seatsDamageMinor,
+            aftermarketFitment: seatsAftermarketFitment,
+            electronicSeat: seatsElectronicSeat,
+            images: selectedSeatsImage,
+          ),
+        ),
+        interior2: Interior2(
+          audioStereoAssembly: Interior2Common(
+            images: selectedAudioStereoAssemblyImage,
+            replaced: audioStereoAssemblyReplaced,
+            crackMajor: audioStereoAssemblyCrackMajor,
+            crackMinor: audioStereoAssemblyCrackMinor,
+            corrosionMinor: audioStereoAssemblyCorrosionMinor,
+            corrosionMajor: audioStereoAssemblyCrackMajor,
+            bendDentMajor: audioStereoAssemblyBendDentMajor,
+            punchesOpenRepaired: audioStereoAssemblyPunchesOpenRepaired,
+            repainted: audioStereoAssemblyRepainted,
+            hammerRepairedMajor: audioStereoAssemblyHammerRepairedMajor,
+            hammerRepairedMinor: audioStereoAssemblyHammerRepairedMinor,
+            wrapping: audioStereoAssemblyWrapping,
+            scratchesMinor: audioStereoAssemblyScratchesMinor,
+            scratchesMajor: audioStereoAssemblyScratchesMajor,
+            paintMismatch: audioStereoAssemblyPaintMisMatch,
+          ),
+          centreConsoleAssembly: Interior2Common(
+            images: selectedCentreConsoleAssemblyImage,
+            replaced: centreConsoleAssemblyReplaced,
+            crackMajor: centreConsoleAssemblyCrackMajor,
+            crackMinor: centreConsoleAssemblyCrackMinor,
+            corrosionMinor: centreConsoleAssemblyCorrosionMinor,
+            corrosionMajor: centreConsoleAssemblyCrackMajor,
+            bendDentMajor: centreConsoleAssemblyBendDentMajor,
+            punchesOpenRepaired: centreConsoleAssemblyPunchesOpenRepaired,
+            repainted: centreConsoleAssemblyRepainted,
+            hammerRepairedMajor: centreConsoleAssemblyHammerRepairedMajor,
+            hammerRepairedMinor: centreConsoleAssemblyHammerRepairedMinor,
+            wrapping: centreConsoleAssemblyWrapping,
+            scratchesMinor: centreConsoleAssemblyScratchesMinor,
+            scratchesMajor: centreConsoleAssemblyScratchesMajor,
+            paintMismatch: centreConsoleAssemblyPaintMisMatch,
+          ),
+          forwardParkingSensors: Interior2Common(
+            images: selectedForwardParkingSensorsImage,
+            replaced: forwardParkingSensorsReplaced,
+            crackMajor: forwardParkingSensorsCrackMajor,
+            crackMinor: forwardParkingSensorsCrackMinor,
+            corrosionMinor: forwardParkingSensorsCorrosionMinor,
+            corrosionMajor: forwardParkingSensorsCrackMajor,
+            bendDentMajor: forwardParkingSensorsBendDentMajor,
+            punchesOpenRepaired: forwardParkingSensorsPunchesOpenRepaired,
+            repainted: forwardParkingSensorsRepainted,
+            hammerRepairedMajor: forwardParkingSensorsHammerRepairedMajor,
+            hammerRepairedMinor: forwardParkingSensorsHammerRepairedMinor,
+            wrapping: forwardParkingSensorsWrapping,
+            scratchesMinor: forwardParkingSensorsScratchesMinor,
+            scratchesMajor: forwardParkingSensorsScratchesMajor,
+            paintMismatch: forwardParkingSensorsPaintMisMatch,
+          ),
+          frontLeftDoorAssembly: Interior2Common(
+            images: selectedFrontLeftDoorAssemblyImage,
+            replaced: frontLeftDoorAssemblyReplaced,
+            crackMajor: frontLeftDoorAssemblyCrackMajor,
+            crackMinor: frontLeftDoorAssemblyCrackMinor,
+            corrosionMinor: frontLeftDoorAssemblyCorrosionMinor,
+            corrosionMajor: frontLeftDoorAssemblyCrackMajor,
+            bendDentMajor: frontLeftDoorAssemblyBendDentMajor,
+            punchesOpenRepaired: frontLeftDoorAssemblyPunchesOpenRepaired,
+            repainted: frontLeftDoorAssemblyRepainted,
+            hammerRepairedMajor: frontLeftDoorAssemblyHammerRepairedMajor,
+            hammerRepairedMinor: frontLeftDoorAssemblyHammerRepairedMinor,
+            wrapping: frontLeftDoorAssemblyWrapping,
+            scratchesMinor: frontLeftDoorAssemblyScratchesMinor,
+            scratchesMajor: frontLeftDoorAssemblyScratchesMajor,
+            paintMismatch: frontLeftDoorAssemblyPaintMisMatch,
+          ),
+          frontRightDoorAssembly: Interior2Common(
+            images: selectedFrontRightDoorAssemblyImage,
+            replaced: frontRightDoorAssemblyReplaced,
+            crackMajor: frontRightDoorAssemblyCrackMajor,
+            crackMinor: frontRightDoorAssemblyCrackMinor,
+            corrosionMinor: frontRightDoorAssemblyCorrosionMinor,
+            corrosionMajor: frontRightDoorAssemblyCrackMajor,
+            bendDentMajor: frontRightDoorAssemblyBendDentMajor,
+            punchesOpenRepaired: frontRightDoorAssemblyPunchesOpenRepaired,
+            repainted: frontRightDoorAssemblyRepainted,
+            hammerRepairedMajor: frontRightDoorAssemblyHammerRepairedMajor,
+            hammerRepairedMinor: frontRightDoorAssemblyHammerRepairedMinor,
+            wrapping: frontRightDoorAssemblyWrapping,
+            scratchesMinor: frontRightDoorAssemblyScratchesMinor,
+            scratchesMajor: frontRightDoorAssemblyScratchesMajor,
+            paintMismatch: frontRightDoorAssemblyPaintMisMatch,
+          ),
+          reverseParkingCamera: Interior2Common(
+            images: selectedReverseParkingCameraImage,
+            replaced: reverseParkingCameraReplaced,
+            crackMajor: reverseParkingCameraCrackMajor,
+            crackMinor: reverseParkingCameraCrackMinor,
+            corrosionMinor: reverseParkingCameraCorrosionMinor,
+            corrosionMajor: reverseParkingCameraCrackMajor,
+            bendDentMajor: reverseParkingCameraBendDentMajor,
+            punchesOpenRepaired: reverseParkingCameraPunchesOpenRepaired,
+            repainted: reverseParkingCameraRepainted,
+            hammerRepairedMajor: reverseParkingCameraHammerRepairedMajor,
+            hammerRepairedMinor: reverseParkingCameraHammerRepairedMinor,
+            wrapping: reverseParkingCameraWrapping,
+            scratchesMinor: reverseParkingCameraScratchesMinor,
+            scratchesMajor: reverseParkingCameraScratchesMajor,
+            paintMismatch: reverseParkingCameraPaintMisMatch,
+          ),
+          reverseParkingSensors: Interior2Common(
+            images: selectedReverseParkingSensorsImage,
+            replaced: reverseParkingSensorsReplaced,
+            crackMajor: reverseParkingSensorsCrackMajor,
+            crackMinor: reverseParkingSensorsCrackMinor,
+            corrosionMinor: reverseParkingSensorsCorrosionMinor,
+            corrosionMajor: reverseParkingSensorsCrackMajor,
+            bendDentMajor: reverseParkingSensorsBendDentMajor,
+            punchesOpenRepaired: reverseParkingSensorsPunchesOpenRepaired,
+            repainted: reverseParkingSensorsRepainted,
+            hammerRepairedMajor: reverseParkingSensorsHammerRepairedMajor,
+            hammerRepairedMinor: reverseParkingSensorsHammerRepairedMinor,
+            wrapping: reverseParkingSensorsWrapping,
+            scratchesMinor: reverseParkingSensorsScratchesMinor,
+            scratchesMajor: reverseParkingSensorsScratchesMajor,
+            paintMismatch: reverseParkingSensorsPaintMisMatch,
+          ),
+        ),
+        leftSide: LeftSide(
+          frontLeftExterior: FrontLeftExterior(
+            images: selectedFrontLeftExteriorImage,
+            repaired: frontLeftExteriorRepaired,
+            replaced: frontLeftExteriorReplaced,
+            crackMajor: frontLeftExteriorCrackMajor,
+            crackMinor: frontLeftExteriorCrackMinor,
+            corrosionMinor: frontLeftExteriorCorrosionMinor,
+            corrosionMajor: frontLeftExteriorCrackMajor,
+            bendDentMajor: frontLeftExteriorBendDentMajor,
+            bendDentMinor: frontLeftExteriorBendDentMinor,
+            punchesOpenRepaired: frontLeftExteriorPunchesOpenRepaired,
+          ),
+          frontLeftMechanical: Interior2Common(
+            images: selectedFrontLeftMechanicalImage,
+            replaced: frontLeftMechanicalReplaced,
+            crackMajor: frontLeftMechanicalCrackMajor,
+            crackMinor: frontLeftMechanicalCrackMinor,
+            corrosionMinor: frontLeftMechanicalCorrosionMinor,
+            corrosionMajor: frontLeftMechanicalCrackMajor,
+            bendDentMajor: frontLeftMechanicalBendDentMajor,
+            punchesOpenRepaired: frontLeftMechanicalPunchesOpenRepaired,
+            repainted: frontLeftMechanicalRepainted,
+            hammerRepairedMajor: frontLeftMechanicalHammerRepairedMajor,
+            hammerRepairedMinor: frontLeftMechanicalHammerRepairedMinor,
+            wrapping: frontLeftMechanicalWrapping,
+            scratchesMinor: frontLeftMechanicalScratchesMinor,
+            scratchesMajor: frontLeftMechanicalScratchesMajor,
+            paintMismatch: frontLeftMechanicalPaintMisMatch,
+          ),
+          frontLeftStructure: FrontLeftStructure(
+            leftFloorPanChannel: Interior2Common(
+              images: selectedLeftFloorPanChannelImage,
+              replaced: leftFloorPanChannelReplaced,
+              crackMajor: leftFloorPanChannelCrackMajor,
+              crackMinor: leftFloorPanChannelCrackMinor,
+              corrosionMinor: leftFloorPanChannelCorrosionMinor,
+              corrosionMajor: leftFloorPanChannelCrackMajor,
+              bendDentMajor: leftFloorPanChannelBendDentMajor,
+              punchesOpenRepaired: leftFloorPanChannelPunchesOpenRepaired,
+              repainted: leftFloorPanChannelRepainted,
+              hammerRepairedMajor: leftFloorPanChannelHammerRepairedMajor,
+              hammerRepairedMinor: leftFloorPanChannelHammerRepairedMinor,
+              wrapping: leftFloorPanChannelWrapping,
+              scratchesMinor: leftFloorPanChannelScratchesMinor,
+              scratchesMajor: leftFloorPanChannelScratchesMajor,
+              paintMismatch: leftFloorPanChannelPaintMisMatch,
+            ),
+            leftPillarB: Interior2Common(
+              images: selectedLeftPillarBImage,
+              replaced: leftPillarBReplaced,
+              crackMajor: leftPillarBCrackMajor,
+              crackMinor: leftPillarBCrackMinor,
+              corrosionMinor: leftPillarBCorrosionMinor,
+              corrosionMajor: leftPillarBCrackMajor,
+              bendDentMajor: leftPillarBBendDentMajor,
+              punchesOpenRepaired: leftPillarBPunchesOpenRepaired,
+              repainted: leftPillarBRepainted,
+              hammerRepairedMajor: leftPillarBHammerRepairedMajor,
+              hammerRepairedMinor: leftPillarBHammerRepairedMinor,
+              wrapping: leftPillarBWrapping,
+              scratchesMinor: leftPillarBScratchesMinor,
+              scratchesMajor: leftPillarBScratchesMajor,
+              paintMismatch: leftPillarBPaintMisMatch,
+            ),
+            leftPillarC: Interior2Common(
+              images: selectedLeftPillarCImage,
+              replaced: leftPillarCReplaced,
+              crackMajor: leftPillarCCrackMajor,
+              crackMinor: leftPillarCCrackMinor,
+              corrosionMinor: leftPillarCCorrosionMinor,
+              corrosionMajor: leftPillarCCrackMajor,
+              bendDentMajor: leftPillarCBendDentMajor,
+              punchesOpenRepaired: leftPillarCPunchesOpenRepaired,
+              repainted: leftPillarCRepainted,
+              hammerRepairedMajor: leftPillarCHammerRepairedMajor,
+              hammerRepairedMinor: leftPillarCHammerRepairedMinor,
+              wrapping: leftPillarCWrapping,
+              scratchesMinor: leftPillarCScratchesMinor,
+              scratchesMajor: leftPillarCScratchesMajor,
+              paintMismatch: leftPillarCPaintMisMatch,
+            ),
+            leftRunningBoard: TRunningBoard(
+              images: selectedLeftRunningBoardImage,
+              replaced: leftRunningBoardReplaced,
+              corrosionMinor: leftRunningBoardCorrosionMinor,
+              corrosionMajor: leftRunningBoardCorrosionMinor,
+              crack: leftRunningBoardCrack,
+              punchesOpenRepaired: leftRunningBoardPunchesOpenRepaired,
+              repainted: leftRunningBoardRepainted,
+              paintMismatch: leftRunningBoardPaintMisMatch,
+            ),
+            rearLeftDoorChannel: Interior2Common(
+              images: selectedRearLeftDoorChannelImage,
+              replaced: rearLeftDoorChannelReplaced,
+              crackMajor: rearLeftDoorChannelCrackMajor,
+              crackMinor: rearLeftDoorChannelCrackMinor,
+              corrosionMinor: rearLeftDoorChannelCorrosionMinor,
+              corrosionMajor: rearLeftDoorChannelCrackMajor,
+              bendDentMajor: rearLeftDoorChannelBendDentMajor,
+              punchesOpenRepaired: rearLeftDoorChannelPunchesOpenRepaired,
+              repainted: rearLeftDoorChannelRepainted,
+              hammerRepairedMajor: rearLeftDoorChannelHammerRepairedMajor,
+              hammerRepairedMinor: rearLeftDoorChannelHammerRepairedMinor,
+              wrapping: rearLeftDoorChannelWrapping,
+              scratchesMinor: rearLeftDoorChannelScratchesMinor,
+              scratchesMajor: rearLeftDoorChannelScratchesMajor,
+              paintMismatch: rearLeftDoorChannelPaintMisMatch,
+            ),
+            rearLeftFloorPan: Interior2Common(
+              images: selectedRearLeftFloorPanImage,
+              replaced: rearLeftFloorPanReplaced,
+              crackMajor: rearLeftFloorPanCrackMajor,
+              crackMinor: rearLeftFloorPanCrackMinor,
+              corrosionMinor: rearLeftFloorPanCorrosionMinor,
+              corrosionMajor: rearLeftFloorPanCrackMajor,
+              bendDentMajor: rearLeftFloorPanBendDentMajor,
+              punchesOpenRepaired: rearLeftFloorPanPunchesOpenRepaired,
+              repainted: rearLeftFloorPanRepainted,
+              hammerRepairedMajor: rearLeftFloorPanHammerRepairedMajor,
+              hammerRepairedMinor: rearLeftFloorPanHammerRepairedMinor,
+              wrapping: rearLeftFloorPanWrapping,
+              scratchesMinor: rearLeftFloorPanScratchesMinor,
+              scratchesMajor: rearLeftFloorPanScratchesMajor,
+              paintMismatch: rearLeftFloorPanPaintMisMatch,
+            ),
+            rearLeftWheelHouse: Interior2Common(
+              images: selectedRearLeftWheelHouseImage,
+              replaced: rearLeftWheelHouseReplaced,
+              crackMajor: rearLeftWheelHouseCrackMajor,
+              crackMinor: rearLeftWheelHouseCrackMinor,
+              corrosionMinor: rearLeftWheelHouseCorrosionMinor,
+              corrosionMajor: rearLeftWheelHouseCrackMajor,
+              bendDentMajor: rearLeftWheelHouseBendDentMajor,
+              punchesOpenRepaired: rearLeftWheelHousePunchesOpenRepaired,
+              repainted: rearLeftWheelHouseRepainted,
+              hammerRepairedMajor: rearLeftWheelHouseHammerRepairedMajor,
+              hammerRepairedMinor: rearLeftWheelHouseHammerRepairedMinor,
+              wrapping: rearLeftWheelHouseWrapping,
+              scratchesMinor: rearLeftWheelHouseScratchesMinor,
+              scratchesMajor: rearLeftWheelHouseScratchesMajor,
+              paintMismatch: rearLeftWheelHousePaintMisMatch,
+            ),
+          ),
+          rearLeftExterior: FrontLeftExterior(
+            images: selectedRearLeftExteriorImage,
+            repaired: rearLeftExteriorRepaired,
+            replaced: rearLeftExteriorReplaced,
+            crackMajor: rearLeftExteriorCrackMajor,
+            crackMinor: rearLeftExteriorCrackMinor,
+            corrosionMinor: rearLeftExteriorCorrosionMinor,
+            corrosionMajor: rearLeftExteriorCrackMajor,
+            bendDentMajor: rearLeftExteriorBendDentMajor,
+            bendDentMinor: rearLeftExteriorBendDentMinor,
+            punchesOpenRepaired: rearLeftExteriorPunchesOpenRepaired,
+          ),
+          rearLeftMechanical: FrontLeftExterior(
+            images: selectedRearLeftExteriorImage,
+            repaired: rearLeftExteriorRepaired,
+            replaced: rearLeftExteriorReplaced,
+            crackMajor: rearLeftExteriorCrackMajor,
+            crackMinor: rearLeftExteriorCrackMinor,
+            corrosionMinor: rearLeftExteriorCorrosionMinor,
+            corrosionMajor: rearLeftExteriorCrackMajor,
+            bendDentMajor: rearLeftExteriorBendDentMajor,
+            bendDentMinor: rearLeftExteriorBendDentMinor,
+            punchesOpenRepaired: rearLeftExteriorPunchesOpenRepaired,
+          ),
+          rearLeftStructure: RearLeftStructure(
+            leftFenderLining: FrontLeftExterior(
+              images: selectedLeftFenderLiningImage,
+              repaired: leftFenderLiningRepaired,
+              replaced: leftFenderLiningReplaced,
+              crackMajor: leftFenderLiningCrackMajor,
+              crackMinor: leftFenderLiningCrackMinor,
+              corrosionMinor: leftFenderLiningCorrosionMinor,
+              corrosionMajor: leftFenderLiningCrackMajor,
+              bendDentMajor: leftFenderLiningBendDentMajor,
+              bendDentMinor: leftFenderLiningBendDentMinor,
+              punchesOpenRepaired: leftFenderLiningPunchesOpenRepaired,
+            ),
+            leftFenderPanel: FrontLeftExterior(
+              images: selectedLeftFenderPanelImage,
+              repaired: leftFenderPanelRepaired,
+              replaced: leftFenderPanelReplaced,
+              crackMajor: leftFenderPanelCrackMajor,
+              crackMinor: leftFenderPanelCrackMinor,
+              corrosionMinor: leftFenderPanelCorrosionMinor,
+              corrosionMajor: leftFenderPanelCrackMajor,
+              bendDentMajor: leftFenderPanelBendDentMajor,
+              bendDentMinor: leftFenderPanelBendDentMinor,
+              punchesOpenRepaired: leftFenderPanelPunchesOpenRepaired,
+            ),
+            leftSvmAssembly: FrontLeftExterior(
+              images: selectedLeftSvmAssemblyImage,
+              repaired: leftSvmAssemblyRepaired,
+              replaced: leftSvmAssemblyReplaced,
+              crackMajor: leftSvmAssemblyCrackMajor,
+              crackMinor: leftSvmAssemblyCrackMinor,
+              corrosionMinor: leftSvmAssemblyCorrosionMinor,
+              corrosionMajor: leftSvmAssemblyCrackMajor,
+              bendDentMajor: leftSvmAssemblyBendDentMajor,
+              bendDentMinor: leftSvmAssemblyBendDentMinor,
+              punchesOpenRepaired: leftSvmAssemblyPunchesOpenRepaired,
+            ),
+            rearLeftDoorPanel: FrontLeftExterior(
+              images: selectedRearLeftDoorPanelImage,
+              repaired: rearLeftDoorPanelRepaired,
+              replaced: rearLeftDoorPanelReplaced,
+              crackMajor: rearLeftDoorPanelCrackMajor,
+              crackMinor: rearLeftDoorPanelCrackMinor,
+              corrosionMinor: rearLeftDoorPanelCorrosionMinor,
+              corrosionMajor: rearLeftDoorPanelCrackMajor,
+              bendDentMajor: rearLeftDoorPanelBendDentMajor,
+              bendDentMinor: rearLeftDoorPanelBendDentMinor,
+              punchesOpenRepaired: rearLeftDoorPanelPunchesOpenRepaired,
+            ),
+          ),
+        ),
+        rearSide: RearSide(
+          rearExterior: RearExterior(
+            dickeyDoorPanel: FrontLeftExterior(
+              images: selectedDickeyDoorPanelImage,
+              hammerRepairedMinor: dickeyDoorPanelHammerRepairedMinor,
+              hammerRepairedMajor: dickeyDoorPanelHammerRepairedMajor,
+              replaced: dickeyDoorPanelReplaced,
+              crackMajor: dickeyDoorPanelCrackMajor,
+              crackMinor: dickeyDoorPanelCrackMinor,
+              corrosionMinor: dickeyDoorPanelCorrosionMinor,
+              corrosionMajor: dickeyDoorPanelCrackMajor,
+              bendDentMajor: dickeyDoorPanelBendDentMajor,
+              bendDentMinor: dickeyDoorPanelBendDentMinor,
+              punchesOpenRepaired: dickeyDoorPanelPunchesOpenRepaired,
+            ),
+            dickeyLeftStayRodShocker: FrontLeftExterior(
+              images: selectedDickeyLeftStayRodShockerImage,
+              hammerRepairedMinor: dickeyLeftStayRodShockerHammerRepairedMinor,
+              hammerRepairedMajor: dickeyRightStayRodShockerHammerRepairedMajor,
+              replaced: dickeyLeftStayRodShockerReplaced,
+              crackMajor: dickeyLeftStayRodShockerCrackMajor,
+              crackMinor: dickeyLeftStayRodShockerCrackMinor,
+              corrosionMinor: dickeyLeftStayRodShockerCorrosionMinor,
+              corrosionMajor: dickeyLeftStayRodShockerCrackMajor,
+              bendDentMajor: dickeyLeftStayRodShockerBendDentMajor,
+              bendDentMinor: dickeyLeftStayRodShockerBendDentMinor,
+              punchesOpenRepaired: dickeyLeftStayRodShockerPunchesOpenRepaired,
+            ),
+            dickeyRightStayRodShocker: FrontLeftExterior(
+              images: selectedDickeyRightStayRodShockerImage,
+              hammerRepairedMinor: dickeyRightStayRodShockerHammerRepairedMinor,
+              hammerRepairedMajor: dickeyRightStayRodShockerHammerRepairedMajor,
+              replaced: dickeyRightStayRodShockerReplaced,
+              crackMajor: dickeyRightStayRodShockerCrackMajor,
+              crackMinor: dickeyRightStayRodShockerCrackMinor,
+              corrosionMinor: dickeyRightStayRodShockerCorrosionMinor,
+              corrosionMajor: dickeyRightStayRodShockerCrackMajor,
+              bendDentMajor: dickeyRightStayRodShockerBendDentMajor,
+              bendDentMinor: dickeyRightStayRodShockerBendDentMinor,
+              punchesOpenRepaired: dickeyRightStayRodShockerPunchesOpenRepaired,
+            ),
+            leftTailLightAssembly: Interior2Common(
+              images: selectedLeftTailLightAssemblyImage,
+              replaced: leftTailLightAssemblyReplaced,
+              crackMajor: leftTailLightAssemblyCrackMajor,
+              crackMinor: leftTailLightAssemblyCrackMinor,
+              corrosionMinor: leftTailLightAssemblyCorrosionMinor,
+              corrosionMajor: leftTailLightAssemblyCrackMajor,
+              bendDentMajor: leftTailLightAssemblyBendDentMajor,
+              punchesOpenRepaired: leftTailLightAssemblyPunchesOpenRepaired,
+              repainted: leftTailLightAssemblyRepainted,
+              hammerRepairedMajor: leftTailLightAssemblyHammerRepairedMajor,
+              hammerRepairedMinor: leftTailLightAssemblyHammerRepairedMinor,
+              wrapping: leftTailLightAssemblyWrapping,
+              scratchesMinor: leftTailLightAssemblyScratchesMinor,
+              scratchesMajor: leftTailLightAssemblyScratchesMajor,
+              paintMismatch: leftTailLightAssemblyPaintMisMatch,
+            ),
+            rearBumperPanel: Interior2Common(
+              images: selectedRearBumperPanelImage,
+              replaced: rearBumperPanelReplaced,
+              crackMajor: rearBumperPanelCrackMajor,
+              crackMinor: rearBumperPanelCrackMinor,
+              corrosionMinor: rearBumperPanelCorrosionMinor,
+              corrosionMajor: rearBumperPanelCrackMajor,
+              bendDentMajor: rearBumperPanelBendDentMajor,
+              punchesOpenRepaired: rearBumperPanelPunchesOpenRepaired,
+              repainted: rearBumperPanelRepainted,
+              hammerRepairedMajor: rearBumperPanelHammerRepairedMajor,
+              hammerRepairedMinor: rearBumperPanelHammerRepairedMinor,
+              wrapping: rearBumperPanelWrapping,
+              scratchesMinor: rearBumperPanelScratchesMinor,
+              scratchesMajor: rearBumperPanelScratchesMajor,
+              paintMismatch: rearBumperPanelPaintMisMatch,
+            ),
+            rearRegistrationPlate: Interior2Common(
+              images: selectedRearRegistrationPlateImage,
+              replaced: rearRegistrationPlateReplaced,
+              crackMajor: rearRegistrationPlateCrackMajor,
+              crackMinor: rearRegistrationPlateCrackMinor,
+              corrosionMinor: rearRegistrationPlateCorrosionMinor,
+              corrosionMajor: rearRegistrationPlateCrackMajor,
+              bendDentMajor: rearRegistrationPlateBendDentMajor,
+              punchesOpenRepaired: rearRegistrationPlatePunchesOpenRepaired,
+              repainted: rearRegistrationPlateRepainted,
+              hammerRepairedMajor: rearRegistrationPlateHammerRepairedMajor,
+              hammerRepairedMinor: rearRegistrationPlateHammerRepairedMinor,
+              wrapping: rearRegistrationPlateWrapping,
+              scratchesMinor: rearRegistrationPlateScratchesMinor,
+              scratchesMajor: rearRegistrationPlateScratchesMajor,
+              paintMismatch: rearRegistrationPlatePaintMisMatch,
+            ),
+            rearWindshieldGlass: Interior2Common(
+              images: selectedRearWindshieldGlassImage,
+              replaced: rearWindshieldGlassReplaced,
+              crackMajor: rearWindshieldGlassCrackMajor,
+              crackMinor: rearWindshieldGlassCrackMinor,
+              corrosionMinor: rearWindshieldGlassCorrosionMinor,
+              corrosionMajor: rearWindshieldGlassCrackMajor,
+              bendDentMajor: rearWindshieldGlassBendDentMajor,
+              punchesOpenRepaired: rearWindshieldGlassPunchesOpenRepaired,
+              repainted: rearWindshieldGlassRepainted,
+              hammerRepairedMajor: rearWindshieldGlassHammerRepairedMajor,
+              hammerRepairedMinor: rearWindshieldGlassHammerRepairedMinor,
+              wrapping: rearWindshieldGlassWrapping,
+              scratchesMinor: rearWindshieldGlassScratchesMinor,
+              scratchesMajor: rearWindshieldGlassScratchesMajor,
+              paintMismatch: rearWindshieldGlassPaintMisMatch,
+            ),
+            rightTailLightAssembly: Interior2Common(
+              images: selectedRightTailLightAssemblyImage,
+              replaced: rightTailLightAssemblyReplaced,
+              crackMajor: rightTailLightAssemblyCrackMajor,
+              crackMinor: rightTailLightAssemblyCrackMinor,
+              corrosionMinor: rightTailLightAssemblyCorrosionMinor,
+              corrosionMajor: rightTailLightAssemblyCrackMajor,
+              bendDentMajor: rightTailLightAssemblyBendDentMajor,
+              punchesOpenRepaired: rightTailLightAssemblyPunchesOpenRepaired,
+              repainted: rightTailLightAssemblyRepainted,
+              hammerRepairedMajor: rightTailLightAssemblyHammerRepairedMajor,
+              hammerRepairedMinor: rightTailLightAssemblyHammerRepairedMinor,
+              wrapping: rightTailLightAssemblyWrapping,
+              scratchesMinor: rightTailLightAssemblyScratchesMinor,
+              scratchesMajor: rightTailLightAssemblyScratchesMajor,
+              paintMismatch: rightTailLightAssemblyPaintMisMatch,
+            ),
+          ),
+          roofStructureAndRoot: RoofStructureAndRoot(
+              dickeyBackPanel: FrontLeftExterior(
+                images: selectedDickeyBackPanelImage,
+                hammerRepairedMinor: dickeyBackPanelHammerRepairedMinor,
+                hammerRepairedMajor: dickeyBackPanelHammerRepairedMajor,
+                replaced: dickeyBackPanelReplaced,
+                crackMajor: dickeyBackPanelCrackMajor,
+                crackMinor: dickeyBackPanelCrackMinor,
+                corrosionMinor: dickeyBackPanelCorrosionMinor,
+                corrosionMajor: dickeyBackPanelCrackMajor,
+                bendDentMajor: dickeyBackPanelBendDentMajor,
+                bendDentMinor: dickeyBackPanelBendDentMinor,
+                punchesOpenRepaired: dickeyBackPanelPunchesOpenRepaired,
+              ),
+              dickeyFloor: FrontLeftExterior(
+                images: selectedDickeyFloorImage,
+                hammerRepairedMinor: dickeyFloorHammerRepairedMinor,
+                hammerRepairedMajor: dickeyFloorHammerRepairedMajor,
+                replaced: dickeyFloorReplaced,
+                crackMajor: dickeyFloorCrackMajor,
+                crackMinor: dickeyFloorCrackMinor,
+                corrosionMinor: dickeyFloorCorrosionMinor,
+                corrosionMajor: dickeyFloorCrackMajor,
+                bendDentMajor: dickeyFloorBendDentMajor,
+                bendDentMinor: dickeyFloorBendDentMinor,
+                punchesOpenRepaired: dickeyFloorPunchesOpenRepaired,
+              ),
+              dickeyLeftLeg: FrontLeftExterior(
+                images: selectedDickeyLeftLegImage,
+                hammerRepairedMinor: dickeyLeftLegHammerRepairedMinor,
+                hammerRepairedMajor: dickeyLeftLegHammerRepairedMajor,
+                replaced: dickeyLeftLegReplaced,
+                repaired: dickeyLeftLegRepaired,
+                crackMajor: dickeyLeftLegCrackMajor,
+                crackMinor: dickeyLeftLegCrackMinor,
+                corrosionMinor: dickeyLeftLegCorrosionMinor,
+                corrosionMajor: dickeyLeftLegCrackMajor,
+                bendDentMajor: dickeyLeftLegBendDentMajor,
+                bendDentMinor: dickeyLeftLegBendDentMinor,
+                punchesOpenRepaired: dickeyLeftLegPunchesOpenRepaired,
+              ),
+              dickeyRightLeg: FrontLeftExterior(
+                images: selectedDickeyRightLegImage,
+                hammerRepairedMinor: dickeyRightLegHammerRepairedMinor,
+                hammerRepairedMajor: dickeyRightLegHammerRepairedMajor,
+                replaced: dickeyRightLegReplaced,
+                repaired: dickeyRightLegRepaired,
+                crackMajor: dickeyRightLegCrackMajor,
+                crackMinor: dickeyRightLegCrackMinor,
+                corrosionMinor: dickeyRightLegCorrosionMinor,
+                corrosionMajor: dickeyRightLegCrackMajor,
+                bendDentMajor: dickeyRightLegBendDentMajor,
+                bendDentMinor: dickeyRightLegBendDentMinor,
+                punchesOpenRepaired: dickeyRightLegPunchesOpenRepaired,
+              ),
+              dickeySidewalls: DickeySidewalls(
+                leftDickeySidewall: FrontLeftExterior(
+                  images: selectedLeftDickeySidewallImage,
+                  sealantMissingCrackRepaired:
+                      leftDickeySidewallSealantMissingCrackRepaired,
+                  replaced: leftDickeySidewallReplaced,
+                  crackMajor: leftDickeySidewallCrackMajor,
+                  crackMinor: leftDickeySidewallCrackMinor,
+                  corrosionMinor: leftDickeySidewallCorrosionMinor,
+                  corrosionMajor: leftDickeySidewallCrackMajor,
+                  bendDentMajor: leftDickeySidewallBendDentMajor,
+                  bendDentMinor: leftDickeySidewallBendDentMinor,
+                  punchesOpenRepaired: leftDickeySidewallPunchesOpenRepaired,
+                ),
+                rightDickeySidewall: FrontLeftExterior(
+                  images: selectedRightDickeySidewallImage,
+                  replaced: rightDickeySidewallReplaced,
+                  sealantMissingCrackRepaired:
+                      rightDickeySidewallSealantMissingCrackRepaired,
+                  crackMajor: rightDickeySidewallCrackMajor,
+                  crackMinor: rightDickeySidewallCrackMinor,
+                  corrosionMinor: rightDickeySidewallCorrosionMinor,
+                  corrosionMajor: rightDickeySidewallCrackMajor,
+                  bendDentMajor: rightDickeySidewallBendDentMajor,
+                  bendDentMinor: rightDickeySidewallBendDentMinor,
+                  punchesOpenRepaired: rightDickeySidewallPunchesOpenRepaired,
+                ),
+              ),
+              dickeyStrutTowers: DickeyStrutTowers(
+                leftDickeyStrutTower: FrontLeftExterior(
+                  images: selectedLeftDickeyStrutTowerImage,
+                  sealantMissingCrackRepaired:
+                      leftDickeyStrutTowerSealantMissingCrackRepaired,
+                  replaced: leftDickeyStrutTowerReplaced,
+                  crackMajor: leftDickeyStrutTowerCrackMajor,
+                  crackMinor: leftDickeyStrutTowerCrackMinor,
+                  corrosionMinor: leftDickeyStrutTowerCorrosionMinor,
+                  corrosionMajor: leftDickeyStrutTowerCrackMajor,
+                  bendDentMajor: leftDickeyStrutTowerBendDentMajor,
+                  bendDentMinor: leftDickeyStrutTowerBendDentMinor,
+                  punchesOpenRepaired: leftDickeyStrutTowerPunchesOpenRepaired,
+                ),
+                rightDickeyStrutTower: FrontLeftExterior(
+                  images: selectedRightDickeyStrutTowerImage,
+                  sealantMissingCrackRepaired:
+                      rightDickeyStrutTowerSealantMissingCrackRepaired,
+                  replaced: rightDickeyStrutTowerReplaced,
+                  crackMajor: rightDickeyStrutTowerCrackMajor,
+                  crackMinor: rightDickeyStrutTowerCrackMinor,
+                  corrosionMinor: rightDickeyStrutTowerCorrosionMinor,
+                  corrosionMajor: rightDickeyStrutTowerCrackMajor,
+                  bendDentMajor: rightDickeyStrutTowerBendDentMajor,
+                  bendDentMinor: rightDickeyStrutTowerBendDentMinor,
+                  punchesOpenRepaired: rightDickeyStrutTowerPunchesOpenRepaired,
+                ),
+              ),
+              roofPanel: RoofPanel(
+                images: selectedRoofPanelImage,
+                replaced: roofPanelReplaced,
+                repaired: roofPanelRepaired,
+                wrapping: roofPanelWrapping,
+                paintDefective: roofPanelPaintMisMatch,
+                corrosionMinor: roofPanelCorrosionMinor,
+                corrosionMajor: roofPanelCorrosionMajor,
+                repainted: roofPanelRepainted,
+                paintMismatch: roofPanelPaintMisMatch,
+                scratchesMinor: roofPanelScratchesMinor,
+                scratchesMajor: roofPanelScratchesMajor,
+                sealantMissing: roofPanelSealantMissing,
+                multipleDentsDentMajor: roofPanelMultipleDentsDentMajor,
+                multipleDentsDentMinor: roofPanelMultipleDentsDentMinor,
+                aftermarketSunroofFitment: roofPanelAftermarketSunroofFitment,
+                externalHoleTear: roofPanelExternalHoleTear,
+                aftermarketDualTonePaint: roofPanelAftermarketDualTonePaint,
+              ),
+              spareTyreAssembly: SpareTyreAssembly(
+                images: selectedSpareTyreAssemblyImage,
+                spareTyreAvailable: spareTyreAvailable,
+              )),
+        ),
+        rightSide: RightSide(
+          frontRightExterior: FrontRightExterior(
+            frontRightDoorPanel: FrontLeftExterior(
+              images: selectedFrontRightDoorPanelImage,
+              replaced: frontRightDoorPanelReplaced,
+              repaired: frontRightDoorPanelRepaired,
+              crackMajor: frontRightDoorPanelCrackMajor,
+              crackMinor: frontRightDoorPanelCrackMinor,
+              corrosionMinor: frontRightDoorPanelCorrosionMinor,
+              corrosionMajor: frontRightDoorPanelCrackMajor,
+              bendDentMajor: frontRightDoorPanelBendDentMajor,
+              bendDentMinor: frontRightDoorPanelBendDentMinor,
+              punchesOpenRepaired: frontRightDoorPanelPunchesOpenRepaired,
+            ),
+            rightFenderLining: FrontLeftExterior(
+              images: selectedRightFenderLiningImage,
+              replaced: rightFenderLiningReplaced,
+              repaired: rightFenderLiningRepaired,
+              crackMajor: rightFenderLiningCrackMajor,
+              crackMinor: rightFenderLiningCrackMinor,
+              corrosionMinor: rightFenderLiningCorrosionMinor,
+              corrosionMajor: rightFenderLiningCrackMajor,
+              bendDentMajor: rightFenderLiningBendDentMajor,
+              bendDentMinor: rightFenderLiningBendDentMinor,
+              punchesOpenRepaired: rightFenderLiningPunchesOpenRepaired,
+            ),
+            rightFenderPanel: FrontLeftExterior(
+              images: selectedRightFenderPanelImage,
+              replaced: rightFenderPanelReplaced,
+              repaired: rightFenderPanelRepaired,
+              crackMajor: rightFenderPanelCrackMajor,
+              crackMinor: rightFenderPanelCrackMinor,
+              corrosionMinor: rightFenderPanelCorrosionMinor,
+              corrosionMajor: rightFenderPanelCrackMajor,
+              bendDentMajor: rightFenderPanelBendDentMajor,
+              bendDentMinor: rightFenderPanelBendDentMinor,
+              punchesOpenRepaired: rightFenderPanelPunchesOpenRepaired,
+            ),
+            rightSvmAssembly: FrontLeftExterior(
+              images: selectedRightSvmAssemblyImage,
+              replaced: rightSvmAssemblyReplaced,
+              repaired: rightSvmAssemblyRepaired,
+              crackMajor: rightSvmAssemblyCrackMajor,
+              crackMinor: rightSvmAssemblyCrackMinor,
+              corrosionMinor: rightSvmAssemblyCorrosionMinor,
+              corrosionMajor: rightSvmAssemblyCrackMajor,
+              bendDentMajor: rightSvmAssemblyBendDentMajor,
+              bendDentMinor: rightSvmAssemblyBendDentMinor,
+              punchesOpenRepaired: rightSvmAssemblyPunchesOpenRepaired,
+            ),
+          ),
+          frontRightMechanical: FrontRightMechanical(
+            exhaustSystem: frontRightMechanicalExhaustSystem,
+            fourWheelDrive: FrontLeftExterior(
+              images: selectedFourWheelDriveImage,
+              replaced: fourWheelDriveReplaced,
+              repaired: fourWheelDriveRepaired,
+              crackMajor: fourWheelDriveCrackMajor,
+              crackMinor: fourWheelDriveCrackMinor,
+              corrosionMinor: fourWheelDriveCorrosionMinor,
+              corrosionMajor: fourWheelDriveCrackMajor,
+              bendDentMajor: fourWheelDriveBendDentMajor,
+              bendDentMinor: fourWheelDriveBendDentMinor,
+              punchesOpenRepaired: fourWheelDrivePunchesOpenRepaired,
+            ),
+            frontRightBrakeAssembly: FrontLeftExterior(
+              images: selectedFrontRightBrakeAssemblyImage,
+              replaced: frontRightBrakeAssemblyReplaced,
+              repaired: frontRightBrakeAssemblyRepaired,
+              crackMajor: frontRightBrakeAssemblyCrackMajor,
+              crackMinor: frontRightBrakeAssemblyCrackMinor,
+              corrosionMinor: frontRightBrakeAssemblyCorrosionMinor,
+              corrosionMajor: frontRightBrakeAssemblyCrackMajor,
+              bendDentMajor: frontRightBrakeAssemblyBendDentMajor,
+              bendDentMinor: frontRightBrakeAssemblyBendDentMinor,
+              punchesOpenRepaired: frontRightBrakeAssemblyPunchesOpenRepaired,
+            ),
+            frontRightSuspension: FrontRightSuspension(
+              frontJumpingRodAssembly:
+                  frontRightSuspensionFrontJumpingRodAssembly,
+              frontRightLinkRod: frontRightSuspensionFrontRightLinkRod,
+              frontRightLowerControlArmAssembly:
+                  frontRightSuspensionFrontRightLowerControlArmAssembly,
+              frontRightStrutAssembly:
+                  frontRightSuspensionFrontRightStrutAssembly,
+            ),
+            frontRightTyreAssembly: FrontLeftExterior(
+              images: selectedFrontRightTyreAssemblyImage,
+              replaced: frontRightTyreAssemblyReplaced,
+              repaired: frontRightTyreAssemblyRepaired,
+              crackMajor: frontRightTyreAssemblyCrackMajor,
+              crackMinor: frontRightTyreAssemblyCrackMinor,
+              corrosionMinor: frontRightTyreAssemblyCorrosionMinor,
+              corrosionMajor: frontRightTyreAssemblyCrackMajor,
+              bendDentMajor: frontRightTyreAssemblyBendDentMajor,
+              bendDentMinor: frontRightTyreAssemblyBendDentMinor,
+              punchesOpenRepaired: frontRightTyreAssemblyPunchesOpenRepaired,
+            ),
+            frontWheelDrive: FrontLeftExterior(
+              images: selectedFrontWheelDriveImage,
+              replaced: frontWheelDriveReplaced,
+              repaired: frontWheelDriveRepaired,
+              crackMajor: frontWheelDriveCrackMajor,
+              crackMinor: frontWheelDriveCrackMinor,
+              corrosionMinor: frontWheelDriveCorrosionMinor,
+              corrosionMajor: frontWheelDriveCrackMajor,
+              bendDentMajor: frontWheelDriveBendDentMajor,
+              bendDentMinor: frontWheelDriveBendDentMinor,
+              punchesOpenRepaired: frontWheelDrivePunchesOpenRepaired,
+            ),
+          ),
+          rearRightStructure: RearRightStructure(
+            rearRightDoorChannel: Interior2Common(
+              images: selectedRearRightDoorChannelImage,
+              replaced: rearRightDoorChannelReplaced,
+              crackMajor: rearRightDoorChannelCrackMajor,
+              crackMinor: rearRightDoorChannelCrackMinor,
+              corrosionMinor: rearRightDoorChannelCorrosionMinor,
+              corrosionMajor: rearRightDoorChannelCrackMajor,
+              bendDentMajor: rearRightDoorChannelBendDentMajor,
+              punchesOpenRepaired: rearRightDoorChannelPunchesOpenRepaired,
+              repainted: rearRightDoorChannelRepainted,
+              hammerRepairedMajor: rearRightDoorChannelHammerRepairedMajor,
+              hammerRepairedMinor: rearRightDoorChannelHammerRepairedMinor,
+              wrapping: rearRightDoorChannelWrapping,
+              scratchesMinor: rearRightDoorChannelScratchesMinor,
+              scratchesMajor: rearRightDoorChannelScratchesMajor,
+              paintMismatch: rearRightDoorChannelPaintMisMatch,
+            ),
+            rearRightFloorPan: Interior2Common(
+              images: selectedRearRightFloorPanImage,
+              replaced: rearRightFloorPanReplaced,
+              crackMajor: rearRightFloorPanCrackMajor,
+              crackMinor: rearRightFloorPanCrackMinor,
+              corrosionMinor: rearRightFloorPanCorrosionMinor,
+              corrosionMajor: rearRightFloorPanCrackMajor,
+              bendDentMajor: rearRightFloorPanBendDentMajor,
+              punchesOpenRepaired: rearRightFloorPanPunchesOpenRepaired,
+              repainted: rearRightFloorPanRepainted,
+              hammerRepairedMajor: rearRightFloorPanHammerRepairedMajor,
+              hammerRepairedMinor: rearRightFloorPanHammerRepairedMinor,
+              wrapping: rearRightFloorPanWrapping,
+              scratchesMinor: rearRightFloorPanScratchesMinor,
+              scratchesMajor: rearRightFloorPanScratchesMajor,
+              paintMismatch: rearRightFloorPanPaintMisMatch,
+            ),
+            rearRightWheelHouse: Interior2Common(
+              images: selectedRearRightWheelHouseImage,
+              replaced: rearRightWheelHouseReplaced,
+              crackMajor: rearRightWheelHouseCrackMajor,
+              crackMinor: rearRightWheelHouseCrackMinor,
+              corrosionMinor: rearRightWheelHouseCorrosionMinor,
+              corrosionMajor: rearRightWheelHouseCrackMajor,
+              bendDentMajor: rearRightWheelHouseBendDentMajor,
+              punchesOpenRepaired: rearRightWheelHousePunchesOpenRepaired,
+              repainted: rearRightWheelHouseRepainted,
+              hammerRepairedMajor: rearRightWheelHouseHammerRepairedMajor,
+              hammerRepairedMinor: rearRightWheelHouseHammerRepairedMinor,
+              wrapping: rearRightWheelHouseWrapping,
+              scratchesMinor: rearRightWheelHouseScratchesMinor,
+              scratchesMajor: rearRightWheelHouseScratchesMajor,
+              paintMismatch: rearRightWheelHousePaintMisMatch,
+            ),
+            rightFloorPanChannel: Interior2Common(
+              images: selectedRightFloorPanChannelImage,
+              replaced: rightFloorPanChannelReplaced,
+              crackMajor: rightFloorPanChannelCrackMajor,
+              crackMinor: rightFloorPanChannelCrackMinor,
+              corrosionMinor: rightFloorPanChannelCorrosionMinor,
+              corrosionMajor: rightFloorPanChannelCrackMajor,
+              bendDentMajor: rightFloorPanChannelBendDentMajor,
+              punchesOpenRepaired: rightFloorPanChannelPunchesOpenRepaired,
+              repainted: rightFloorPanChannelRepainted,
+              hammerRepairedMajor: rightFloorPanChannelHammerRepairedMajor,
+              hammerRepairedMinor: rightFloorPanChannelHammerRepairedMinor,
+              wrapping: rightFloorPanChannelWrapping,
+              scratchesMinor: rightFloorPanChannelScratchesMinor,
+              scratchesMajor: rightFloorPanChannelScratchesMajor,
+              paintMismatch: rightFloorPanChannelPaintMisMatch,
+            ),
+            rightPillarB: Interior2Common(
+              images: selectedRightPillarBImage,
+              replaced: rightPillarBReplaced,
+              crackMajor: rightPillarBCrackMajor,
+              crackMinor: rightPillarBCrackMinor,
+              corrosionMinor: rightPillarBCorrosionMinor,
+              corrosionMajor: rightPillarBCrackMajor,
+              bendDentMajor: rightPillarBBendDentMajor,
+              punchesOpenRepaired: rightPillarBPunchesOpenRepaired,
+              repainted: rightPillarBRepainted,
+              hammerRepairedMajor: rightPillarBHammerRepairedMajor,
+              hammerRepairedMinor: rightPillarBHammerRepairedMinor,
+              wrapping: rightPillarBWrapping,
+              scratchesMinor: rightPillarBScratchesMinor,
+              scratchesMajor: rightPillarBScratchesMajor,
+              paintMismatch: rightPillarBPaintMisMatch,
+            ),
+            rightPillarC: Interior2Common(
+              images: selectedRightPillarCImage,
+              replaced: rightPillarCReplaced,
+              crackMajor: rightPillarCCrackMajor,
+              crackMinor: rightPillarCCrackMinor,
+              corrosionMinor: rightPillarCCorrosionMinor,
+              corrosionMajor: rightPillarCCrackMajor,
+              bendDentMajor: rightPillarCBendDentMajor,
+              punchesOpenRepaired: rightPillarCPunchesOpenRepaired,
+              repainted: rightPillarCRepainted,
+              hammerRepairedMajor: rightPillarCHammerRepairedMajor,
+              hammerRepairedMinor: rightPillarCHammerRepairedMinor,
+              wrapping: rightPillarCWrapping,
+              scratchesMinor: rightPillarCScratchesMinor,
+              scratchesMajor: rightPillarCScratchesMajor,
+              paintMismatch: rightPillarCPaintMisMatch,
+            ),
+            rightRunningBoard: TRunningBoard(
+              images: selectedRightRunningBoardImage,
+              replaced: rightRunningBoardReplaced,
+              repainted: rightRunningBoardRepainted,
+              corrosionMinor: rightRunningBoardCorrosionMinor,
+              corrosionMajor: rightRunningBoardCorrosionMajor,
+              punchesOpenRepaired: rightRunningBoardPunchesOpenRepaired,
+              paintMismatch: rightRunningBoardPaintMisMatch,
+              paintDefective: rightRunningBoardPaintDefective,
+              crack: rightRunningBoardCrack,
+            ),
+          ),
+          rightRightMechanical: Interior2Common(
+            images: selectedRightMechanicalImage,
+            replaced: rightMechanicalReplaced,
+            crackMajor: rightMechanicalCrackMajor,
+            crackMinor: rightMechanicalCrackMinor,
+            corrosionMinor: rightMechanicalCorrosionMinor,
+            corrosionMajor: rightMechanicalCrackMajor,
+            bendDentMajor: rightMechanicalBendDentMajor,
+            punchesOpenRepaired: rightMechanicalPunchesOpenRepaired,
+            repainted: rightMechanicalRepainted,
+            hammerRepairedMajor: rightMechanicalHammerRepairedMajor,
+            hammerRepairedMinor: rightMechanicalHammerRepairedMinor,
+            wrapping: rightMechanicalWrapping,
+            scratchesMinor: rightMechanicalScratchesMinor,
+            scratchesMajor: rightMechanicalScratchesMajor,
+            paintMismatch: rightMechanicalPaintMisMatch,
+          ),
+        ),
+        testDrive: TestDrive(
+          steeringHealth: testDriveSteeringHealth,
+          accelerateToCheckClutch: AccelerateToCheckClutch(
+            clutchPedalVibration: testDriveClutchPedalVibration,
+            noiseFromTurbocharger: testDriveNoiseFromTurbocharger,
+          ),
+          applyBrakesTillCarStop: ApplyBrakesTillCarStop(
+            frontBrakeNoiseVibration: testDriveFrontBrakeNoiseVibration,
+            idleStartStopNotWorking: testDriveIdleStartStopNotWorking,
+            rearBrakeNoiseVibration: testDriveRearBrakeNoiseVibration,
+          ),
+        ),
+      ),
+    );
+    // Prepare the data from newCarDoc
+    // Assuming newCarDoc is an object with a toMap method to convert it to a Map
+    Map<String, dynamic> requestBody = newCarDoc.toMap();
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json', // Specify the content type
+        },
+        body: jsonEncode(requestBody), // Encode the Map to JSON
+      );
+
+      // Check the response status
+      if (response.statusCode == 200) {
+        // Successfully sent the data
+        print('Data sent successfully: ${response.body}');
+      } else {
+        // Handle the error response
+        print('Failed to send data: ${response.statusCode}, ${response.body}');
+      }
+    } catch (error) {
+      // Handle any exceptions
+      print('Error occurred: $error');
+    }
   }
 
   void _saveCarInspection() async {
@@ -3483,56 +4661,92 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       maxBidPrice: num.tryParse(widget.carDetails.car_price.toString() * 2),
       highestBid: 0.0,
     );
+    ElevatedButton(
+      onPressed: () async {
+        // Show the "Car Inspection Saved!" message immediately
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Car Inspection Saved!')),
+        );
+        try {
+          // Save the car details to Firebase
+          await _database
+              .child(widget.carDetails.serialNumber.toString())
+              .set(newCarDoc.toMap());
+          // Send data to the API
+          await sendDataToApi();
+          // Save car auction details to Firebase
+          await carAuctionRef
+              .child(widget.carDetails.serialNumber.toString())
+              .set(carAuction.toMap());
 
-    await _database
-        .child(widget.carDetails.serialNumber.toString())
-        .set(newCarDoc.toMap());
-    await carAuctionRef
-        .child(widget.carDetails.serialNumber.toString())
-        .set(carAuction.toMap());
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Car Inspection Saved!')),
+          // Optionally, show another message if everything succeeds
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Car details successfully saved!')),
+          );
+        } catch (error) {
+          // Show error message if something fails
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to save data: $error')),
+          );
+        }
+      },
+      child: const Text('Submit'),
     );
+    // await _database
+    //     .child(widget.carDetails.serialNumber.toString())
+    //     .set(newCarDoc.toMap());
+    // await sendDataToApi();
+    // await carAuctionRef
+    //     .child(widget.carDetails.serialNumber.toString())
+    //     .set(carAuction.toMap());
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   const SnackBar(content: Text('Car Inspection Saved!')),
+    // );
     Navigator.pop(context);
     Navigator.pop(context);
   }
-
   String getUId() {
     const uuid = Uuid();
     return uuid.v1();
   }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Inspection'),
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          _buildCarDetailsPage(), // Car Details Page
-          _buildInspectionPage(), // Inspection Page
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index; // Update the selected index
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car),
-            label: 'Car Details',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Inspection',
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        // Returning false disables the back button
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Inspection'),
+          automaticallyImplyLeading: false,
+        ),
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: [
+            _buildCarDetailsPage(), // Car Details Page
+            _buildInspectionPage(), // Inspection Page
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index; // Update the selected index
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.directions_car),
+              label: 'Car Details',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.assignment),
+              label: 'Inspection',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -4031,7 +5245,6 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     if (selectedBatteryImage == null) {
                       final XFile? image =
                           await picker.pickImage(source: ImageSource.camera);
-
                       if (image != null) {
                         setState(() {
                           _selectedBatteryImage = File(image.path);

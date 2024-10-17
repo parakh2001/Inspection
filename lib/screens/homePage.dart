@@ -19,6 +19,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  String? evaluatorId;
   final DatabaseReference _database = FirebaseDatabase.instance.ref('leads');
   late Future<List<Lead>> _futureLeads;
   Evaluator? evaluator;
@@ -128,85 +129,6 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
-  Future<List<Lead>> fetchLeads() async {
-    // Get the currently logged-in user
-    User? user = await getCurrentUser();
-    if (user == null) {
-      print("No user logged in");
-      return [];
-    }
-
-    // Get the evaluator ID using the logged-in user's details
-    String? evaluatorId = await getEvaluatorIdFromUser(user);
-    if (evaluatorId == null) {
-      print("Evaluator ID not found for the logged-in user");
-      return [];
-    }
-
-    // Fetch the evaluator's data
-    final DatabaseReference evaluatorRef =
-        FirebaseDatabase.instance.ref('evaluator/$evaluatorId');
-    final evaluatorSnapshot = await evaluatorRef.once();
-
-    // Safely check if there is evaluator data
-    if (evaluatorSnapshot.snapshot.value == null) {
-      print("Evaluator data not found");
-      return [];
-    }
-    // Check if evaluator data is a Map and safely extract evaluator locations
-    final evaluatorData = evaluatorSnapshot.snapshot.value;
-    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    if (evaluatorData is Map && evaluatorData['evaluator_location'] is List) {
-      List<dynamic> evaluatorLocations = evaluatorData['evaluator_location'];
-      // Fetch leads data from Firebase
-      final DatabaseReference leadsRef =
-          FirebaseDatabase.instance.ref('leads_data');
-      final leadsSnapshot = await leadsRef.once();
-      // Safely check if there is leads data
-      if (leadsSnapshot.snapshot.value == null) {
-        print("No leads data found");
-        return [];
-      }
-      List<Lead> leads = [];
-      // Handle leads data if it's a Map
-      if (leadsSnapshot.snapshot.value is Map) {
-        final leadsData = leadsSnapshot.snapshot.value as Map<dynamic, dynamic>;
-
-        // Filter leads based on evaluator's locations
-        leadsData.forEach((key, value) {
-          Lead lead = Lead.fromJson(Map<String, dynamic>.from(value));
-          // Check if the lead's user_city matches any of the evaluator's locations
-          if (evaluatorLocations.contains(lead.userCity.trim())) {
-            leads.add(lead);
-          }
-        });
-      }
-      // Handle leads data if it's a List
-      else if (leadsSnapshot.snapshot.value is List) {
-        final leadsList = leadsSnapshot.snapshot.value as List<dynamic>;
-        for (var leadData in leadsList) {
-          if (leadData is Map) {
-            Lead lead = Lead.fromJson(Map<String, dynamic>.from(leadData));
-            // Check if the lead's user_city matches any of the evaluator's locations
-            if (evaluatorLocations.contains(lead.userCity.trim()) &&
-                lead.bookingDate == todayDate) {
-              leads.add(lead);
-            }
-          } else {
-            print("Unexpected data format in leads list: $leadData");
-          }
-        }
-      } else {
-        print(
-            "Unexpected data structure for leads: ${leadsSnapshot.snapshot.value}");
-      }
-      return leads;
-    } else {
-      print("Unexpected data structure for evaluator data");
-    }
-    return [];
-  }
-
   void _makeCall(String phoneNumber) async {
     final Uri url = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(url)) {
@@ -243,7 +165,6 @@ class _HomepageState extends State<Homepage> {
     return auth.currentUser;
   }
 
-  String? evaluatorId;
   Future<String?> getEvaluatorIdFromUser(User user) async {
     final DatabaseReference evaluatorRef =
         FirebaseDatabase.instance.ref('evaluator');
@@ -281,6 +202,85 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  Future<List<Lead>> fetchLeads() async {
+    // Get the currently logged-in user
+    User? user = await getCurrentUser();
+    if (user == null) {
+      print("No user logged in");
+      return [];
+    }
+    // Get the evaluator ID using the logged-in user's details
+    String? evaluatorId = await getEvaluatorIdFromUser(user);
+    if (evaluatorId == null) {
+      print("Evaluator ID not found for the logged-in user");
+      return [];
+    }
+    // Fetch the evaluator's data
+    final DatabaseReference evaluatorRef =
+        FirebaseDatabase.instance.ref('evaluator/$evaluatorId');
+    final evaluatorSnapshot = await evaluatorRef.once();
+    // Safely check if there is evaluator data
+    if (evaluatorSnapshot.snapshot.value == null) {
+      print("Evaluator data not found");
+      return [];
+    }
+    // Check if evaluator data is a Map and safely extract evaluator locations
+    final evaluatorData = evaluatorSnapshot.snapshot.value;
+    if (evaluatorData is Map && evaluatorData['evaluator_location'] is List) {
+      List<dynamic> evaluatorLocations = evaluatorData['evaluator_location'];
+      // Get today's date in the format that matches `booking_date`
+      String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      // Fetch leads data from Firebase
+      final DatabaseReference leadsRef =
+          FirebaseDatabase.instance.ref('leads_data');
+      final leadsSnapshot = await leadsRef.once();
+      // Safely check if there is leads data
+      if (leadsSnapshot.snapshot.value == null) {
+        print("No leads data found");
+        return [];
+      }
+      List<Lead> leads = [];
+      // Handle leads data if it's a Map
+      if (leadsSnapshot.snapshot.value is Map) {
+        final leadsData = leadsSnapshot.snapshot.value as Map<dynamic, dynamic>;
+        // Filter leads based on evaluator's locations and today's date
+        leadsData.forEach((key, value) {
+          Lead lead = Lead.fromJson(Map<String, dynamic>.from(value));
+          // Check if the lead's user_city matches any of the evaluator's locations
+          // and if the booking_date matches today's date
+          if (evaluatorLocations.contains(lead.userCity.trim()) &&
+              lead.bookingDate == todayDate) {
+            leads.add(lead);
+          }
+        });
+      }
+      // Handle leads data if it's a List
+      else if (leadsSnapshot.snapshot.value is List) {
+        final leadsList = leadsSnapshot.snapshot.value as List<dynamic>;
+        for (var leadData in leadsList) {
+          if (leadData is Map) {
+            Lead lead = Lead.fromJson(Map<String, dynamic>.from(leadData));
+            // Check if the lead's user_city matches any of the evaluator's locations
+            // and if the booking_date matches today's date
+            if (evaluatorLocations.contains(lead.userCity.trim()) &&
+                lead.bookingDate == todayDate) {
+              leads.add(lead);
+            }
+          } else {
+            print("Unexpected data format in leads list: $leadData");
+          }
+        }
+      } else {
+        print(
+            "Unexpected data structure for leads: ${leadsSnapshot.snapshot.value}");
+      }
+      return leads;
+    } else {
+      print("Unexpected data structure for evaluator data");
+    }
+    return [];
+  }
+
   Future<List<dynamic>> fetchLeadsData() async {
     final response =
         await http.get(Uri.parse('https://gowaggon.com/crm/api/leadlist'));
@@ -295,33 +295,48 @@ class _HomepageState extends State<Homepage> {
   Future<void> storeLeadsData(List<dynamic> leadsData) async {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.ref('leads_data');
+
+    // Iterate through each lead in the provided leadsData
     for (var lead in leadsData) {
-      String serialNumber = lead['serial_number'].toString();
-      // Use null-aware operators or provide default values if null
-      await databaseRef.child(serialNumber).set({
-        'serial_number':
-            lead['serial_number'] ?? '', // Provide default empty string if null
-        'booking_date': lead['booking_date'] ?? '',
-        'date': lead['date'] ?? '',
-        'booking_slot': lead['booking_slot'] ?? '',
-        'mobile_number': lead['mobile_number'] ?? '',
-        'brand': lead['brand'] ?? '',
-        'fuel_type': lead['fuel_type'] ?? '',
-        'km': lead['km'] ?? '',
-        'manf_year': lead['manf_year'] ?? '',
-        'model': lead['model'] ?? '',
-        'owner': lead['owner'] ?? '',
-        'rto_loc': lead['rto_loc'] ?? '',
-        'sell': lead['sell'] ?? '', // Assuming 'sell' can be nullable
-        'transmission': lead['transmission'] ?? '',
-        'variant': lead['variant'] ?? '',
-        'address': lead['address'] ?? '',
-        'landmark': lead['landmark'] ?? '',
-        'pincode': lead['pincode'] ?? '',
-        'state': lead['state'] ?? '',
-        'user_city': lead['user_city'] ?? '',
-        'car_price': lead['car_price'] ?? '',
-      });
+      // Check if 'serial_number' exists and is not null
+      if (lead['serial_number'] != null) {
+        try {
+          // Convert serial number to string
+          String serialNumber = lead['serial_number'].toString();
+
+          // Use null-aware operators to provide default values if any field is null
+          await databaseRef.child(serialNumber).set({
+            'serial_number': lead['serial_number'] ?? '',
+            'booking_date': lead['booking_date'] ?? '',
+            'date': lead['date'] ?? '',
+            'booking_slot': lead['booking_slot'] ?? '',
+            'mobile_number': lead['mobile_number'] ?? '',
+            'brand': lead['brand'] ?? '',
+            'fuel_type': lead['fuel_type'] ?? '',
+            'km': lead['km'] ?? '',
+            'manf_year': lead['manf_year'] ?? '',
+            'model': lead['model'] ?? '',
+            'owner': lead['owner'] ?? '',
+            'rto_loc': lead['rto_loc'] ?? '',
+            'sell': lead['sell'] ?? '', // Assuming 'sell' can be nullable
+            'transmission': lead['transmission'] ?? '',
+            'variant': lead['variant'] ?? '',
+            'address': lead['address'] ?? '',
+            'landmark': lead['landmark'] ?? '',
+            'pincode': lead['pincode'] ?? '',
+            'state': lead['state'] ?? '',
+            'user_city': lead['user_city'] ?? '',
+            'car_price': lead['car_price'] ?? '',
+          });
+
+          print("Lead $serialNumber saved successfully.");
+        } catch (e) {
+          // Handle any errors that occur during the write operation
+          print("Error saving lead ${lead['serial_number']}: $e");
+        }
+      } else {
+        print("Lead does not have a valid serial_number: $lead");
+      }
     }
   }
 
@@ -338,8 +353,7 @@ class _HomepageState extends State<Homepage> {
   Future<void> _refreshLeads() async {
     await fetchEvaluatorByEmail();
     setState(() {
-      _futureLeads =
-          fetchLeads(); // Refresh leads by calling the fetch function again
+      _futureLeads = fetchLeads();
     });
   }
 

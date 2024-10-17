@@ -1,0 +1,274 @@
+{
+    "Front_side":{
+        "Front_exterior_1":{
+            "key_and_locking_system":{
+
+            },
+            "bonnet_assembly":{
+
+            },
+            "front_registration_plate":{
+
+            },
+            "front_bumper_assembly":{
+
+            }
+        },
+        "Front_exterior_2":{
+            "front_left_fog_light_assembly":{
+
+            },
+            "left_drl":{
+
+            },
+            "left_headlight_assembly":{
+
+            },
+            "right_drl":{
+
+            },
+            "right_headlight_assembly":{
+
+            },
+            "front_right_fog_light_assembly":{
+
+            }
+        },
+        "Front_structure_1":{
+            "front_left_leg":{
+
+            },
+            "radiator_support":{
+
+            },
+            "front_right_leg":{
+
+            },
+            "subframe":{
+
+            },
+            "ladder_chassis":{
+
+            }
+        },
+        "Front_structure_2":{
+            "left_headlight_support":{
+
+            },
+            "left_apron":{
+
+            },
+            "right_headlight_support":{
+
+            },
+            "right_apron":{
+
+            },
+            "fire_wall":{
+
+            },
+            "cowl_top_assembly":{
+
+            }
+        },
+        "Mechanical":{
+            "battery_assembly":{
+
+            },
+            "engine_assembly":{
+
+            },
+            "cooling_system":{
+
+            },
+            "ignition_system":{
+
+            },
+            "air_supply_system":{
+
+            },
+            "manual_transmission":{
+
+            },
+            "automatic_transmission":{
+
+            },
+            "cng_assembly":{
+
+            }
+        }
+    },
+    "Right_side":{
+        "front_right_exterior":{
+            "right_fender_assembly":{
+
+            },
+            "front_right_door_assembly":{
+
+            }
+        },
+        "front_right_mechanical":{
+            "front_right_tyre_assembly":{
+
+            },
+            "steering_system":{
+
+            },
+            "front_right_suspension":{
+
+            },
+            "front_right_brake_assembly":{
+
+            },
+            "exhaust_system":{
+
+            },
+            "front_wheel_drive":{
+
+            },
+            "four_wheel_drive":{
+
+            }
+        },
+        "front_right_structure":{
+            "front_right_wheel_house":{
+
+            },
+            "right_pillar_A":{
+
+            },
+            "front_right_door_channel":{
+
+            },
+            "front_right_floor_pan":{
+
+            }
+        },
+        "rear_right_exterior":{
+            "rear_right_door_assembly":{
+
+            },
+            "rear_quarter_panel_assembly":{
+
+            }
+        },
+        "rear_right_structure":{
+            "right_running_board_assembly":{
+
+            },
+            "right_pillar_B":{
+
+            },
+            "right_floor_pan_channel":{
+
+            },
+            "rear_right_door_channel":{
+
+            },
+            "rear_right_floor_pan":{
+
+            },
+            "rear_right_wheel_house":{
+
+            },
+            "right_pillar_C":{
+
+            },
+            "right_pillar_D":{
+
+            }
+        },
+        "rear_right_mechanical":{
+            "rear_right_tyre_assembly":{
+
+            },
+            "rear_right_suspension":{
+
+            },
+            "rear_right_brake_assembly":{
+
+            },
+            "exhaust_system":{
+
+            },
+            "four_wheel_drive":{
+
+            },
+            "rear_wheel_drive":{
+
+            }
+        }
+    },
+    "Rear_side":{
+        "rear_exterior":{
+            "right_tail_light_assembly":{
+
+            },
+            "rear_windshield":{
+
+            },
+            "dickey_door_assembly":{
+
+            },
+            "rear_bumper_assembly":{
+
+            },
+            "rear_registration_plate_assembly":{
+
+            },
+            "left_tail_light_assembly":{
+
+            }
+        },
+        "rear_structure_and_roof":{
+            "roof_assembly":{
+
+            },
+            "dickey_right_leg":{
+
+            },
+            "dickey_compartment":{
+
+            },
+            "spare_tyre_assembly":{
+
+            },
+            "dickey_left_leg":{
+
+            }
+        }
+    },
+    "Left_side":{
+        "rear_left_mechanical":{
+            "rear_left_tyre_assembly":{
+
+            },
+            "rear_left_suspension":{
+
+            },
+            "rear_left_brake_assembly":{
+                
+            }
+        },
+        "rear_left_exterior":{
+
+        },
+        "rear_left_structure":{
+        },
+        "front_left_exterior":{
+
+        },
+        "front_left_structure":{
+
+        },
+        "front_left_mechanical":{
+
+        }
+    },
+    "Interiors":{
+
+    },
+    "Test_drive":{
+
+    }
+}
