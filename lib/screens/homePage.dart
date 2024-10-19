@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:inspection/model/car_doc.dart';
 import 'package:inspection/model/evaluator.dart';
-import 'package:inspection/pages/carDetails.dart';
+// import 'package:inspection/pages/carDetails.dart';
+import 'package:inspection/pages/newCarDetails.dart';
 import 'package:inspection/pages/loginPage.dart';
 import 'package:inspection/screens/profilePage.dart';
 import 'package:inspection/screens/settingsPage.dart';
@@ -71,24 +73,6 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       loadingEvaluatorData = false;
     });
-  }
-
-  Future<void> _updateLeadStatus(String leadId, String newStatus) async {
-    try {
-      await _database.child(leadId).update({
-        'lead_status': newStatus,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lead status updated to $newStatus')),
-      );
-      _refreshLeads(); // Refresh leads after status update
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error updating lead status: $e'),
-        ),
-      );
-    }
   }
 
   Future<void> _contactSalesperson(String salespersonId) async {
@@ -246,10 +230,12 @@ class _HomepageState extends State<Homepage> {
         // Filter leads based on evaluator's locations and today's date
         leadsData.forEach((key, value) {
           Lead lead = Lead.fromJson(Map<String, dynamic>.from(value));
+          print(lead);
           // Check if the lead's user_city matches any of the evaluator's locations
           // and if the booking_date matches today's date
           if (evaluatorLocations.contains(lead.userCity.trim()) &&
-              lead.bookingDate == todayDate) {
+              lead.bookingDate == todayDate &&
+              lead.leadStatus == 1) {
             leads.add(lead);
           }
         });
@@ -263,7 +249,8 @@ class _HomepageState extends State<Homepage> {
             // Check if the lead's user_city matches any of the evaluator's locations
             // and if the booking_date matches today's date
             if (evaluatorLocations.contains(lead.userCity.trim()) &&
-                lead.bookingDate == todayDate) {
+                lead.bookingDate == todayDate &&
+                lead.leadStatus == 1) {
               leads.add(lead);
             }
           } else {
@@ -327,6 +314,7 @@ class _HomepageState extends State<Homepage> {
             'state': lead['state'] ?? '',
             'user_city': lead['user_city'] ?? '',
             'car_price': lead['car_price'] ?? '',
+            'leadStatus': lead['leadStatus'],
           });
 
           print("Lead $serialNumber saved successfully.");

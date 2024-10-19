@@ -247,28 +247,159 @@
 
             },
             "rear_left_brake_assembly":{
-                
+
             }
         },
         "rear_left_exterior":{
+            "left_quarter_panel_assembly":{
 
+            },
+            "fuel_lid_assembly":{
+
+            },
+            "rear_left_door_assembly":{
+
+            }
         },
         "rear_left_structure":{
+            "left_pillar_D":{
+
+            },
+            "left_pillar_C":{
+
+            },
+            "rear_left_wheel_house":{
+
+            },
+            "rear_left_floor_pan":{
+
+            },
+            "rear_left_door_channel":{
+
+            },
+            "left_floor_pan_channel":{
+
+            },
+            "left_pillar_B":{
+
+            }
         },
         "front_left_exterior":{
+            "front_left_door_assembly":{
 
+            },
+            "left_fender_assembly":{
+
+            }
         },
         "front_left_structure":{
+            "left_running_board_assembly":{
 
+            },
+            "front_left_floor_pan":{
+
+            },
+            "front_left_door_channel":{
+
+            },
+            "left_pillar_A":{
+
+            },
+            "front_left_wheel_house":{
+
+            }
         },
         "front_left_mechanical":{
+            "front_left_tyre_assembly":{
 
+            },
+            "front_left_suspension":{
+
+            },
+            "front_left_brake_assembly":{
+
+            },
+            "front_wheel_drive":{
+
+            }
         }
     },
     "Interiors":{
+        "interior_1":{
 
+        },
+        "interior_2":{
+            "audio_stereo_assembly":{
+
+            },
+            "reverse_parking_camera":{
+
+            },
+            "reverse_parking_sensors":{
+
+            },
+            "forward_parking_sensors":{
+
+            },
+            "front_left_door_assembly":{
+
+            },
+            "front_right_door_assembly":{
+
+            },
+            "center_console_assembly":{
+
+            },
+            "four_wheel_drive":{
+
+            },
+            "interior_3":{
+                "rear_left_door_assembly":{
+
+                },
+                "rear_right_door_assembly":{
+
+                },
+                "roof_assembly":{
+
+                },
+                "floor_carpets_and_mats":{
+
+                },
+                "car":{
+
+                }
+            }
+        }
     },
     "Test_drive":{
+        "static_engine_off":{
+            "odometer_reading":{
 
+            },
+            "image":{
+
+            }
+        },
+        "static_engine_on":{
+            "crank_the_engine_two_times":{
+                "griding_noise":true,
+                "long_cranking":false,
+                "vibration_on_steering_wheel":false,
+                "vibration_on_floor_pan_pedal":true
+            },
+            "turn_steering_wheel_to_both_ends":{
+
+            },
+            "press_clutch_pedal":{
+                "abnormal_noise":true,
+                "clutch_pedal_spongy":false,
+                "clutch_pedal_soft":true,
+                "clutch_pedal_hard":false
+            },
+            "manual_gearbox_engage":{
+                
+            }
+        }
     }
 }

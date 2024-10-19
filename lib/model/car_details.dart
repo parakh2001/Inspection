@@ -789,15 +789,19 @@ class Extra {
       };
 }
 
+class FrontStructure2 {}
+
 class FrontSide {
   FrontExterior1? frontExterior1;
   FrontExterior2? frontExterior2;
   FrontStructure1? frontStructure1;
+  FrontStructure2? frontStructure2;
 
   FrontSide({
     this.frontExterior1,
     this.frontExterior2,
     this.frontStructure1,
+    this.frontStructure2,
   });
 
   FrontSide copyWith({
