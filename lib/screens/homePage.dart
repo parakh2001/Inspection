@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:inspection/model/car_doc.dart';
 import 'package:inspection/model/evaluator.dart';
-// import 'package:inspection/pages/carDetails.dart';
 import 'package:inspection/pages/newCarDetails.dart';
 import 'package:inspection/pages/loginPage.dart';
 import 'package:inspection/screens/profilePage.dart';
@@ -279,6 +278,16 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  void _rescheduleAction() {
+    // Your logic for rescheduling, e.g., show a date picker
+    print("Reschedule clicked");
+  }
+
+  void _cancelAction() {
+    // Your logic for canceling, e.g., remove the item from the list
+    print("Cancel clicked");
+  }
+
   Future<void> storeLeadsData(List<dynamic> leadsData) async {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.ref('leads_data');
@@ -503,13 +512,32 @@ class _HomepageState extends State<Homepage> {
                                                   ],
                                                 ),
                                               ),
-                                              IconButton(
+                                              PopupMenuButton<String>(
                                                 icon:
                                                     const Icon(Icons.more_vert),
-                                                onPressed: () {
-                                                  // Show options or menu
+                                                onSelected: (String result) {
+                                                  switch (result) {
+                                                    case 'Reschedule':
+                                                      _rescheduleAction(); // Call your reschedule function
+                                                      break;
+                                                    case 'Cancel':
+                                                      _cancelAction(); // Call your cancel function
+                                                      break;
+                                                  }
                                                 },
-                                              ),
+                                                itemBuilder: (BuildContext
+                                                        context) =>
+                                                    <PopupMenuEntry<String>>[
+                                                  const PopupMenuItem<String>(
+                                                    value: 'Reschedule',
+                                                    child: Text('Reschedule'),
+                                                  ),
+                                                  const PopupMenuItem<String>(
+                                                    value: 'Cancel',
+                                                    child: Text('Cancel'),
+                                                  ),
+                                                ],
+                                              )
                                             ],
                                           ),
                                           const SizedBox(height: 8),

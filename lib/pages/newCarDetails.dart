@@ -9,7 +9,6 @@ import 'package:inspection/model/car_details.dart';
 import '../model/new_lead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For jsonEncode
-import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class CarDetailsPage extends StatefulWidget {
   final Lead
@@ -75,9 +74,9 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   bool _isChassisNumberOk = false;
 
   final ImagePicker picker = ImagePicker();
-  File? _selectedRcImage;
-  File? _selectedCarImage;
-  File? _selectedChassisNumberImage;
+  XFile? _selectedRcImage;
+  XFile? _selectedCarImage;
+  XFile? _selectedChassisNumberImage;
 
   List<File> _selectedOtherImages = [];
   //Image String
@@ -97,7 +96,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
   Future<void> _pickImage(List<File> sectionImages, String sectionName) async {
     if (sectionImages.length < 15) {
-      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+      final XFile? image =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
       if (image != null) {
         setState(() {
           sectionImages.add(File(image.path));
@@ -229,6 +229,35 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     }
   }
 
+  Future<String> uploadCarDetailsImage({
+    required XFile imageVar,
+    required String imageRef,
+  }) async {
+    final File file = File(imageVar.path); // Convert XFile to File
+    final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final Reference reference = storage.ref('$imageRef/$fileName');
+
+    try {
+      final UploadTask uploadTask = reference.putFile(file);
+
+      uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+        });
+      });
+
+      final TaskSnapshot taskSnapshot = await uploadTask;
+      if (taskSnapshot.bytesTransferred == taskSnapshot.totalBytes) {
+        final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        return downloadUrl;
+      } else {
+        throw Exception('Image upload failed: Incomplete transfer.');
+      }
+    } catch (e) {
+      throw Exception('Image upload failed: $e');
+    }
+  }
+
   Future<List<String>> _uploadImages(
       List<File> images, String sectionName, String serialNumber) async {
     List<String> downloadUrls = [];
@@ -258,111 +287,38 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     );
   }
 
-  // Save data to Firebase
-  void _saveCarDetails() async {
-    setState(() {
-      carDoc = CarDoc(
-        rcDetails: RcDetails(
-          rcNumber: _rcNumberController.text,
-          rcImage: selectedRcImage, // Replace with actual logic for image
-        ),
-        carDetails: CarDetailsClass(
-          mfgYearMonth: _mfgYearMonthController.text,
-          carMake: _carMakeController.text,
-          carModel: _carModelController.text,
-          fuelType: _fuelTypeController.text,
-          transmission: _transmissionController.text,
-          images: selectedCarImage, // Replace with actual logic for image
-        ),
-        registrationDetails: RegistrationDetails(
-          registrationYearMonth: _mfgYearMonthController.text,
-        ),
-        others: Others(
-          owners: int.parse(_ownersController.text),
-          hsrpAvailable: _hsrpAvailable,
-          engineNumber: _engineNumberController.text,
-          isChassisNumberOk: _isChassisNumberOk,
-          chassisNumberImage: selectedChassisNumberImage,
-          noOfKeys: int.tryParse(_numberOfKeyController.text),
-        ),
-      );
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Car Details Saved!')),
-    );
-  }
-
-  Future<void> sendDataToApi() async {
-    // Define the URL for the API
-    final url = Uri.parse('https://gowaggon.com/crm/api/PostInspection');
-    final newCarDoc = CarDetails(
-      serialNumber: widget.carDetails.serialNumber,
-      reMarks: _reMarksController.text,
-      carDoc: carDoc,
-    );
-    // Prepare the data from newCarDoc
-    // Assuming newCarDoc is an object with a toMap method to convert it to a Map
-    Map<String, dynamic> requestBody = newCarDoc.toMap();
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json', // Specify the content type
-        },
-        body: jsonEncode(requestBody), // Encode the Map to JSON
-      );
-
-      // Check the response status
-      if (response.statusCode == 200) {
-        // Successfully sent the data
-        print('Data sent successfully: ${response.body}');
-      } else {
-        // Handle the error response
-        print('Failed to send data: ${response.statusCode}, ${response.body}');
-      }
-    } catch (error) {
-      // Handle any exceptions
-      print('Error occurred: $error');
-    }
-  }
-
-  // void _saveCarInspection() async {
-  //   DatabaseReference carAuctionRef =
-  //       FirebaseDatabase.instance.ref('car_auction');
+  // Future<void> sendDataToApi() async {
+  //   // Define the URL for the API
+  //   final url = Uri.parse('https://gowaggon.com/crm/api/PostInspection');
   //   final newCarDoc = CarDetails(
   //     serialNumber: widget.carDetails.serialNumber,
   //     reMarks: _reMarksController.text,
   //     carDoc: carDoc,
   //   );
-  //   ElevatedButton(
-  //     onPressed: () async {
-  //       // Show the "Car Inspection Saved!" message immediately
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Car Inspection Saved!')),
-  //       );
-  //       try {
-  //         // Save the car details to Firebase
-  //         await _database
-  //             .child(widget.carDetails.serialNumber.toString())
-  //             .set(newCarDoc.toMap());
-  //         // Send data to the API
-  //         await sendDataToApi();
-  //         // Optionally, show another message if everything succeeds
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(content: Text('Car details successfully saved!')),
-  //         );
-  //       } catch (error) {
-  //         // Show error message if something fails
-  //         ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text('Failed to save data: $error')),
-  //         );
-  //       }
-  //     },
-  //     child: const Text('Submit'),
-  //   );
-  //   Navigator.pop(context);
-  //   Navigator.pop(context);
+  //   // Prepare the data from newCarDoc
+  //   // Assuming newCarDoc is an object with a toMap method to convert it to a Map
+  //   Map<String, dynamic> requestBody = newCarDoc.toMap();
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         'Content-Type': 'application/json', // Specify the content type
+  //       },
+  //       body: jsonEncode(requestBody), // Encode the Map to JSON
+  //     );
+
+  //     // Check the response status
+  //     if (response.statusCode == 200) {
+  //       // Successfully sent the data
+  //       print('Data sent successfully: ${response.body}');
+  //     } else {
+  //       // Handle the error response
+  //       print('Failed to send data: ${response.statusCode}, ${response.body}');
+  //     }
+  //   } catch (error) {
+  //     // Handle any exceptions
+  //     print('Error occurred: $error');
+  //   }
   // }
 
   @override
@@ -623,8 +579,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             await _saveFinalVerdict();
 
                             // Update the lead status
-                            await _updateLeadStatus(
-                                widget.carDetails.leadStatus, 4);
+                            // await _updateLeadStatus(
+                            //     widget.carDetails.leadStatus, 4);
 
                             // Pop the modal and go back to the home page
                             Navigator.pop(context); // Close the bottom sheet
@@ -657,38 +613,53 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   //This function is not working(as of 20-10-24 5:40am)
-  Future<void> _updateLeadStatus(int serialNumber, int newStatus) async {
-    try {
-      // Set the path for the other database reference
-      final DatabaseReference otherDatabaseRef =
-          FirebaseDatabase.instance.ref('leads_data/$serialNumber/leadStatus');
-      await otherDatabaseRef.set(newStatus);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              "Lead status updated to $newStatus of the lead with serial number $serialNumber"),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error updating lead status in the other database: $e"),
-        ),
-      );
-    }
-  }
+  // Future<void> _updateLeadStatus(int serialNumber, int newStatus) async {
+  //   try {
+  //     // Set the path for the other database reference
+  //     final DatabaseReference otherDatabaseRef =
+  //         FirebaseDatabase.instance.ref('leads_data/$serialNumber/leadStatus');
+  //     print(
+  //         "Updating leadStatus at path: leads_data/$serialNumber/leadStatus with value: $newStatus");
+  //     await otherDatabaseRef.set(newStatus);
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(
+  //             "Lead status updated to $newStatus of the lead with serial number $serialNumber"),
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text("Error updating lead status in the other database: $e"),
+  //       ),
+  //     );
+  //   }
+  // }
 
   Future<void> _saveFinalVerdict() async {
     try {
       final String verdict = _finalVerdictController.text;
+      final int serialNumber = widget.carDetails.serialNumber;
 
-      // Save final verdict to Firebase
+      // Data to be saved
+      Map<String, dynamic> carHealthData = {
+        'car_health': {
+          'final_verdict': verdict,
+        },
+        'serial_number':
+            serialNumber, // Adding the serial_number to the database
+      };
+
+      // Save the final verdict and serial number to Firebase
       await _database
-          .child('${widget.carDetails.serialNumber}/car_health/final_verdict')
-          .set(verdict);
+          .child('${widget.carDetails.serialNumber}')
+          .update(carHealthData);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Final verdict saved successfully!")),
+        SnackBar(
+          content: Text("Final verdict Submitted Successfully"),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -938,9 +909,15 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
 // Method to remove an image from the list
+// This function is not tested as of 5:47am 20-10-2024
   void _removeImage(int index) {
     setState(() {
-      imageList.removeAt(index); // Make sure to modify the appropriate list
+      if (index >= 0 && index < imageList.length) {
+        print("Removing image at index: $index"); // Debug print
+        imageList.removeAt(index);
+      } else {
+        print("Index out of range: $index");
+      }
     });
   }
 
@@ -1008,12 +985,12 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedRcImage == null) {
-                      final XFile? image =
-                          await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image = await picker.pickImage(
+                          source: ImageSource.camera, imageQuality: 50);
 
                       if (image != null) {
                         setState(() {
-                          _selectedRcImage = File(image.path);
+                          _selectedRcImage = XFile(image.path);
                         });
                         final result = await uploadImage(
                           imageVar: image,
@@ -1036,7 +1013,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             image: DecorationImage(
-                              image: FileImage(_selectedRcImage!),
+                              image: FileImage(File(_selectedRcImage!.path)),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -1119,12 +1096,12 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedCarImage == null) {
-                      final XFile? image =
-                          await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image = await picker.pickImage(
+                          source: ImageSource.camera, imageQuality: 50);
 
                       if (image != null) {
                         setState(() {
-                          _selectedCarImage = File(image.path);
+                          _selectedCarImage = XFile(image.path);
                         });
                         final result = await uploadImage(
                           imageVar: image,
@@ -1147,7 +1124,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             image: DecorationImage(
-                              image: FileImage(_selectedCarImage!),
+                              image: FileImage(File(_selectedCarImage!.path)),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -1193,6 +1170,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 }
                 return null;
               },
+              isNumber: true,
             ),
             _buildTextField(
               _engineNumberController,
@@ -1222,12 +1200,12 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                 child: GestureDetector(
                   onTap: () async {
                     if (selectedChassisNumberImage == null) {
-                      final XFile? image =
-                          await picker.pickImage(source: ImageSource.camera);
+                      final XFile? image = await picker.pickImage(
+                          source: ImageSource.camera, imageQuality: 50);
 
                       if (image != null) {
                         setState(() {
-                          _selectedChassisNumberImage = File(image.path);
+                          _selectedChassisNumberImage = XFile(image.path);
                         });
                         final result = await uploadImage(
                           imageVar: image,
@@ -1250,7 +1228,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             image: DecorationImage(
-                              image: FileImage(_selectedChassisNumberImage!),
+                              image: FileImage(
+                                  File(_selectedChassisNumberImage!.path)),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -1357,69 +1336,129 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     );
   }
 
-  // void _showReMarksOptions(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled:
-  //         true, // This makes sure the modal adjusts with the keyboard
-  //     builder: (context) {
-  //       return SingleChildScrollView(
-  //         child: Padding(
-  //           padding: EdgeInsets.only(
-  //             bottom: MediaQuery.of(context)
-  //                 .viewInsets
-  //                 .bottom, // Adjusts for keyboard height
-  //           ),
-  //           child: Form(
-  //             key: _formBottomKey,
-  //             child: Container(
-  //               padding: const EdgeInsets.all(16.0),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   // First TextField
-  //                   _buildTextField(
-  //                     _carFairPriceController,
-  //                     'Car Fair Price',
-  //                     isNumber: true,
-  //                     (value) {
-  //                       return null;
-  //                     },
-  //                   ),
-  //                   const SizedBox(height: 14.0),
-  //                   _buildTextField(
-  //                     _reMarksController,
-  //                     'Remark',
-  //                     (value) {
-  //                       if (value!.isEmpty) {
-  //                         return 'Enter Remark';
-  //                       }
-  //                       return null;
-  //                     },
-  //                   ),
-  //                   const SizedBox(height: 16.0),
+  Future<void> pickRcImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
 
-  //                   // Submit Button
-  //                   SizedBox(
-  //                     width: double.infinity,
-  //                     child: ElevatedButton(
-  //                       onPressed: () {
-  //                         if (_formBottomKey.currentState!.validate()) {
-  //                           _saveCarInspection();
-  //                         }
-  //                       },
-  //                       child: const Text('Submit'),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+    if (image != null) {
+      setState(() {
+        _selectedRcImage = image;
+      });
+    }
+  }
+
+  Future<void> pickCarImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+
+    if (image != null) {
+      setState(() {
+        _selectedCarImage = image;
+      });
+    }
+  }
+
+  Future<void> pickChassisNumberImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+
+    if (image != null) {
+      setState(() {
+        _selectedChassisNumberImage = image;
+      });
+    }
+  }
+// function to save CarDetailsPage in firebase
+
+  final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+
+  void _saveCarDetails() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator());
+        },
+      );
+
+      String? rcImageUrl;
+      String? carImageUrl;
+      String? chassisNumberImageUrl;
+
+      if (_selectedRcImage != null) {
+        rcImageUrl = await uploadCarDetailsImage(
+          imageVar: _selectedRcImage!,
+          imageRef:
+              'inspection/${widget.carDetails.serialNumber}/car_doc/rc_details',
+        );
+      }
+
+      if (_selectedCarImage != null) {
+        carImageUrl = await uploadCarDetailsImage(
+          imageVar: _selectedCarImage!,
+          imageRef:
+              'inspection/${widget.carDetails.serialNumber}/car_doc/car_details',
+        );
+      }
+
+      if (_selectedChassisNumberImage != null) {
+        chassisNumberImageUrl = await uploadCarDetailsImage(
+          imageVar: _selectedChassisNumberImage!,
+          imageRef:
+              'inspection/${widget.carDetails.serialNumber}/car_doc/other_details/chassis_number_image',
+        );
+      }
+
+      Map<String, dynamic> carDetailsData = {
+        "car_doc": {
+          "car_details": {
+            "car_make": _carMakeController.text,
+            "car_model": _carModelController.text,
+            "fuel_type": _fuelTypeController.text,
+            "images": carImageUrl,
+            "mfg_year_month": _mfgYearMonthController.text,
+            "transmission": _transmissionController.text,
+          },
+          "others": {
+            "chassisNumberImage": chassisNumberImageUrl,
+            "engine_number": _engineNumberController.text,
+            "hsrp_available": _hsrpAvailable,
+            "isChassisNumberOk": _isChassisNumberOk,
+            "noOfKeys": int.parse(_numberOfKeyController.text),
+            "owners": int.parse(_ownersController.text),
+          },
+          "rc_details": {
+            "rc_image": rcImageUrl,
+            "rc_number": _rcNumberController.text,
+          },
+          "registration_details": {
+            "registration_year_month": _registrationYearMonthController.text,
+          },
+        }
+      };
+
+      await dbRef
+          .child("inspection/${widget.carDetails.serialNumber}")
+          .set(carDetailsData);
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Car Details Saved Successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to Save Car Details: $e')),
+      );
+    }
+  }
 
   // Helper method to create text fields
   Widget _buildTextField(TextEditingController controller, String labelText,
