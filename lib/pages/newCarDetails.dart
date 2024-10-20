@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspection/model/car_details.dart';
+import 'package:inspection/services/inspection_service.dart';
 // import 'package:inspection/model/lead.dart';
 import '../model/new_lead.dart';
 import 'package:http/http.dart' as http;
@@ -286,6 +287,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       ),
     );
   }
+// function to send Data to PostAPI
 
   // Future<void> sendDataToApi() async {
   //   // Define the URL for the API
@@ -516,6 +518,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Inspection data saved successfully!"),
+          backgroundColor: Colors.green,
           duration: Duration(seconds: 5),
         ),
       );
@@ -567,41 +570,32 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
+                          // Check if the verdict text field is empty
                           if (_finalVerdictController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Please enter a verdict")),
-                            );
-                            return;
-                          }
-
-                          try {
-                            // Save the final verdict
-                            await _saveFinalVerdict();
-
-                            // Update the lead status
-                            // await _updateLeadStatus(
-                            //     widget.carDetails.leadStatus, 4);
-
-                            // Pop the modal and go back to the home page
-                            Navigator.pop(context); // Close the bottom sheet
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/home',
-                              (Route<dynamic> route) =>
-                                  false, // Remove all previous routes
-                            );
-                          } catch (e) {
-                            print("Error: $e");
-                            ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                  content:
-                                      Text('Error submitting verdict: $e')),
+                                content: Text("Please enter a verdict"),
+                                backgroundColor: Colors.orange,
+                              ),
                             );
+                            return; // Exit the function if the text field is empty
                           }
+
+                          // Call the _saveFinalVerdict function to save the data
+                          await _saveFinalVerdict();
+
+                          // Navigate to the home page after saving the verdict
+                          Navigator.pop(context); // Close the bottom sheet
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/home',
+                            (Route<dynamic> route) =>
+                                false, // Remove all previous routes
+                          );
                         },
                         child: const Text('Submit'),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
