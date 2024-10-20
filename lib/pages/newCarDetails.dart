@@ -9,6 +9,7 @@ import 'package:inspection/model/car_details.dart';
 import '../model/new_lead.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // For jsonEncode
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class CarDetailsPage extends StatefulWidget {
   final Lead
@@ -21,6 +22,7 @@ class CarDetailsPage extends StatefulWidget {
 
 class _CarDetailsPageState extends State<CarDetailsPage> {
   late DatabaseReference _database;
+  double _uploadProgress = 0.0; // Progress starts at 0.0
   int _selectedIndex = 0; // To keep track of the selected page
   final _formKey = GlobalKey<FormState>();
   final _formInspectionKey = GlobalKey<FormState>();
@@ -56,6 +58,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
   ///rc details
   final TextEditingController _rcNumberController = TextEditingController();
+  List<File> imageList = []; // Initialize as an empty list
 
   ///video
   final TextEditingController engineNoiseVideo = TextEditingController();
@@ -111,7 +114,6 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
   Widget _buildSection(
     String title,
-    List<File> imageList,
     TextEditingController commentsController,
   ) {
     return ExpansionTile(
@@ -200,8 +202,11 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     try {
       final UploadTask uploadTask = reference.putFile(file);
 
-      // Show upload progress if needed (optional)
+      // Track the progress
       uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+        setState(() {
+          _uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
+        });
         print(
             'Upload progress: ${snapshot.bytesTransferred}/${snapshot.totalBytes}');
       });
@@ -222,6 +227,24 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       print('Image upload failed: $e');
       throw Exception('Image upload failed: $e');
     }
+  }
+
+  Future<List<String>> _uploadImages(
+      List<File> images, String sectionName, String serialNumber) async {
+    List<String> downloadUrls = [];
+
+    for (var image in images) {
+      XFile xfile = XFile(image.path); // Convert File to XFile
+
+      String downloadUrl = await uploadImage(
+        imageVar: xfile,
+        imageRef: 'inspection/$serialNumber/car_health/$sectionName',
+      );
+
+      downloadUrls.add(downloadUrl);
+    }
+
+    return downloadUrls;
   }
 
   // Function to show max bid reached SnackBar
@@ -304,43 +327,43 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     }
   }
 
-  void _saveCarInspection() async {
-    DatabaseReference carAuctionRef =
-        FirebaseDatabase.instance.ref('car_auction');
-    final newCarDoc = CarDetails(
-      serialNumber: widget.carDetails.serialNumber,
-      reMarks: _reMarksController.text,
-      carDoc: carDoc,
-    );
-    ElevatedButton(
-      onPressed: () async {
-        // Show the "Car Inspection Saved!" message immediately
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Car Inspection Saved!')),
-        );
-        try {
-          // Save the car details to Firebase
-          await _database
-              .child(widget.carDetails.serialNumber.toString())
-              .set(newCarDoc.toMap());
-          // Send data to the API
-          await sendDataToApi();
-          // Optionally, show another message if everything succeeds
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Car details successfully saved!')),
-          );
-        } catch (error) {
-          // Show error message if something fails
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to save data: $error')),
-          );
-        }
-      },
-      child: const Text('Submit'),
-    );
-    Navigator.pop(context);
-    Navigator.pop(context);
-  }
+  // void _saveCarInspection() async {
+  //   DatabaseReference carAuctionRef =
+  //       FirebaseDatabase.instance.ref('car_auction');
+  //   final newCarDoc = CarDetails(
+  //     serialNumber: widget.carDetails.serialNumber,
+  //     reMarks: _reMarksController.text,
+  //     carDoc: carDoc,
+  //   );
+  //   ElevatedButton(
+  //     onPressed: () async {
+  //       // Show the "Car Inspection Saved!" message immediately
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Car Inspection Saved!')),
+  //       );
+  //       try {
+  //         // Save the car details to Firebase
+  //         await _database
+  //             .child(widget.carDetails.serialNumber.toString())
+  //             .set(newCarDoc.toMap());
+  //         // Send data to the API
+  //         await sendDataToApi();
+  //         // Optionally, show another message if everything succeeds
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('Car details successfully saved!')),
+  //         );
+  //       } catch (error) {
+  //         // Show error message if something fails
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Failed to save data: $error')),
+  //         );
+  //       }
+  //     },
+  //     child: const Text('Submit'),
+  //   );
+  //   Navigator.pop(context);
+  //   Navigator.pop(context);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -384,27 +407,21 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   Future<void> _saveSectionData(String sectionName, List<File> images,
-      TextEditingController commentsController) async {
-    try {
-      // Save comments to Firebase Realtime Database
-      final String comment = commentsController.text;
-      await _database
-          .child(
-              '${widget.carDetails.serialNumber}/car_health/$sectionName/comments')
-          .set(comment);
+      TextEditingController commentsController, String serialNumber) async {
+    List<String> imageUrls =
+        await _uploadImages(images, sectionName, serialNumber);
 
-      // Upload each image to Firebase Storage
-      for (int i = 0; i < images.length; i++) {
-        File image = images[i];
-        String imageRef =
-            'inspection/${widget.carDetails.serialNumber}/car_health/$sectionName/${sectionName}_image_$i.jpg';
+    // Prepare section data
+    final sectionData = {
+      'comments': commentsController.text,
+      'images': imageUrls,
+    };
 
-        // Upload image to Firebase Storage
-        await storage.ref(imageRef).putFile(image);
-      }
-    } catch (e) {
-      throw e; // Throw the error to catch in the main method
-    }
+    // Reference to the section in Realtime Database
+    DatabaseReference sectionRef = FirebaseDatabase.instance
+        .ref('inspection/$serialNumber/car_health/$sectionName');
+
+    await sectionRef.set(sectionData);
   }
 
   Future<void> _saveInspectionData() async {
@@ -516,31 +533,39 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       });
       return;
     }
+    String serialNumber =
+        widget.carDetails.serialNumber.toString(); // Replace with actual data
 
     try {
       // Save Interior Section
-      await _saveSectionData(
-          'interior', _interiorImages, _interiorCommentsController);
+      await _saveSectionData('interior', _interiorImages,
+          _interiorCommentsController, serialNumber);
 
       // Save Exterior Section
-      await _saveSectionData(
-          'exterior', _exteriorImages, _exteriorCommentsController);
+      await _saveSectionData('exterior', _exteriorImages,
+          _exteriorCommentsController, serialNumber);
 
       // Save Extra Section
-      await _saveSectionData('extra', _extraImages, _extraCommentsController);
-
-      // Save Test Drive Section (added this section)
       await _saveSectionData(
-          'test_drive', _testDriveImages, _testDriveCommentsController);
+          'extra', _extraImages, _extraCommentsController, serialNumber);
+
+      // Save Test Drive Section
+      await _saveSectionData('test_drive', _testDriveImages,
+          _testDriveCommentsController, serialNumber);
+
+      // Show final verdict options
       _showFinalVerdictOptions(context);
+
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Inspection data saved successfully!")),
+        SnackBar(
+          content: Text("Inspection data saved successfully!"),
+          duration: Duration(seconds: 5),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error saving inspection data: $e"),
-        ),
+        SnackBar(content: Text("Error saving inspection data: $e")),
       );
     } finally {
       setState(() {
@@ -593,16 +618,30 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                             return;
                           }
 
-                          // Save the final verdict
-                          await _saveFinalVerdict();
+                          try {
+                            // Save the final verdict
+                            await _saveFinalVerdict();
 
-                          // Update the lead status
-                          await _updateLeadStatus(
-                              widget.carDetails.leadStatus, 4);
+                            // Update the lead status
+                            await _updateLeadStatus(
+                                widget.carDetails.leadStatus, 4);
 
-                          // Pop all pages until you reach the home page
-                          Navigator.popUntil(
-                              context, ModalRoute.withName('/homePage'));
+                            // Pop the modal and go back to the home page
+                            Navigator.pop(context); // Close the bottom sheet
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/home',
+                              (Route<dynamic> route) =>
+                                  false, // Remove all previous routes
+                            );
+                          } catch (e) {
+                            print("Error: $e");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content:
+                                      Text('Error submitting verdict: $e')),
+                            );
+                          }
                         },
                         child: const Text('Submit'),
                       ),
@@ -617,17 +656,24 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     );
   }
 
+  //This function is not working(as of 20-10-24 5:40am)
   Future<void> _updateLeadStatus(int serialNumber, int newStatus) async {
     try {
-      await _database
-          .child('leads_data/$serialNumber/leadStatus')
-          .set(newStatus);
+      // Set the path for the other database reference
+      final DatabaseReference otherDatabaseRef =
+          FirebaseDatabase.instance.ref('leads_data/$serialNumber/leadStatus');
+      await otherDatabaseRef.set(newStatus);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lead status updated to $newStatus")),
+        SnackBar(
+          content: Text(
+              "Lead status updated to $newStatus of the lead with serial number $serialNumber"),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating lead status: $e")),
+        SnackBar(
+          content: Text("Error updating lead status in the other database: $e"),
+        ),
       );
     }
   }
@@ -772,7 +818,46 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
             SizedBox(height: 20),
 
             _isUploading
-                ? Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              value:
+                                  _uploadProgress, // Shows progress from 0 to 1
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.purple), // Custom color
+                              strokeWidth: 8.0, // Custom width
+                              backgroundColor:
+                                  Colors.grey[300], // Background for the circle
+                            ),
+                            // Overlay text for percentage
+                            Text(
+                              '${(_uploadProgress * 100).toStringAsFixed(0)}%', // Shows percentage
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors
+                                    .purple, // Text color matching progress
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Uploading...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors
+                                .grey[700], // Friendly text below the progress
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : ElevatedButton(
                     onPressed: _saveInspectionData,
                     child: Text('Save Inspection Data'),
@@ -811,15 +896,36 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           } else if (index < imageList.length) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: FileImage(imageList[index]),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
+              child: GestureDetector(
+                onTap: () {
+                  // Remove the image when clicked
+                  _removeImage(index);
+                },
+                child: Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: FileImage(imageList[index]),
+                          fit: BoxFit.cover,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    // Remove button (icon or text)
+                    IconButton(
+                      icon: Icon(
+                        Icons.remove_circle,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        _removeImage(index);
+                      },
+                    ),
+                  ],
                 ),
               ),
             );
@@ -829,6 +935,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
         },
       ),
     );
+  }
+
+// Method to remove an image from the list
+  void _removeImage(int index) {
+    setState(() {
+      imageList.removeAt(index); // Make sure to modify the appropriate list
+    });
   }
 
   Future<void> _pickCarDetailsImage() async {
@@ -1244,69 +1357,69 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     );
   }
 
-  void _showReMarksOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled:
-          true, // This makes sure the modal adjusts with the keyboard
-      builder: (context) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context)
-                  .viewInsets
-                  .bottom, // Adjusts for keyboard height
-            ),
-            child: Form(
-              key: _formBottomKey,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // First TextField
-                    _buildTextField(
-                      _carFairPriceController,
-                      'Car Fair Price',
-                      isNumber: true,
-                      (value) {
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 14.0),
-                    _buildTextField(
-                      _reMarksController,
-                      'Remark',
-                      (value) {
-                        if (value!.isEmpty) {
-                          return 'Enter Remark';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
+  // void _showReMarksOptions(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled:
+  //         true, // This makes sure the modal adjusts with the keyboard
+  //     builder: (context) {
+  //       return SingleChildScrollView(
+  //         child: Padding(
+  //           padding: EdgeInsets.only(
+  //             bottom: MediaQuery.of(context)
+  //                 .viewInsets
+  //                 .bottom, // Adjusts for keyboard height
+  //           ),
+  //           child: Form(
+  //             key: _formBottomKey,
+  //             child: Container(
+  //               padding: const EdgeInsets.all(16.0),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   // First TextField
+  //                   _buildTextField(
+  //                     _carFairPriceController,
+  //                     'Car Fair Price',
+  //                     isNumber: true,
+  //                     (value) {
+  //                       return null;
+  //                     },
+  //                   ),
+  //                   const SizedBox(height: 14.0),
+  //                   _buildTextField(
+  //                     _reMarksController,
+  //                     'Remark',
+  //                     (value) {
+  //                       if (value!.isEmpty) {
+  //                         return 'Enter Remark';
+  //                       }
+  //                       return null;
+  //                     },
+  //                   ),
+  //                   const SizedBox(height: 16.0),
 
-                    // Submit Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formBottomKey.currentState!.validate()) {
-                            _saveCarInspection();
-                          }
-                        },
-                        child: const Text('Submit'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  //                   // Submit Button
+  //                   SizedBox(
+  //                     width: double.infinity,
+  //                     child: ElevatedButton(
+  //                       onPressed: () {
+  //                         if (_formBottomKey.currentState!.validate()) {
+  //                           _saveCarInspection();
+  //                         }
+  //                       },
+  //                       child: const Text('Submit'),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   // Helper method to create text fields
   Widget _buildTextField(TextEditingController controller, String labelText,
