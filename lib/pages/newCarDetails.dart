@@ -263,15 +263,26 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       List<File> images, String sectionName, String serialNumber) async {
     List<String> downloadUrls = [];
 
-    for (var image in images) {
-      XFile xfile = XFile(image.path); // Convert File to XFile
+    try {
+      for (var image in images) {
+        print("Uploading image from: ${image.path}");
 
-      String downloadUrl = await uploadImage(
-        imageVar: xfile,
-        imageRef: 'inspection/$serialNumber/car_health/$sectionName',
-      );
+        // Convert File to XFile if needed
+        XFile xfile = XFile(image.path);
 
-      downloadUrls.add(downloadUrl);
+        // Upload image and get the download URL
+        String downloadUrl = await uploadImage(
+          imageVar: xfile,
+          imageRef: 'inspection/$serialNumber/car_health/$sectionName',
+        );
+
+        // Add the download URL to the list
+        downloadUrls.add(downloadUrl);
+
+        print("Uploaded image to: $downloadUrl");
+      }
+    } catch (e) {
+      print("Error uploading images for $sectionName: $e");
     }
 
     return downloadUrls;
@@ -366,20 +377,28 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
   Future<void> _saveSectionData(String sectionName, List<File> images,
       TextEditingController commentsController, String serialNumber) async {
-    List<String> imageUrls =
-        await _uploadImages(images, sectionName, serialNumber);
+    try {
+      List<String> imageUrls =
+          await _uploadImages(images, sectionName, serialNumber);
 
-    // Prepare section data
-    final sectionData = {
-      'comments': commentsController.text,
-      'images': imageUrls,
-    };
+      // Prepare section data
+      final sectionData = {
+        'comments': commentsController.text,
+        'images': imageUrls,
+      };
 
-    // Reference to the section in Realtime Database
-    DatabaseReference sectionRef = FirebaseDatabase.instance
-        .ref('inspection/$serialNumber/car_health/$sectionName');
+      // Reference to the section in Realtime Database
+      DatabaseReference sectionRef = FirebaseDatabase.instance
+          .ref('inspection/$serialNumber/car_health/$sectionName');
 
-    await sectionRef.set(sectionData);
+      print("Saving data for $sectionName: $sectionData");
+
+      await sectionRef.set(sectionData);
+
+      print("$sectionName data saved successfully");
+    } catch (e) {
+      print("Error saving $sectionName data: $e");
+    }
   }
 
   Future<void> _saveInspectionData() async {
@@ -492,44 +511,99 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       return;
     }
     String serialNumber =
-        widget.carDetails.serialNumber.toString(); // Replace with actual data
+        widget.carDetails.serialNumber.toString(); // Car's serial number
 
     try {
       // Save Interior Section
-      await _saveSectionData('interior', _interiorImages,
-          _interiorCommentsController, serialNumber);
+      await _saveSectionData(
+        'interior', // Section name
+        _interiorImages, // List of images for the interior section
+        _interiorCommentsController, // Comments controller for the interior section
+        serialNumber, // Car's serial number
+      );
 
       // Save Exterior Section
-      await _saveSectionData('exterior', _exteriorImages,
-          _exteriorCommentsController, serialNumber);
+      await _saveSectionData(
+        'exterior',
+        _exteriorImages,
+        _exteriorCommentsController,
+        serialNumber,
+      );
 
       // Save Extra Section
       await _saveSectionData(
-          'extra', _extraImages, _extraCommentsController, serialNumber);
+        'extra',
+        _extraImages,
+        _extraCommentsController,
+        serialNumber,
+      );
 
       // Save Test Drive Section
-      await _saveSectionData('test_drive', _testDriveImages,
-          _testDriveCommentsController, serialNumber);
-
-      // Show final verdict options
-      _showFinalVerdictOptions(context);
+      await _saveSectionData(
+        'test_drive',
+        _testDriveImages,
+        _testDriveCommentsController,
+        serialNumber,
+      );
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Inspection data saved successfully!"),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 5),
+          duration: Duration(seconds: 3),
         ),
       );
+
+      // Show final verdict options after successful data save
+      _showFinalVerdictOptions(context);
     } catch (e) {
+      // Handle errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving inspection data: $e")),
+        SnackBar(
+          content: Text("Error saving inspection data: $e"),
+        ),
       );
     } finally {
       setState(() {
         _isUploading = false;
       });
+    }
+  }
+
+  Future<void> _savefinalVerdictSerialNumber() async {
+    try {
+      // Define the database reference based on the serial number
+      DatabaseReference carHealthRef = FirebaseDatabase.instance
+          .ref()
+          .child('inspection')
+          .child(widget.carDetails.serialNumber.toString())
+          .child('car_health');
+
+      DatabaseReference serialNumberRef = FirebaseDatabase.instance
+          .ref()
+          .child('inspection')
+          .child(widget.carDetails.serialNumber.toString());
+
+      // Prepare the data to be saved
+      Map<String, dynamic> carHealthData = {
+        'finalVerdict': _finalVerdictController.text,
+      };
+
+      Map<String, dynamic> serialNumberData = {
+        'serial_number': widget.carDetails.serialNumber,
+      };
+
+      // Insert final verdict in inspection/$serialNumber/car_health
+      await carHealthRef.update(carHealthData);
+
+      // Insert serial number in inspection/$serialNumber/serial_number
+      await serialNumberRef.update(serialNumberData);
+
+      print("Data saved successfully in car_health and serial_number");
+    } catch (e) {
+      print('Error saving inspection data: $e');
+      throw e; // Throw the error to handle it in the submit button's try-catch block
     }
   }
 
@@ -578,20 +652,42 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                                 backgroundColor: Colors.orange,
                               ),
                             );
-                            return; // Exit the function if the text field is empty
+                            return;
                           }
-
-                          // Call the _saveFinalVerdict function to save the data
-                          await _saveFinalVerdict();
-
-                          // Navigate to the home page after saving the verdict
-                          Navigator.pop(context); // Close the bottom sheet
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/home',
-                            (Route<dynamic> route) =>
-                                false, // Remove all previous routes
-                          );
+                          try {
+                            // Save inspection data to Firebase
+                            await _saveInspectionData();
+                            await _savefinalVerdictSerialNumber();
+                            InspectionService inspectionService =
+                                InspectionService();
+                            int serialNumber = widget.carDetails.serialNumber;
+                            await inspectionService
+                                .postInspectionData(serialNumber);
+                            // Success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "Inspection data and final verdict submitted successfully"),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 5),
+                              ),
+                            );
+                            // Navigate to the home page
+                            Navigator.pop(context);
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/home',
+                              (Route<dynamic> route) =>
+                                  false, // Remove all previous routes
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Error submitting data: $e"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         },
                         child: const Text('Submit'),
                       ),
@@ -629,38 +725,6 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   //     );
   //   }
   // }
-
-  Future<void> _saveFinalVerdict() async {
-    try {
-      final String verdict = _finalVerdictController.text;
-      final int serialNumber = widget.carDetails.serialNumber;
-
-      // Data to be saved
-      Map<String, dynamic> carHealthData = {
-        'car_health': {
-          'final_verdict': verdict,
-        },
-        'serial_number':
-            serialNumber, // Adding the serial_number to the database
-      };
-
-      // Save the final verdict and serial number to Firebase
-      await _database
-          .child('${widget.carDetails.serialNumber}')
-          .update(carHealthData);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Final verdict Submitted Successfully"),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error saving final verdict: $e")),
-      );
-    }
-  }
 
   Widget _buildNewInspectionPage() {
     return Padding(
