@@ -607,6 +607,8 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     }
   }
 
+  bool _isLoading = false;
+
   void _showFinalVerdictOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -639,59 +641,76 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
                     ),
                     const SizedBox(height: 16.0),
 
-                    // Submit Button
-                    SizedBox(
+                    // Submit Button with Circular Progress Indicator
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // Check if the verdict text field is empty
-                          if (_finalVerdictController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Please enter a verdict"),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                            return;
-                          }
-                          try {
-                            // Save inspection data to Firebase
-                            await _saveInspectionData();
-                            await _savefinalVerdictSerialNumber();
-                            InspectionService inspectionService =
-                                InspectionService();
-                            int serialNumber = widget.carDetails.serialNumber;
-                            await inspectionService
-                                .postInspectionData(serialNumber);
-                            // Success message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    "Inspection data and final verdict submitted successfully"),
-                                backgroundColor: Colors.green,
-                                duration: Duration(seconds: 5),
-                              ),
-                            );
-                            // Navigate to the home page
-                            Navigator.pop(context);
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/home',
-                              (Route<dynamic> route) =>
-                                  false, // Remove all previous routes
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Error submitting data: $e"),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                        child: const Text('Submit'),
-                      ),
-                    )
+                      child: _isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : ElevatedButton(
+                              onPressed: () async {
+                                // Check if the verdict text field is empty
+                                if (_finalVerdictController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("Please enter a verdict"),
+                                      backgroundColor: Colors.orange,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                setState(() {
+                                  _isLoading = true; // Start loading
+                                });
+
+                                try {
+                                  // Save inspection data to Firebase
+                                  await _saveInspectionData();
+                                  await _savefinalVerdictSerialNumber();
+
+                                  InspectionService inspectionService =
+                                      InspectionService();
+                                  int serialNumber =
+                                      widget.carDetails.serialNumber;
+                                  await inspectionService
+                                      .postInspectionData(serialNumber);
+
+                                  // Success message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          "Inspection data and final verdict submitted successfully"),
+                                      backgroundColor: Colors.green,
+                                      duration: Duration(seconds: 5),
+                                    ),
+                                  );
+
+                                  // Navigate to the home page
+                                  Navigator.pop(context);
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    '/home',
+                                    (Route<dynamic> route) =>
+                                        false, // Remove all previous routes
+                                  );
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content:
+                                          Text("Error submitting data: $e"),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                } finally {
+                                  setState(() {
+                                    _isLoading = false; // Stop loading
+                                  });
+                                }
+                              },
+                              child: const Text('Submit'),
+                            ),
+                    ),
                   ],
                 ),
               ),

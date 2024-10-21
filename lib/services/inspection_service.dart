@@ -31,6 +31,7 @@ class InspectionService {
   }
 
   Future<void> postInspectionData(int serialNumber) async {
+    print('this funciton is working fine');
     DatabaseEvent event =
         await _databaseReference.child('inspection/$serialNumber').once();
 
