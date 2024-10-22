@@ -20,7 +20,6 @@ class Lead {
   final String variant;
   final String car_price;
   final int leadStatus;
-
   Lead({
     required this.serialNumber,
     required this.address,
@@ -48,7 +47,7 @@ class Lead {
   factory Lead.fromJson(Map<String, dynamic> json) {
     return Lead(
       serialNumber:
-          json['serial_number'] ?? 0, // Provide a default value if null
+      json['serial_number'] ?? 0, // Provide a default value if null
       address: json['address'] ?? '', // Default empty string
       bookingDate: json['booking_date'] ?? '', // Default empty string
       bookingSlot: json['booking_slot'] ?? '', // Default empty string
@@ -68,7 +67,7 @@ class Lead {
       userCity: json['user_city'] ?? '', // Default empty string
       variant: json['variant'] ?? '', // Default empty string
       car_price: json['car_price'] ?? '', // Default empty string
-      leadStatus: json['leadStatus'] ?? 0, // Provide a default value if null
+      leadStatus: json['leadStatus'] ?? 1, // Provide a default value if null
     );
   }
 }

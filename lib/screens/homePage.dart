@@ -21,7 +21,7 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   String? evaluatorId;
-  final DatabaseReference _database = FirebaseDatabase.instance.ref('leads');
+  // final DatabaseReference _database = FirebaseDatabase.instance.ref('leads');
   late Future<List<Lead>> _futureLeads;
   Evaluator? evaluator;
   final User? user = FirebaseAuth.instance.currentUser;
@@ -185,6 +185,7 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  //
   Future<List<Lead>> fetchLeads() async {
     // Get the currently logged-in user
     User? user = await getCurrentUser();
@@ -192,79 +193,82 @@ class _HomepageState extends State<Homepage> {
       print("No user logged in");
       return [];
     }
+
     // Get the evaluator ID using the logged-in user's details
     String? evaluatorId = await getEvaluatorIdFromUser(user);
     if (evaluatorId == null) {
       print("Evaluator ID not found for the logged-in user");
       return [];
     }
+
     // Fetch the evaluator's data
     final DatabaseReference evaluatorRef =
         FirebaseDatabase.instance.ref('evaluator/$evaluatorId');
     final evaluatorSnapshot = await evaluatorRef.once();
-    // Safely check if there is evaluator data
     if (evaluatorSnapshot.snapshot.value == null) {
       print("Evaluator data not found");
       return [];
     }
-    // Check if evaluator data is a Map and safely extract evaluator locations
+
+    // Safely check if evaluator data is a Map and extract evaluator locations
     final evaluatorData = evaluatorSnapshot.snapshot.value;
-    if (evaluatorData is Map && evaluatorData['evaluator_location'] is List) {
-      List<dynamic> evaluatorLocations = evaluatorData['evaluator_location'];
-      // Get today's date in the format that matches `booking_date`
-      String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      // Fetch leads data from Firebase
-      final DatabaseReference leadsRef =
-          FirebaseDatabase.instance.ref('leads_data');
-      final leadsSnapshot = await leadsRef.once();
-      // Safely check if there is leads data
-      if (leadsSnapshot.snapshot.value == null) {
-        print("No leads data found");
-        return [];
-      }
-      List<Lead> leads = [];
-      // Handle leads data if it's a Map
-      if (leadsSnapshot.snapshot.value is Map) {
-        final leadsData = leadsSnapshot.snapshot.value as Map<dynamic, dynamic>;
-        // Filter leads based on evaluator's locations and today's date
-        leadsData.forEach((key, value) {
+    if (!(evaluatorData is Map &&
+        evaluatorData['evaluator_location'] is List)) {
+      print("Unexpected data structure for evaluator data");
+      return [];
+    }
+
+    List<dynamic> evaluatorLocations = evaluatorData['evaluator_location'];
+
+    // Get today's date in the correct format
+    String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // Fetch leads data from Firebase
+    final DatabaseReference leadsRef =
+        FirebaseDatabase.instance.ref('leads_data');
+    final leadsSnapshot = await leadsRef.once();
+    if (leadsSnapshot.snapshot.value == null) {
+      print("No leads data found");
+      return [];
+    }
+
+    List<Lead> leads = [];
+
+    // Process the leads data (could be Map or List)
+    final leadsData = leadsSnapshot.snapshot.value;
+    if (leadsData is Map) {
+      // If leads data is a Map
+      leadsData.forEach((key, value) {
+        if (value is Map) {
           Lead lead = Lead.fromJson(Map<String, dynamic>.from(value));
-          print(lead);
-          // Check if the lead's user_city matches any of the evaluator's locations
-          // and if the booking_date matches today's date
-          if (evaluatorLocations.contains(lead.userCity.trim()) &&
-              lead.bookingDate == todayDate &&
-              lead.leadStatus == 1) {
+          if (_isLeadValid(lead, evaluatorLocations, todayDate)) {
             leads.add(lead);
           }
-        });
-      }
-      // Handle leads data if it's a List
-      else if (leadsSnapshot.snapshot.value is List) {
-        final leadsList = leadsSnapshot.snapshot.value as List<dynamic>;
-        for (var leadData in leadsList) {
-          if (leadData is Map) {
-            Lead lead = Lead.fromJson(Map<String, dynamic>.from(leadData));
-            // Check if the lead's user_city matches any of the evaluator's locations
-            // and if the booking_date matches today's date
-            if (evaluatorLocations.contains(lead.userCity.trim()) &&
-                lead.bookingDate == todayDate &&
-                lead.leadStatus == 1) {
-              leads.add(lead);
-            }
-          } else {
-            print("Unexpected data format in leads list: $leadData");
+        }
+      });
+    } else if (leadsData is List) {
+      // If leads data is a List
+      for (var leadData in leadsData) {
+        if (leadData is Map) {
+          Lead lead = Lead.fromJson(Map<String, dynamic>.from(leadData));
+          if (_isLeadValid(lead, evaluatorLocations, todayDate)) {
+            leads.add(lead);
           }
         }
-      } else {
-        print(
-            "Unexpected data structure for leads: ${leadsSnapshot.snapshot.value}");
       }
-      return leads;
     } else {
-      print("Unexpected data structure for evaluator data");
+      print("Unexpected data structure for leads data");
     }
-    return [];
+
+    return leads;
+  }
+
+// Helper function to validate a lead
+  bool _isLeadValid(
+      Lead lead, List<dynamic> evaluatorLocations, String todayDate) {
+    return evaluatorLocations.contains(lead.userCity.trim()) &&
+        lead.bookingDate == todayDate &&
+        lead.leadStatus == 1;
   }
 
   Future<List<dynamic>> fetchLeadsData() async {
@@ -291,7 +295,6 @@ class _HomepageState extends State<Homepage> {
   Future<void> storeLeadsData(List<dynamic> leadsData) async {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.ref('leads_data');
-
     // Iterate through each lead in the provided leadsData
     for (var lead in leadsData) {
       // Check if 'serial_number' exists and is not null
@@ -299,7 +302,6 @@ class _HomepageState extends State<Homepage> {
         try {
           // Convert serial number to string
           String serialNumber = lead['serial_number'].toString();
-
           // Use null-aware operators to provide default values if any field is null
           await databaseRef.child(serialNumber).set({
             'serial_number': lead['serial_number'] ?? '',
@@ -314,7 +316,7 @@ class _HomepageState extends State<Homepage> {
             'model': lead['model'] ?? '',
             'owner': lead['owner'] ?? '',
             'rto_loc': lead['rto_loc'] ?? '',
-            'sell': lead['sell'] ?? '', // Assuming 'sell' can be nullable
+            'sell': lead['sell'] ?? '',
             'transmission': lead['transmission'] ?? '',
             'variant': lead['variant'] ?? '',
             'address': lead['address'] ?? '',
@@ -325,7 +327,6 @@ class _HomepageState extends State<Homepage> {
             'car_price': lead['car_price'] ?? '',
             'leadStatus': lead['leadStatus'],
           });
-
           print("Lead $serialNumber saved successfully.");
         } catch (e) {
           // Handle any errors that occur during the write operation
@@ -348,10 +349,27 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<void> _refreshLeads() async {
-    await fetchEvaluatorByEmail();
-    setState(() {
-      _futureLeads = fetchLeads();
-    });
+    try {
+      // Step 2: Fetch new leads from the API
+      await fetchEvaluatorByEmail();
+      // Step 3: Update the UI by fetching the updated leads data from Firebase
+      setState(() {
+        _futureLeads = fetchLeads();
+      });
+
+      // Optional: Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Leads refreshed successfully."),
+        backgroundColor: Colors.green,
+      ));
+    } catch (error) {
+      // Handle errors if any
+      print("Failed to refresh leads: $error");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to refresh leads: $error"),
+        backgroundColor: Colors.red,
+      ));
+    }
   }
 
   @override
@@ -630,10 +648,11 @@ class _HomepageState extends State<Homepage> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CarDetailsPage(
-                                                          carDetails: lead,
-                                                        )),
+                                                  builder: (context) =>
+                                                      CarDetailsPage(
+                                                    carDetails: lead,
+                                                  ),
+                                                ),
                                               );
                                             },
                                             style: ElevatedButton.styleFrom(
