@@ -217,12 +217,10 @@ class _HomepageState extends State<Homepage> {
       print("Unexpected data structure for evaluator data");
       return [];
     }
-
     List<dynamic> evaluatorLocations = evaluatorData['evaluator_location'];
-
     // Get today's date in the correct format
     String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
+    // String todayDate = '2024-10-26';
     // Fetch leads data from Firebase
     final DatabaseReference leadsRef =
         FirebaseDatabase.instance.ref('leads_data');
@@ -231,9 +229,7 @@ class _HomepageState extends State<Homepage> {
       print("No leads data found");
       return [];
     }
-
     List<Lead> leads = [];
-
     // Process the leads data (could be Map or List)
     final leadsData = leadsSnapshot.snapshot.value;
     if (leadsData is Map) {
@@ -259,10 +255,8 @@ class _HomepageState extends State<Homepage> {
     } else {
       print("Unexpected data structure for leads data");
     }
-
     return leads;
   }
-
 // Helper function to validate a lead
   bool _isLeadValid(
       Lead lead, List<dynamic> evaluatorLocations, String todayDate) {
@@ -270,7 +264,6 @@ class _HomepageState extends State<Homepage> {
         lead.bookingDate == todayDate &&
         lead.leadStatus == 1;
   }
-
   Future<List<dynamic>> fetchLeadsData() async {
     final response =
         await http.get(Uri.parse('https://gowaggon.com/crm/api/leadlist'));
@@ -281,17 +274,14 @@ class _HomepageState extends State<Homepage> {
       throw Exception('Failed to load leads data');
     }
   }
-
   void _rescheduleAction() {
     // Your logic for rescheduling, e.g., show a date picker
     print("Reschedule clicked");
   }
-
   void _cancelAction() {
     // Your logic for canceling, e.g., remove the item from the list
     print("Cancel clicked");
   }
-
   Future<void> storeLeadsData(List<dynamic> leadsData) async {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.ref('leads_data');

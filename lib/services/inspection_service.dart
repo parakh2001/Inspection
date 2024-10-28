@@ -14,7 +14,6 @@ class InspectionService {
         },
         body: jsonEncode(inspectionData),
       );
-
       // Check if the request was successful
       if (response.statusCode == 200) {
         // Successfully inserted data
@@ -31,10 +30,9 @@ class InspectionService {
   }
 
   Future<void> postInspectionData(int serialNumber) async {
-    print('this funciton is working fine');
+    print('this is postInspection function');
     DatabaseEvent event =
         await _databaseReference.child('inspection/$serialNumber').once();
-
     if (event.snapshot.exists && event.snapshot.value != null) {
       final data = event.snapshot.value as Map<dynamic, dynamic>;
 
@@ -83,18 +81,21 @@ class InspectionService {
             "comments": data['car_health']?['extra']?['comments'] ?? '',
             "images": data['car_health']?['extra']?['images'] ?? [],
           },
-          "final_verdict": data['car_health']?['final_verdict'] ?? '',
+          "finalVerdict": data['car_health']?['finalVerdict'] ?? 'N/A',
           "interior": {
             "comments": data['car_health']?['interior']?['comments'] ?? '',
             "images": data['car_health']?['interior']?['images'] ?? [],
           },
+          "engine": {"video": ""},
           "test_drive": {
+            "before_test_drive_km": data['car_health']?['test_drive']
+                ?['before_test_drive_km'],
+            "after_test_drive_km": data,
             "comments": data['car_health']?['test_drive']?['comments'] ?? '',
             "images": data['car_health']?['test_drive']?['images'] ?? [],
           },
         },
       };
-
       // Now you can send the inspectionData to the API
       await sendInspectionData(inspectionData);
     } else {
