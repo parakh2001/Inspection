@@ -766,8 +766,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
               );
       // Save video URL to Firebase Realtime Database
       await videoSave.ref
-          .child(
-              'inspection/${widget.carDetails.serialNumber}/car_health/engine')
+          .child('/car_health/engine')
           .update({'video_url': videoUrl});
 
       ScaffoldMessenger.of(context).showSnackBar(

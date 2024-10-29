@@ -54,7 +54,7 @@ android {
         release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
-            storeFile file("key.jks")
+            storeFile file("/home/pg25/Documents/Gowaggon/inspection_freelancer/Inspection/android/app/inspection-keystore.jks")
             storePassword keystoreProperties['storePassword']
         }
     }
