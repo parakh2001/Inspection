@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspection/model/car_details.dart';
+import 'package:inspection/screens/homePage.dart';
 import 'package:inspection/services/inspection_service.dart';
 import 'package:intl/intl.dart';
 import '../model/new_lead.dart';
@@ -18,23 +19,25 @@ class CarDetailsPage extends StatefulWidget {
   _CarDetailsPageState createState() => _CarDetailsPageState();
 }
 
-class _CarDetailsPageState extends State<CarDetailsPage> {
+class _CarDetailsPageState extends State<CarDetailsPage>
+    with WidgetsBindingObserver {
   late DatabaseReference _database;
   double _uploadProgress = 0.0;
   int _selectedIndex = 0;
   final _formKey = GlobalKey<FormState>();
   final _formInspectionKey = GlobalKey<FormState>();
   final _formBottomKey = GlobalKey<FormState>();
+  final TextEditingController _beforeTestDriveKmController =
+      TextEditingController();
+  final TextEditingController _afterTestDriveKmController =
+      TextEditingController();
+
   List<File> _interiorImages = [];
   List<File> _exteriorImages = [];
   List<File> _extraImages = [];
   final _interiorCommentsController = TextEditingController();
   final _exteriorCommentsController = TextEditingController();
   final _extraCommentsController = TextEditingController();
-  final TextEditingController _beforeTestDriveKmController =
-      TextEditingController();
-  final TextEditingController _afterTestDriveKmController =
-      TextEditingController();
   final TextEditingController _finalVerdictController = TextEditingController();
   bool _isUploading = false;
   FirebaseStorage storage = FirebaseStorage.instance;
@@ -79,6 +82,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   void initState() {
     super.initState();
     _database = FirebaseDatabase.instance.ref('inspection');
+  }
+
+  @override
+  void dispose() {
+    _beforeTestDriveKmController.dispose();
+    _afterTestDriveKmController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage(List<File> sectionImages, String sectionName) async {
@@ -253,23 +263,35 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     String serialNumber,
     List<String> existingImageUrls,
   ) async {
-    // Copy existing URLs to avoid duplicates
-    List<String> imageUrls = List<String>.from(existingImageUrls);
-    // Map each image upload to a future
-    List<Future<String>> uploadFutures = images.map((image) async {
-      // Upload image if not already uploaded
-      String imageUrl = await uploadImage(
-        imageVar: XFile(image.path),
-        imageRef: 'inspection/$serialNumber/car_health/$sectionName',
-      );
-      if (!imageUrls.contains(imageUrl)) {
-        imageUrls.add(imageUrl);
+    List<String> uploadedImageUrls = List.from(existingImageUrls);
+
+    for (File image in images) {
+      try {
+        // Generate a unique file name for each image
+        final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final String imageRefPath =
+            'inspection/$serialNumber/car_health/$sectionName/$fileName';
+
+        // Upload image and retrieve the download URL
+        final Reference reference = FirebaseStorage.instance.ref(imageRefPath);
+        final UploadTask uploadTask = reference.putFile(image);
+        final TaskSnapshot snapshot = await uploadTask;
+
+        if (snapshot.state == TaskState.success) {
+          final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+          // Avoid duplicate URLs by checking if it's already in the list
+          if (!uploadedImageUrls.contains(downloadUrl)) {
+            uploadedImageUrls.add(downloadUrl);
+          }
+        }
+      } catch (e) {
+        print("Error uploading image: $e");
+        throw Exception("Error uploading images.");
       }
-      return imageUrl;
-    }).toList();
-    // Wait for all uploads to complete
-    await Future.wait(uploadFutures);
-    return imageUrls;
+    }
+
+    return uploadedImageUrls;
   }
 
   // Function to show max bid reached SnackBar
@@ -334,6 +356,7 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       // Reference to the section in Realtime Database
       DatabaseReference sectionRef = FirebaseDatabase.instance
           .ref('inspection/$serialNumber/car_health/$sectionName');
+
       // Retrieve existing image URLs, if any
       final sectionSnapshot = await sectionRef.get();
       List<String> existingImageUrls = [];
@@ -344,14 +367,20 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
           existingImageUrls = List<String>.from(existingData['images']);
         }
       }
-      // Upload images, avoiding duplicates
+
+      // Upload new images, avoiding duplicates
       List<String> imageUrls = await _uploadImages(
           images, sectionName, serialNumber, existingImageUrls);
+
+      // Ensure the URLs are unique and up-to-date
+      imageUrls = imageUrls.toSet().toList();
+
       // Prepare section data with updated image URLs
       final sectionData = {
         'comments': commentsController.text,
         'images': imageUrls,
       };
+
       print("Saving data for $sectionName: $sectionData");
       await sectionRef.set(sectionData);
       print("$sectionName data saved successfully");
@@ -388,21 +417,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
         commentsController: _extraCommentsController,
         serialNumber: serialNumber,
       );
-      await _saveSectionData(
+      await _savetestDriveData(
         sectionName: 'test_drive',
         images: _testDriveImages,
         commentsController: _testDriveCommentsController,
+        beforeTestDriveKmController: _beforeTestDriveKmController,
+        afterTestDriveKmController: _afterTestDriveKmController,
         serialNumber: serialNumber,
-      );
-      // Save Test Drive KM readings
-      await _saveTestDriveKm(serialNumber);
-      // Success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Inspection data saved successfully!"),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
       );
       // Show final verdict options
       _showFinalVerdictOptions(context);
@@ -454,14 +475,47 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     }
   }
 
-  Future<void> _saveTestDriveKm(String serialNumber) async {
-    DatabaseReference testDriveRef = FirebaseDatabase.instance
-        .ref('inspection/$serialNumber/car_health/test_drive');
-    final testDriveData = {
-      'before_test_drive_km': _beforeTestDriveKmController.text,
-      'after_test_drive_km': _afterTestDriveKmController.text,
-    };
-    await testDriveRef.set(testDriveData);
+  Future<void> _savetestDriveData({
+    required String sectionName,
+    required List<File> images,
+    required TextEditingController commentsController,
+    required TextEditingController beforeTestDriveKmController,
+    required TextEditingController afterTestDriveKmController,
+    required String serialNumber,
+  }) async {
+    try {
+      // Reference to the section in Realtime Database
+      DatabaseReference sectionRef = FirebaseDatabase.instance
+          .ref('inspection/$serialNumber/car_health/$sectionName');
+
+      // Retrieve existing image URLs, if any
+      final sectionSnapshot = await sectionRef.get();
+      List<String> existingImageUrls = [];
+      if (sectionSnapshot.exists) {
+        final existingData =
+            Map<String, dynamic>.from(sectionSnapshot.value as Map);
+        if (existingData.containsKey('images')) {
+          existingImageUrls = List<String>.from(existingData['images']);
+        }
+      }
+      // Upload images, avoiding duplicates
+      List<String> imageUrls = await _uploadImages(
+          images, sectionName, serialNumber, existingImageUrls);
+      // Prepare section data with comments, image URLs, and KM readings
+      final sectionData = {
+        'before_test_drive_km': beforeTestDriveKmController.text,
+        'after_test_drive_km': afterTestDriveKmController.text,
+        'comments': commentsController.text,
+        'images': imageUrls,
+      };
+      print("Saving data for $sectionName: $sectionData");
+      // Set the updated data
+      await sectionRef.set(sectionData);
+      print("$sectionName data saved successfully");
+    } catch (e) {
+      print("Error saving $sectionName data: $e");
+      throw Exception("Error saving $sectionName data");
+    }
   }
 
   Future<void> _savefinalVerdictSerialNumber() async {
@@ -504,170 +558,202 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       builder: (context) {
         return SafeArea(
           child: Container(
-            height: MediaQuery.of(context).size.height, // Full screen height
-            child: Scaffold(
-              appBar: AppBar(
-                automaticallyImplyLeading: false, // Remove default back button
-                title: Text('Add Final Verdict'),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      Navigator.pop(context); // Close modal
-                    },
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
+              children: [
+                Scaffold(
+                  appBar: AppBar(
+                    automaticallyImplyLeading:
+                        false, // Remove default back button
+                    title: Text('Add Final Verdict'),
+                    actions: [
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom,
-                  ),
-                  child: Form(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextFormField(
-                            controller: _finalVerdictController,
-                            maxLines: null, // Allow multiline input
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              labelText: 'Final Verdict',
-                              hintText: 'Enter your final verdict',
-                            ),
-                            onChanged: (value) {
-                              // Check if the input is empty and set the first bullet point
-                              if (value.isEmpty) {
-                                _finalVerdictController.value =
-                                    TextEditingValue(
-                                  text:
-                                      '• ', // Start with a bullet point if input is empty
-                                  selection: TextSelection.collapsed(
-                                      offset:
-                                          2), // Place cursor after the bullet point
-                                );
-                              } else if (value.endsWith('\n')) {
-                                // If the last character is a newline, add a bullet point on the new line
-                                String formattedValue =
-                                    value.trimRight() + '\n• ';
-                                _finalVerdictController.value =
-                                    TextEditingValue(
-                                  text: formattedValue,
-                                  selection: TextSelection.collapsed(
-                                      offset: formattedValue.length),
-                                );
-                              }
-                            },
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter a verdict';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16.0),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                            width: double.infinity,
-                            child: _isLoading
-                                ? Column(
-                                    children: [
-                                      Text(
-                                          "Uploading... ${(_uploadProgress * 100).toInt()}%"),
-                                      LinearProgressIndicator(
-                                          value: _uploadProgress),
-                                    ],
-                                  )
-                                : ElevatedButton(
-                                    onPressed: _isLoading
-                                        ? null
-                                        : () async {
-                                            // Validation checks
-                                            if (_rcNumberController
-                                                .text.isEmpty) {
-                                              showErrorSnackBar(
-                                                  context: context,
-                                                  errorMsg: "Enter RC Number");
-                                              return;
-                                            } else if (_selectedRcImage ==
-                                                null) {
-                                              showErrorSnackBar(
-                                                  context: context,
-                                                  errorMsg:
-                                                      "Please upload RC image");
-                                              return;
-                                            }
-                                            // Add other validation checks as needed
+                  body: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: Form(
+                        child: Container(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                controller: _finalVerdictController,
+                                maxLines: null, // Allow multiline input
+                                keyboardType: TextInputType.multiline,
+                                decoration: InputDecoration(
+                                  labelText: 'Final Verdict',
+                                  hintText: 'Enter your final verdict',
+                                ),
+                                onChanged: (value) {
+                                  // Check if the input is empty and set the first bullet point
+                                  if (value.isEmpty) {
+                                    _finalVerdictController.value =
+                                        TextEditingValue(
+                                      text:
+                                          '• ', // Start with a bullet point if input is empty
+                                      selection: TextSelection.collapsed(
+                                          offset:
+                                              2), // Place cursor after the bullet point
+                                    );
+                                  } else if (value.endsWith('\n')) {
+                                    // If the last character is a newline, add a bullet point on the new line
+                                    String formattedValue =
+                                        value.trimRight() + '\n• ';
+                                    _finalVerdictController.value =
+                                        TextEditingValue(
+                                      text: formattedValue,
+                                      selection: TextSelection.collapsed(
+                                          offset: formattedValue.length),
+                                    );
+                                  }
+                                },
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter a verdict';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16.0),
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () async {
+                                          // Show loading dialog
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Prevent dismissing by tapping outside
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                content: Row(
+                                                  children: [
+                                                    CircularProgressIndicator(
+                                                      color: Colors
+                                                          .blue, // Change color as needed
+                                                    ),
+                                                    SizedBox(width: 16),
+                                                    Text("Processing..."),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                          setState(() {
+                                            _isLoading = true;
+                                          });
+                                          // Validation checks
+                                          if (_rcNumberController
+                                              .text.isEmpty) {
+                                            Navigator.of(context)
+                                                .pop(); // Dismiss loading dialog
                                             setState(() {
-                                              _isLoading = true;
+                                              _isLoading = false;
                                             });
-                                            try {
-                                              // Save inspection data to Firebase
-                                              await _savefinalVerdictSerialNumber();
-                                              int serialNumber = widget
-                                                  .carDetails.serialNumber;
-                                              InspectionService
-                                                  inspectionService =
-                                                  InspectionService();
-                                              // Call postInspectionData only once
-                                              print(
-                                                  'before post inspection function');
-                                              await inspectionService
-                                                  .postInspectionData(
-                                                      serialNumber);
-                                              print(
-                                                  'after post inspection function');
-                                              // Delete all leads
-                                              print(
-                                                  'before delete all leads function');
-                                              await deleteAllLeads();
-                                              print(
-                                                  'after delete all leads function');
-                                              // Success message
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      "Inspection data and final verdict submitted successfully"),
-                                                  backgroundColor: Colors.green,
-                                                  duration:
-                                                      Duration(seconds: 5),
-                                                ),
-                                              );
-                                              // Navigate to the home page
-                                              Navigator.pop(context);
-                                              Navigator.pushNamedAndRemoveUntil(
-                                                context,
-                                                '/home',
-                                                (Route<dynamic> route) =>
-                                                    false, // Remove all previous routes
-                                              );
-                                            } catch (e) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      "Error submitting data: $e"),
-                                                  backgroundColor: Colors.red,
-                                                ),
-                                              );
-                                            } finally {
-                                              setState(() {
-                                                _isLoading = false;
-                                              });
+                                            showErrorSnackBar(
+                                              context: context,
+                                              errorMsg: "Enter RC Number",
+                                            );
+                                            return;
+                                          } else if (_selectedRcImage == null) {
+                                            Navigator.of(context)
+                                                .pop(); // Dismiss loading dialog
+                                            setState(() {
+                                              _isLoading = false;
+                                            });
+                                            showErrorSnackBar(
+                                              context: context,
+                                              errorMsg:
+                                                  "Please upload RC image",
+                                            );
+                                            return;
+                                          }
+                                          try {
+                                            // Save inspection data to Firebase
+                                            await _savefinalVerdictSerialNumber();
+                                            int serialNumber =
+                                                widget.carDetails.serialNumber;
+                                            InspectionService
+                                                inspectionService =
+                                                InspectionService();
+
+                                            // Call postInspectionData only once
+                                            await inspectionService
+                                                .postInspectionData(
+                                                    serialNumber);
+                                            // Delete all leads
+                                            await deleteAllLeads();
+                                            // Success message
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    "Inspection data and final verdict submitted successfully"),
+                                                backgroundColor: Colors.green,
+                                                duration: Duration(seconds: 5),
+                                              ),
+                                            );
+
+                                            // Close the loading dialog
+                                            Navigator.of(context)
+                                                .pop(); // Dismiss loading dialog
+
+                                            // Navigate to the home page and remove all previous routes
+                                            Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Homepage()), // Ensure HomePage is the correct widget
+                                              (Route<dynamic> route) =>
+                                                  false, // Remove all previous routes
+                                            );
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    "Error submitting data: $e"),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          } finally {
+                                            // Dismiss loading dialog if still open
+                                            if (Navigator.of(context)
+                                                .canPop()) {
+                                              Navigator.of(context)
+                                                  .pop(); // Dismiss loading dialog
                                             }
-                                          },
-                                    child: Text('Submit'),
-                                  ),
+                                            // Set loading to false after operation completes
+                                            setState(() {
+                                              _isLoading = false;
+                                            });
+                                          }
+                                        },
+                                  child: Text('Submit'),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         );
@@ -675,64 +761,13 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     );
   }
 
-  // bool _isUploadingVideo = false;
-  // double _videoUploadProgress = 0.0;
-  // // Function to capture video
-  // XFile? _capturedVideo;
-  // Future<void> _captureVideo() async {
-  //   try {
-  //     final XFile? video = await picker.pickVideo(
-  //       source: ImageSource.camera,
-  //       maxDuration: Duration(seconds: 15),
-  //     );
-  //     if (video != null) {
-  //       setState(() {
-  //         _capturedVideo = video;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print("Error capturing video: $e");
-  //   }
-  // }
-  // Future<void> _uploadVideoToFirebase(XFile video) async {
-  //   setState(() {
-  //     _isUploadingVideo = true;
-  //   });
-  //   final storageRef = FirebaseStorage.instance.ref().child(
-  //       'inspection/${widget.carDetails.serialNumber}/car_health/engine/video/${DateTime.now().millisecondsSinceEpoch}.mp4');
-  //   final uploadTask = storageRef.putFile(File(video.path));
-  //   uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-  //     setState(() {
-  //       _videoUploadProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-  //     });
-  //   });
-  //   await uploadTask.whenComplete(() async {
-  //     final videoUrl = await storageRef.getDownloadURL();
-  //     _saveVideoUrlToDatabase(videoUrl);
-  //     setState(() {
-  //       _isUploadingVideo = false;
-  //       _capturedVideo = null; // Clear the video after upload
-  //     });
-  //   }).catchError((error) {
-  //     print("Failed to upload video: $error");
-  //     setState(() {
-  //       _isUploadingVideo = false;
-  //     });
-  //   });
-  // }
-  // // Function to save the video URL in Firebase Realtime Database
-  // Future<void> _saveVideoUrlToDatabase(String url) async {
-  //   final serialNumber = widget.carDetails.serialNumber;
-  //   final dbRef = FirebaseDatabase.instance
-  //       .ref('inspection/$serialNumber/car_health/engine');
-  //   await dbRef.set({'video': url});
-  // }
   File? _engineVideoFile;
   Future<void> _captureEngineVideo() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickVideo(
-        source: ImageSource.camera, maxDuration: Duration(seconds: 10));
-
+      source: ImageSource.camera,
+      maxDuration: Duration(seconds: 10),
+    );
     if (pickedFile != null) {
       setState(() {
         _engineVideoFile = File(pickedFile.path);
@@ -740,35 +775,26 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     }
   }
 
-// Function to upload video to Firebase Storage
+  // Function to upload video to Firebase Storage
   Future<void> _uploadEngineVideo() async {
     if (_engineVideoFile == null) return;
-
     try {
       setState(() => _isUploading = true);
-
       final ref = FirebaseStorage.instance.ref(
           'inspection/${widget.carDetails.serialNumber}/car_health/engine/video');
       final uploadTask = ref.putFile(_engineVideoFile!);
-
       uploadTask.snapshotEvents.listen((event) {
         setState(() {
           _uploadProgress =
               event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
         });
       });
-
       final TaskSnapshot taskSnapshot = await uploadTask;
       final videoUrl = await taskSnapshot.ref.getDownloadURL();
-      DatabaseReference videoSave =
-          FirebaseDatabase.instance.ref().child('inspection').child(
-                widget.carDetails.serialNumber.toString(),
-              );
+      DatabaseReference videoSave = FirebaseDatabase.instance
+          .ref('inspection/${widget.carDetails.serialNumber}/car_health/');
       // Save video URL to Firebase Realtime Database
-      await videoSave.ref
-          .child('/car_health/engine')
-          .update({'video_url': videoUrl});
-
+      await videoSave.ref.child('engine').update({'video': videoUrl});
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Engine Video Uploaded Successfully!'),

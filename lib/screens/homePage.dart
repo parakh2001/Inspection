@@ -19,7 +19,7 @@ class Homepage extends StatefulWidget {
   _HomepageState createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
   String? evaluatorId;
   // final DatabaseReference _database = FirebaseDatabase.instance.ref('leads');
   late Future<List<Lead>> _futureLeads;
@@ -257,16 +257,18 @@ class _HomepageState extends State<Homepage> {
     }
     return leads;
   }
+
 // Helper function to validate a lead
   bool _isLeadValid(
       Lead lead, List<dynamic> evaluatorLocations, String todayDate) {
     return evaluatorLocations.contains(lead.userCity.trim()) &&
         lead.bookingDate == todayDate &&
-        lead.leadStatus == 1;
+        (lead.leadStatus == 1 || lead.leadStatus == 3);
   }
+
   Future<List<dynamic>> fetchLeadsData() async {
-    final response =
-        await http.get(Uri.parse('https://gowaggon.com/crm/api/leadlist'));
+    final response = await http
+        .get(Uri.parse('https://gowaggon.com/devlopment/api/leadlist'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       return data['data'];
@@ -274,14 +276,17 @@ class _HomepageState extends State<Homepage> {
       throw Exception('Failed to load leads data');
     }
   }
+
   void _rescheduleAction() {
     // Your logic for rescheduling, e.g., show a date picker
     print("Reschedule clicked");
   }
+
   void _cancelAction() {
     // Your logic for canceling, e.g., remove the item from the list
     print("Cancel clicked");
   }
+
   Future<void> storeLeadsData(List<dynamic> leadsData) async {
     final DatabaseReference databaseRef =
         FirebaseDatabase.instance.ref('leads_data');

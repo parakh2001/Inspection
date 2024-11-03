@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:firebase_database/firebase_database.dart';
-
+import 'package:firebase_database/firebase_database.dart'
+    show DatabaseEvent, DatabaseReference, FirebaseDatabase;
 class InspectionService {
   final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
   Future<void> sendInspectionData(Map<String, dynamic> inspectionData) async {
     try {
       final response = await http.post(
-        Uri.parse('https://gowaggon.com/crm/api/PostInspection'),
+        Uri.parse('https://gowaggon.com/devlopment/api/PostInspection'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -35,7 +35,6 @@ class InspectionService {
         await _databaseReference.child('inspection/$serialNumber').once();
     if (event.snapshot.exists && event.snapshot.value != null) {
       final data = event.snapshot.value as Map<dynamic, dynamic>;
-
       // Prepare the inspection data for the API
       Map<String, dynamic> inspectionData = {
         "serial_number": serialNumber,
@@ -90,7 +89,8 @@ class InspectionService {
           "test_drive": {
             "before_test_drive_km": data['car_health']?['test_drive']
                 ?['before_test_drive_km'],
-            "after_test_drive_km": data,
+            "after_test_drive_km": data['car_health']?['test_drive']
+                ?['after_test_drive_km'],
             "comments": data['car_health']?['test_drive']?['comments'] ?? '',
             "images": data['car_health']?['test_drive']?['images'] ?? [],
           },
