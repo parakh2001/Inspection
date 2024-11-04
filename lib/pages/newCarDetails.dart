@@ -32,7 +32,6 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       TextEditingController();
   final TextEditingController _afterTestDriveKmController =
       TextEditingController();
-
   List<File> _interiorImages = [];
   List<File> _exteriorImages = [];
   List<File> _extraImages = [];
@@ -52,6 +51,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   final TextEditingController _numberOfKeyController = TextEditingController();
   final TextEditingController _engineNumberController = TextEditingController();
   final TextEditingController _refurbCostController = TextEditingController();
+  final _variantController = TextEditingController();
+
   CarDoc? carDoc;
 
   ///rc details
@@ -88,7 +89,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     _carModelController.text = widget.carDetails.model;
     _fuelTypeController.text = widget.carDetails.fuelType;
     _transmissionController.text = widget.carDetails.transmission;
-    _ownersController.text = widget.carDetails.owner;
+    _variantController.text = widget.carDetails.variant;
     _database = FirebaseDatabase.instance.ref('inspection');
   }
 
@@ -544,7 +545,6 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       Map<String, dynamic> carHealthData = {
         'finalVerdict': _finalVerdictController.text,
         'inspectionDateTime': formattedDate,
-        'RefurbValue': _refurbCostController,
       };
       Map<String, dynamic> serialNumberData = {
         'serial_number': widget.carDetails.serialNumber,
@@ -556,6 +556,17 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       print('Error saving inspection data: $e');
       throw e;
     }
+  }
+
+  Future<void> _saveRefurbCost() async {
+    final DatabaseReference databaseRef = FirebaseDatabase.instance.ref();
+    final int refurbCost = int.tryParse(_refurbCostController.text) ?? 0;
+
+    await databaseRef
+        .child('inspection/${widget.carDetails.serialNumber}/car_health')
+        .update({
+      'refurbCost': refurbCost,
+    });
   }
 
   bool _isLoading = false;
@@ -711,12 +722,12 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                                           try {
                                             // Save inspection data to Firebase
                                             await _savefinalVerdictSerialNumber();
+                                            await _saveRefurbCost();
                                             int serialNumber =
                                                 widget.carDetails.serialNumber;
                                             InspectionService
                                                 inspectionService =
                                                 InspectionService();
-
                                             // Call postInspectionData only once
                                             await inspectionService
                                                 .postInspectionData(
@@ -1194,6 +1205,50 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     }
   }
 
+  Future<void> _selectYearMonth(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000), // Adjust as needed
+      lastDate: DateTime.now(),
+      helpText: "Select Registration Year/Month",
+    );
+    if (picked != null) {
+      // Format the date to only show "YYYY/MM"
+      final formattedDate = DateFormat('yyyy/MM').format(picked);
+      setState(() {
+        _registrationYearMonthController.text = formattedDate;
+      });
+    }
+  }
+
+  Widget _buildRegistrationTextField(
+    TextEditingController controller,
+    String labelText,
+    String? Function(String?)? validator, {
+    bool isNumber = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GestureDetector(
+        onTap: () {
+          if (labelText == "Registration Year/Month") {
+            _selectYearMonth(context); // Open date picker when tapped
+          }
+        },
+        child: AbsorbPointer(
+          // Prevent keyboard from opening
+          child: TextFormField(
+            validator: validator,
+            controller: controller,
+            keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+            decoration: InputDecoration(labelText: labelText),
+          ),
+        ),
+      ),
+    );
+  }
+
   // Method to build the Car Details section
   Widget _buildCarDetailsPage() {
     return Form(
@@ -1299,6 +1354,16 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                 (value) {
                   if (value!.isEmpty) {
                     return 'Enter Car Make';
+                  }
+                  return null;
+                },
+              ),
+              _buildTextField(
+                _variantController,
+                'Variant',
+                (value) {
+                  if (value!.isEmpty) {
+                    return 'Enter Car Variant';
                   }
                   return null;
                 },
@@ -1511,7 +1576,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
             ),
           ]),
           _buildCardExpansionTile('Registration Details', [
-            _buildTextField(
+            _buildRegistrationTextField(
               _registrationYearMonthController,
               'Registration Year/Month',
               (value) {
@@ -1568,6 +1633,9 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                 return showErrorSnackBar(
                     context: context,
                     errorMsg: "Enter Registration Year/Month");
+              } else if (_variantController.text.isEmpty) {
+                return showErrorSnackBar(
+                    context: context, errorMsg: "Enter Variant");
               }
               if (_formKey.currentState!.validate()) {
                 _saveCarDetails();
@@ -1625,7 +1693,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
           _numberOfKeyController.text.isEmpty ||
           _ownersController.text.isEmpty ||
           _rcNumberController.text.isEmpty ||
-          _registrationYearMonthController.text.isEmpty) {
+          _registrationYearMonthController.text.isEmpty ||
+          _variantController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please fill in all the required fields.'),
@@ -1675,6 +1744,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
             "images": carImageUrl,
             "mfg_year_month": _mfgYearMonthController.text,
             "transmission": _transmissionController.text,
+            "variant": _variantController.text,
           },
           "others": {
             "chassisNumberImage": chassisNumberImageUrl,

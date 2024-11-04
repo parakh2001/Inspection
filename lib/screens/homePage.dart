@@ -258,7 +258,7 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
     return leads;
   }
 
-// Helper function to validate a lead
+  // Helper function to validate a lead
   bool _isLeadValid(
       Lead lead, List<dynamic> evaluatorLocations, String todayDate) {
     return evaluatorLocations.contains(lead.userCity.trim()) &&
@@ -332,7 +332,6 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       }
     }
   }
-
   void saveLeadsToFirebase() async {
     try {
       List<dynamic> leadsData = await fetchLeadsData();
@@ -342,7 +341,6 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       print('Failed to save leads: $e');
     }
   }
-
   Future<void> _refreshLeads() async {
     try {
       // Step 2: Fetch new leads from the API
@@ -351,7 +349,6 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       setState(() {
         _futureLeads = fetchLeads();
       });
-
       // Optional: Show a success message
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Leads refreshed successfully."),
@@ -360,13 +357,14 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
     } catch (error) {
       // Handle errors if any
       print("Failed to refresh leads: $error");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Failed to refresh leads: $error"),
-        backgroundColor: Colors.red,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to refresh leads: $error"),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
