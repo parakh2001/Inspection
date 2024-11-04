@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:inspection/model/car_details.dart';
 import 'package:inspection/screens/homePage.dart';
@@ -50,6 +51,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   final TextEditingController _ownersController = TextEditingController();
   final TextEditingController _numberOfKeyController = TextEditingController();
   final TextEditingController _engineNumberController = TextEditingController();
+  final TextEditingController _refurbCostController = TextEditingController();
   CarDoc? carDoc;
 
   ///rc details
@@ -81,11 +83,23 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   @override
   void initState() {
     super.initState();
+    _mfgYearMonthController.text = widget.carDetails.manfYear;
+    _carMakeController.text = widget.carDetails.brand;
+    _carModelController.text = widget.carDetails.model;
+    _fuelTypeController.text = widget.carDetails.fuelType;
+    _transmissionController.text = widget.carDetails.transmission;
+    _ownersController.text = widget.carDetails.owner;
     _database = FirebaseDatabase.instance.ref('inspection');
   }
 
   @override
   void dispose() {
+    _mfgYearMonthController.dispose();
+    _carMakeController.dispose();
+    _carModelController.dispose();
+    _fuelTypeController.dispose();
+    _transmissionController.dispose();
+    _ownersController.dispose();
     _beforeTestDriveKmController.dispose();
     _afterTestDriveKmController.dispose();
     super.dispose();
@@ -94,7 +108,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> _pickImage(List<File> sectionImages, String sectionName) async {
     if (sectionImages.length < 20) {
       final XFile? image =
-          await picker.pickImage(source: ImageSource.camera, imageQuality: 10);
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 30);
       if (image != null) {
         setState(() {
           sectionImages.add(File(image.path));
@@ -276,10 +290,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
         final Reference reference = FirebaseStorage.instance.ref(imageRefPath);
         final UploadTask uploadTask = reference.putFile(image);
         final TaskSnapshot snapshot = await uploadTask;
-
         if (snapshot.state == TaskState.success) {
           final String downloadUrl = await snapshot.ref.getDownloadURL();
-
           // Avoid duplicate URLs by checking if it's already in the list
           if (!uploadedImageUrls.contains(downloadUrl)) {
             uploadedImageUrls.add(downloadUrl);
@@ -290,7 +302,6 @@ class _CarDetailsPageState extends State<CarDetailsPage>
         throw Exception("Error uploading images.");
       }
     }
-
     return uploadedImageUrls;
   }
 
@@ -320,8 +331,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
         body: IndexedStack(
           index: _selectedIndex,
           children: [
-            _buildCarDetailsPage(), // Car Details Page
-            _buildNewInspectionPage(), // Inspection Page
+            _buildCarDetailsPage(),
+            _buildNewInspectionPage(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -367,20 +378,16 @@ class _CarDetailsPageState extends State<CarDetailsPage>
           existingImageUrls = List<String>.from(existingData['images']);
         }
       }
-
       // Upload new images, avoiding duplicates
       List<String> imageUrls = await _uploadImages(
           images, sectionName, serialNumber, existingImageUrls);
-
       // Ensure the URLs are unique and up-to-date
       imageUrls = imageUrls.toSet().toList();
-
       // Prepare section data with updated image URLs
       final sectionData = {
         'comments': commentsController.text,
         'images': imageUrls,
       };
-
       print("Saving data for $sectionName: $sectionData");
       await sectionRef.set(sectionData);
       print("$sectionName data saved successfully");
@@ -537,6 +544,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       Map<String, dynamic> carHealthData = {
         'finalVerdict': _finalVerdictController.text,
         'inspectionDateTime': formattedDate,
+        'RefurbValue': _refurbCostController,
       };
       Map<String, dynamic> serialNumberData = {
         'serial_number': widget.carDetails.serialNumber,
@@ -625,6 +633,24 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                                 },
                               ),
                               const SizedBox(height: 16.0),
+                              TextFormField(
+                                controller: _refurbCostController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                decoration: InputDecoration(
+                                  labelText: 'Refurb Cost',
+                                  hintText: 'Enter refurb cost',
+                                ),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter refurb cost';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
                               Container(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16.0),
@@ -707,11 +733,9 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                                                 duration: Duration(seconds: 5),
                                               ),
                                             );
-
                                             // Close the loading dialog
                                             Navigator.of(context)
                                                 .pop(); // Dismiss loading dialog
-
                                             // Navigate to the home page and remove all previous routes
                                             Navigator.pushAndRemoveUntil(
                                               context,
@@ -1198,7 +1222,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                     onTap: () async {
                       if (selectedRcImage == null) {
                         final XFile? image = await picker.pickImage(
-                            source: ImageSource.camera, imageQuality: 10);
+                            source: ImageSource.camera, imageQuality: 30);
                         if (image != null) {
                           setState(
                             () {
@@ -1317,8 +1341,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                     onTap: () async {
                       if (selectedCarImage == null) {
                         final XFile? image = await picker.pickImage(
-                            source: ImageSource.camera, imageQuality: 10);
-
+                            source: ImageSource.camera, imageQuality: 30);
                         if (image != null) {
                           setState(() {
                             _selectedCarImage = XFile(image.path);
@@ -1424,7 +1447,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                   onTap: () async {
                     if (selectedChassisNumberImage == null) {
                       final XFile? image = await picker.pickImage(
-                          source: ImageSource.camera, imageQuality: 10);
+                          source: ImageSource.camera, imageQuality: 30);
                       if (image != null) {
                         setState(() {
                           _selectedChassisNumberImage = XFile(image.path);
@@ -1560,7 +1583,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> pickRcImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 10);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
     if (image != null) {
       setState(() {
         _selectedRcImage = image;
@@ -1571,7 +1594,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> pickCarImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 10);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
     if (image != null) {
       setState(() {
         _selectedCarImage = image;
@@ -1582,7 +1605,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> pickChassisNumberImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 10);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
     if (image != null) {
       setState(() {
         _selectedChassisNumberImage = image;
