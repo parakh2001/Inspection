@@ -26,8 +26,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   double _uploadProgress = 0.0;
   int _selectedIndex = 0;
   final _formKey = GlobalKey<FormState>();
-  final _formInspectionKey = GlobalKey<FormState>();
-  final _formBottomKey = GlobalKey<FormState>();
+  // final _formInspectionKey = GlobalKey<FormState>();
+  // final _formBottomKey = GlobalKey<FormState>();
   final TextEditingController _beforeTestDriveKmController =
       TextEditingController();
   final TextEditingController _afterTestDriveKmController =
@@ -52,12 +52,14 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   final TextEditingController _engineNumberController = TextEditingController();
   final TextEditingController _refurbCostController = TextEditingController();
   final _variantController = TextEditingController();
-
   CarDoc? carDoc;
+  List<File> imageList = [];
+  String? _insuranceType;
+  XFile? _capturedInsuranceImage;
+  String? captureInsuranceImageUrl;
 
   ///rc details
   final TextEditingController _rcNumberController = TextEditingController();
-  List<File> imageList = [];
   //video
   final TextEditingController engineNoiseVideo = TextEditingController();
   final TextEditingController testDriveVideo = TextEditingController();
@@ -72,7 +74,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   XFile? _selectedRcImage;
   XFile? _selectedCarImage;
   XFile? _selectedChassisNumberImage;
-  List<File> _selectedOtherImages = [];
+  // List<File> _selectedOtherImages = [];
   //Image String
   String? selectedRcImage;
   String? selectedCarImage;
@@ -90,7 +92,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     _fuelTypeController.text = widget.carDetails.fuelType;
     _transmissionController.text = widget.carDetails.transmission;
     _variantController.text = widget.carDetails.variant;
-    _database = FirebaseDatabase.instance.ref('inspection');
+    _database = FirebaseDatabase.instance.ref('testing_inspection');
   }
 
   @override
@@ -109,7 +111,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> _pickImage(List<File> sectionImages, String sectionName) async {
     if (sectionImages.length < 20) {
       final XFile? image =
-          await picker.pickImage(source: ImageSource.camera, imageQuality: 30);
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 60);
       if (image != null) {
         setState(() {
           sectionImages.add(File(image.path));
@@ -122,85 +124,6 @@ class _CarDetailsPageState extends State<CarDetailsPage>
         ),
       );
     }
-  }
-
-  Widget _buildSection(
-    String title,
-    TextEditingController commentsController,
-  ) {
-    return ExpansionTile(
-      title: Text(
-        title,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      trailing: Icon(Icons.keyboard_arrow_down),
-      children: [
-        SizedBox(height: 10),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: imageList.length +
-                (imageList.length < 20
-                    ? 1
-                    : 0), // Conditionally add an extra slot for "Add Image"
-            itemBuilder: (context, index) {
-              // If we are at the last index and haven't reached 20 images yet, show "Upload Image"
-              if (index == imageList.length && imageList.length < 20) {
-                return GestureDetector(
-                  onTap: () {
-                    _pickImage(imageList, title);
-                  },
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(width: 1, color: Colors.grey),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "Upload Image",
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),
-                  ),
-                );
-              }
-              // Else, display the images
-              else if (index < imageList.length) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: FileImage(imageList[index]),
-                        fit: BoxFit.cover,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-        ),
-        SizedBox(height: 20),
-        TextField(
-          controller: commentsController,
-          decoration: InputDecoration(
-            labelText: "$title Remarks",
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 4,
-        ),
-        SizedBox(height: 20),
-      ],
-    );
   }
 
   Future<String> uploadCarDetailsImage({
@@ -279,14 +202,12 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     List<String> existingImageUrls,
   ) async {
     List<String> uploadedImageUrls = List.from(existingImageUrls);
-
     for (File image in images) {
       try {
         // Generate a unique file name for each image
         final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
         final String imageRefPath =
-            'inspection/$serialNumber/car_health/$sectionName/$fileName';
-
+            'testing-inspection/$serialNumber/car_health/$sectionName/$fileName';
         // Upload image and retrieve the download URL
         final Reference reference = FirebaseStorage.instance.ref(imageRefPath);
         final UploadTask uploadTask = reference.putFile(image);
@@ -367,7 +288,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     try {
       // Reference to the section in Realtime Database
       DatabaseReference sectionRef = FirebaseDatabase.instance
-          .ref('inspection/$serialNumber/car_health/$sectionName');
+          .ref('testing-inspection/$serialNumber/car_health/$sectionName');
 
       // Retrieve existing image URLs, if any
       final sectionSnapshot = await sectionRef.get();
@@ -494,8 +415,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     try {
       // Reference to the section in Realtime Database
       DatabaseReference sectionRef = FirebaseDatabase.instance
-          .ref('inspection/$serialNumber/car_health/$sectionName');
-
+          .ref('testing-inspection/$serialNumber/car_health/$sectionName');
       // Retrieve existing image URLs, if any
       final sectionSnapshot = await sectionRef.get();
       List<String> existingImageUrls = [];
@@ -531,13 +451,13 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       // Define the database reference based on the serial number
       DatabaseReference carHealthRef = FirebaseDatabase.instance
           .ref()
-          .child('inspection')
+          .child('testing-inspection')
           .child(
             widget.carDetails.serialNumber.toString(),
           )
           .child('car_health');
       DatabaseReference serialNumberRef =
-          FirebaseDatabase.instance.ref().child('inspection').child(
+          FirebaseDatabase.instance.ref().child('testing-inspection').child(
                 widget.carDetails.serialNumber.toString(),
               );
       DateTime now = DateTime.now();
@@ -561,9 +481,9 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> _saveRefurbCost() async {
     final DatabaseReference databaseRef = FirebaseDatabase.instance.ref();
     final int refurbCost = int.tryParse(_refurbCostController.text) ?? 0;
-
     await databaseRef
-        .child('inspection/${widget.carDetails.serialNumber}/car_health')
+        .child(
+            'testing-inspection/${widget.carDetails.serialNumber}/car_health')
         .update({
       'refurbCost': refurbCost,
     });
@@ -582,8 +502,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
               children: [
                 Scaffold(
                   appBar: AppBar(
-                    automaticallyImplyLeading:
-                        false, // Remove default back button
+                    automaticallyImplyLeading: false,
                     title: Text('Add Final Verdict'),
                     actions: [
                       IconButton(
@@ -607,25 +526,21 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                             children: [
                               TextFormField(
                                 controller: _finalVerdictController,
-                                maxLines: null, // Allow multiline input
+                                maxLines: null,
                                 keyboardType: TextInputType.multiline,
                                 decoration: InputDecoration(
                                   labelText: 'Final Verdict',
                                   hintText: 'Enter your final verdict',
                                 ),
                                 onChanged: (value) {
-                                  // Check if the input is empty and set the first bullet point
                                   if (value.isEmpty) {
                                     _finalVerdictController.value =
                                         TextEditingValue(
-                                      text:
-                                          '• ', // Start with a bullet point if input is empty
-                                      selection: TextSelection.collapsed(
-                                          offset:
-                                              2), // Place cursor after the bullet point
+                                      text: '• ',
+                                      selection:
+                                          TextSelection.collapsed(offset: 2),
                                     );
                                   } else if (value.endsWith('\n')) {
-                                    // If the last character is a newline, add a bullet point on the new line
                                     String formattedValue =
                                         value.trimRight() + '\n• ';
                                     _finalVerdictController.value =
@@ -801,7 +716,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     final picker = ImagePicker();
     final pickedFile = await picker.pickVideo(
       source: ImageSource.camera,
-      maxDuration: Duration(seconds: 10),
+      maxDuration: Duration(seconds: 15),
     );
     if (pickedFile != null) {
       setState(() {
@@ -816,7 +731,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     try {
       setState(() => _isUploading = true);
       final ref = FirebaseStorage.instance.ref(
-          'inspection/${widget.carDetails.serialNumber}/car_health/engine/video');
+          'testing-inspection/${widget.carDetails.serialNumber}/car_health/engine/video');
       final uploadTask = ref.putFile(_engineVideoFile!);
       uploadTask.snapshotEvents.listen((event) {
         setState(() {
@@ -826,8 +741,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       });
       final TaskSnapshot taskSnapshot = await uploadTask;
       final videoUrl = await taskSnapshot.ref.getDownloadURL();
-      DatabaseReference videoSave = FirebaseDatabase.instance
-          .ref('inspection/${widget.carDetails.serialNumber}/car_health/');
+      DatabaseReference videoSave = FirebaseDatabase.instance.ref(
+          'testing-inspection/${widget.carDetails.serialNumber}/car_health/');
       // Save video URL to Firebase Realtime Database
       await videoSave.ref.child('engine').update({'video': videoUrl});
       ScaffoldMessenger.of(context).showSnackBar(
@@ -921,24 +836,19 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               children: [
-                SizedBox(height: 10),
                 ElevatedButton.icon(
                   onPressed: _captureEngineVideo,
                   icon: Icon(Icons.videocam),
                   label: Text('Capture Engine Video'),
                 ),
-                SizedBox(height: 10),
                 if (_engineVideoFile != null)
                   ElevatedButton.icon(
                     onPressed: _uploadEngineVideo,
                     icon: Icon(Icons.cloud_upload),
                     label: Text('Upload Engine Video'),
                   ),
-                SizedBox(height: 20),
               ],
             ),
-            SizedBox(height: 20),
-
             // Test Drive Section
             ExpansionTile(
               title: Text(
@@ -1052,12 +962,11 @@ class _CarDetailsPageState extends State<CarDetailsPage>
 // Helper function to build image section
   Widget _buildImageSection(List<File> imageList, String sectionName) {
     return SizedBox(
-      height: 120, // Increased height for better spacing
+      height: 120,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: imageList.length + (imageList.length < 20 ? 1 : 0),
         itemBuilder: (context, index) {
-          // "Add Image" Button
           if (index == imageList.length && imageList.length < 20) {
             return GestureDetector(
               onTap: () {
@@ -1067,13 +976,13 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                 height: 100,
                 width: 100,
                 decoration: BoxDecoration(
-                  color: Colors.blueAccent, // Change to a color that stands out
+                  color: Colors.blueAccent,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 8,
-                      offset: Offset(0, 4), // Shadow position
+                      offset: Offset(0, 4),
                     ),
                   ],
                 ),
@@ -1095,16 +1004,11 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                 ),
               ),
             );
-          }
-          // Display existing images
-          else if (index < imageList.length) {
+          } else if (index < imageList.length) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: GestureDetector(
-                onTap: () {
-                  // Optional: Show a larger version of the image when clicked
-                  // _showImagePreview(imageList[index]);
-                },
+                onTap: () {},
                 child: Stack(
                   alignment: Alignment.topRight,
                   children: [
@@ -1126,7 +1030,6 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                         ],
                       ),
                     ),
-                    // Enhanced Remove Button
                     Positioned(
                       right: 0,
                       top: 0,
@@ -1137,7 +1040,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                           size: 28,
                         ),
                         onPressed: () {
-                          _removeImage(index);
+                          _removeImage(index, imageList); // Pass imageList here
                         },
                       ),
                     ),
@@ -1146,19 +1049,17 @@ class _CarDetailsPageState extends State<CarDetailsPage>
               ),
             );
           } else {
-            return Container(); // Empty container for padding
+            return Container();
           }
         },
       ),
     );
   }
 
-// Method to remove an image from the list
-// This function is not tested as of 5:47am 20-10-2024
-  void _removeImage(int index) {
+  void _removeImage(int index, List<File> imageList) {
     setState(() {
       if (index >= 0 && index < imageList.length) {
-        print("Removing image at index: $index"); // Debug print
+        print("Removing image at index: $index");
         imageList.removeAt(index);
       } else {
         print("Index out of range: $index");
@@ -1166,50 +1067,11 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     });
   }
 
-  Future<void> _pickCarDetailsImage() async {
-    final List<XFile>? image = await picker.pickMultiImage(
-      limit: 10,
-    );
-
-    if (image != null) {
-      setState(() {
-        image.forEach(
-          (element) {
-            _selectedOtherImages.add(File(element.path));
-          },
-        );
-      });
-      image.forEach(
-        (element) async {
-          final File file = File(element.path);
-          final String fileName =
-              '${DateTime.now().millisecondsSinceEpoch}.jpg';
-          final Reference reference = storage.ref(
-              'inspection/${widget.carDetails.serialNumber}/car_doc/other_details/images/$fileName');
-          final UploadTask uploadTask = reference.putFile(file);
-          final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(
-            () {},
-          );
-          if (taskSnapshot.bytesTransferred == taskSnapshot.totalBytes) {
-            final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-            setState(() {
-              selectedOtherImages.add(downloadUrl);
-            });
-            print('Image uploaded successfully: $downloadUrl');
-          } else {
-            // Image upload failed
-            print('Image upload failed');
-          }
-        },
-      );
-    }
-  }
-
   Future<void> _selectYearMonth(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000), // Adjust as needed
+      firstDate: DateTime(2000),
       lastDate: DateTime.now(),
       helpText: "Select Registration Year/Month",
     );
@@ -1233,7 +1095,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
       child: GestureDetector(
         onTap: () {
           if (labelText == "Registration Year/Month") {
-            _selectYearMonth(context); // Open date picker when tapped
+            _selectYearMonth(context);
           }
         },
         child: AbsorbPointer(
@@ -1247,6 +1109,63 @@ class _CarDetailsPageState extends State<CarDetailsPage>
         ),
       ),
     );
+  }
+
+// Method to capture an insurance image from the camera
+  Future<void> captureInsuranceImage() async {
+    final XFile? image =
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 60);
+    if (image != null) {
+      setState(() {
+        _capturedInsuranceImage = image;
+      });
+
+      // Upload the image
+      final result = await uploadImage(
+        imageVar: image,
+        imageRef:
+            'testing-inspection/${widget.carDetails.serialNumber}/car_doc/insurance',
+      );
+
+      // Retrieve and set the download URL if the upload was successful
+      if (result.isNotEmpty) {
+        final downloadUrl = await FirebaseStorage.instance
+            .ref(
+                'testing-inspection/${widget.carDetails.serialNumber}/car_doc/insurance')
+            .getDownloadURL();
+        setState(() {
+          captureInsuranceImageUrl = downloadUrl;
+        });
+      }
+    }
+  }
+
+// Method to upload an insurance image from the gallery
+  Future<void> uploadInsuranceImage() async {
+    final XFile? image =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 60);
+    if (image != null) {
+      setState(() {
+        _capturedInsuranceImage = image;
+      });
+
+      // Upload the image
+      final result = await uploadImage(
+        imageVar: image,
+        imageRef:
+            'testing-inspection/${widget.carDetails.serialNumber}/car_doc/insurance',
+      );
+      // Retrieve and set the download URL if the upload was successful
+      if (result.isNotEmpty) {
+        final downloadUrl = await FirebaseStorage.instance
+            .ref(
+                'testing-inspection/${widget.carDetails.serialNumber}/car_doc/insurance')
+            .getDownloadURL();
+        setState(() {
+          captureInsuranceImageUrl = downloadUrl;
+        });
+      }
+    }
   }
 
   // Method to build the Car Details section
@@ -1277,7 +1196,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                     onTap: () async {
                       if (selectedRcImage == null) {
                         final XFile? image = await picker.pickImage(
-                            source: ImageSource.camera, imageQuality: 30);
+                            source: ImageSource.camera, imageQuality: 60);
                         if (image != null) {
                           setState(
                             () {
@@ -1287,7 +1206,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                           final result = await uploadImage(
                             imageVar: image,
                             imageRef:
-                                'inspection/${widget.carDetails.serialNumber}/car_doc/rc_details',
+                                'testing-inspection/${widget.carDetails.serialNumber}/car_doc/rc_details',
                           );
                           if (result.isNotEmpty) {
                             setState(
@@ -1406,7 +1325,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                     onTap: () async {
                       if (selectedCarImage == null) {
                         final XFile? image = await picker.pickImage(
-                            source: ImageSource.camera, imageQuality: 30);
+                            source: ImageSource.camera, imageQuality: 60);
                         if (image != null) {
                           setState(() {
                             _selectedCarImage = XFile(image.path);
@@ -1414,7 +1333,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                           final result = await uploadImage(
                             imageVar: image,
                             imageRef:
-                                'inspection/${widget.carDetails.serialNumber}/car_doc/car_details',
+                                'testing-inspection/${widget.carDetails.serialNumber}/car_doc/car_details',
                           );
                           if (result.isNotEmpty) {
                             setState(() {
@@ -1512,7 +1431,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                   onTap: () async {
                     if (selectedChassisNumberImage == null) {
                       final XFile? image = await picker.pickImage(
-                          source: ImageSource.camera, imageQuality: 30);
+                          source: ImageSource.camera, imageQuality: 60);
                       if (image != null) {
                         setState(() {
                           _selectedChassisNumberImage = XFile(image.path);
@@ -1520,7 +1439,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                         final result = await uploadImage(
                           imageVar: image,
                           imageRef:
-                              'inspection/${widget.carDetails.serialNumber}/car_doc/other_details/chassis_number_image/',
+                              'testing-inspection/${widget.carDetails.serialNumber}/car_doc/other_details/chassis_number_image/',
                         );
                         if (result.isNotEmpty) {
                           setState(() {
@@ -1575,6 +1494,106 @@ class _CarDetailsPageState extends State<CarDetailsPage>
               },
             ),
           ]),
+          _buildCardExpansionTile(
+            'Insurance Details',
+            [
+              DropdownButtonFormField<String>(
+                value: _insuranceType, // Initially null
+                hint: const Text('Select Insurance Type'),
+                items: [
+                  'Comprehensive',
+                  'Zero Depreciation',
+                  'Third-Party',
+                  'Not Available'
+                ].map((String type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _insuranceType = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select insurance type';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: captureInsuranceImage,
+                    child: _capturedInsuranceImage != null
+                        ? Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              image: DecorationImage(
+                                image: FileImage(
+                                  File(_capturedInsuranceImage!.path),
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(width: 1, color: Colors.grey),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Capture Image",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                  ),
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: uploadInsuranceImage,
+                    child: _capturedInsuranceImage != null
+                        ? Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              image: DecorationImage(
+                                image: FileImage(
+                                  File(_capturedInsuranceImage!.path),
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(width: 1, color: Colors.grey),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Upload Image",
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           _buildCardExpansionTile('Registration Details', [
             _buildRegistrationTextField(
               _registrationYearMonthController,
@@ -1651,7 +1670,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> pickRcImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 60);
     if (image != null) {
       setState(() {
         _selectedRcImage = image;
@@ -1662,7 +1681,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> pickCarImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 60);
     if (image != null) {
       setState(() {
         _selectedCarImage = image;
@@ -1673,7 +1692,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   Future<void> pickChassisNumberImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 60);
     if (image != null) {
       setState(() {
         _selectedChassisNumberImage = image;
@@ -1694,7 +1713,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
           _ownersController.text.isEmpty ||
           _rcNumberController.text.isEmpty ||
           _registrationYearMonthController.text.isEmpty ||
-          _variantController.text.isEmpty) {
+          _variantController.text.isEmpty ||
+          _insuranceType!.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please fill in all the required fields.'),
@@ -1734,6 +1754,14 @@ class _CarDetailsPageState extends State<CarDetailsPage>
               'inspection/${widget.carDetails.serialNumber}/other_details/chassis_number_image',
         );
       }
+      if (_capturedInsuranceImage != null) {
+        captureInsuranceImageUrl = await uploadCarDetailsImage(
+          imageVar: _capturedInsuranceImage!,
+          imageRef:
+              'inspection/${widget.carDetails.serialNumber}/insurance/insurance',
+        );
+      }
+
       // Prepare car details data
       Map<String, dynamic> carDetailsData = {
         "car_doc": {
@@ -1754,6 +1782,10 @@ class _CarDetailsPageState extends State<CarDetailsPage>
             "noOfKeys": int.parse(_numberOfKeyController.text),
             "owners": int.parse(_ownersController.text),
           },
+          "insurance": {
+            "insurance_type": _insuranceType,
+            "insurance_image": captureInsuranceImageUrl
+          },
           "rc_details": {
             "rc_image": rcImageUrl,
             "rc_number": _rcNumberController.text,
@@ -1763,12 +1795,8 @@ class _CarDetailsPageState extends State<CarDetailsPage>
           },
         }
       };
-      // Save the car details to Firebase
-      // await _database.ref
-      //     .child('${widget.carDetails.serialNumber}')
-      //     .set(carDetailsData);
       DatabaseReference carDocRef =
-          FirebaseDatabase.instance.ref().child('inspection').child(
+          FirebaseDatabase.instance.ref().child('testing-inspection').child(
                 widget.carDetails.serialNumber.toString(),
               );
       await carDocRef.set(carDetailsData);
@@ -1801,57 +1829,6 @@ class _CarDetailsPageState extends State<CarDetailsPage>
         controller: controller,
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         decoration: InputDecoration(labelText: labelText),
-      ),
-    );
-  }
-
-  // Helper method to create sections with an expandable tile
-  Widget _buildExpansionSubTile(
-    String title,
-    List<Widget> children,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        right: 10,
-        left: 10,
-      ),
-      child: ExpansionTile(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero, // No border radius
-          side: BorderSide.none, // No border
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        children: children,
-      ),
-    );
-  }
-
-  // Helper method to create sections with an expandable tile
-  Widget _buildExpansionTile(String title, List<Widget> children) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        right: 10,
-        left: 10,
-      ),
-      child: ExpansionTile(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero, // No border radius
-          side: BorderSide.none, // No border
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        children: children,
       ),
     );
   }

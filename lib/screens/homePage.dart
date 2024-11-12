@@ -265,7 +265,6 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
         lead.bookingDate == todayDate &&
         (lead.leadStatus == 1 || lead.leadStatus == 3);
   }
-
   Future<List<dynamic>> fetchLeadsData() async {
     final response = await http
         .get(Uri.parse('https://gowaggon.com/devlopment/api/leadlist'));
@@ -276,7 +275,6 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       throw Exception('Failed to load leads data');
     }
   }
-
   void _rescheduleAction() {
     // Your logic for rescheduling, e.g., show a date picker
     print("Reschedule clicked");
@@ -332,6 +330,7 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       }
     }
   }
+
   void saveLeadsToFirebase() async {
     try {
       List<dynamic> leadsData = await fetchLeadsData();
@@ -341,6 +340,7 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       print('Failed to save leads: $e');
     }
   }
+
   Future<void> _refreshLeads() async {
     try {
       // Step 2: Fetch new leads from the API
@@ -365,6 +365,7 @@ class _HomepageState extends State<Homepage> with WidgetsBindingObserver {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

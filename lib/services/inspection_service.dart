@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_database/firebase_database.dart'
     show DatabaseEvent, DatabaseReference, FirebaseDatabase;
+
 class InspectionService {
   final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
   Future<void> sendInspectionData(Map<String, dynamic> inspectionData) async {
@@ -48,6 +49,7 @@ class InspectionService {
                 data['car_doc']?['car_details']?['mfg_year_month'] ?? 'N/A',
             "transmission":
                 data['car_doc']?['car_details']?['transmission'] ?? 'N/A',
+            "variant": data['car_doc']?['car_details']?['variant'] ?? 'N/A',
           },
           "others": {
             "chassisNumberImage":
@@ -81,11 +83,14 @@ class InspectionService {
             "images": data['car_health']?['extra']?['images'] ?? [],
           },
           "finalVerdict": data['car_health']?['finalVerdict'] ?? 'N/A',
+          // "refurbCost": data['car_health']?['refurbCost'] ?? 'N/A',
           "interior": {
             "comments": data['car_health']?['interior']?['comments'] ?? '',
             "images": data['car_health']?['interior']?['images'] ?? [],
           },
-          "engine": {"video": ""},
+          "engine": {
+            "video": data['car_health']?['engine']?['video'] ?? 'N/A',
+          },
           "test_drive": {
             "before_test_drive_km": data['car_health']?['test_drive']
                 ?['before_test_drive_km'],
